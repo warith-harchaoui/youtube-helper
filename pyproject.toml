@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "youtube-helper"
-version = "1.1.0"
+version = "1.1.1"
 description = "YouTube Helper — yt-dlp wrapper for downloading videos / audio / thumbnails, resolving direct media URLs, browsing video stream catalogs, and pulling no-API engagement metadata (channel / video / comments / subtitles) on YouTube, Vimeo, DailyMotion, Twitch VOD, SoundCloud, and any yt-dlp-supported source."
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
@@ -29,8 +29,8 @@ classifiers = [
 ]
 dependencies = [
     "os-helper @ git+https://github.com/warith-harchaoui/os-helper.git@v1.3.0",
-    "audio-helper @ git+https://github.com/warith-harchaoui/audio-helper.git@v1.4.1",
-    "video-helper @ git+https://github.com/warith-harchaoui/video-helper.git@v1.5.0",
+    "audio-helper @ git+https://github.com/warith-harchaoui/audio-helper.git@v1.4.2",
+    "video-helper @ git+https://github.com/warith-harchaoui/video-helper.git@v1.5.1",
     "yt-dlp>=2024.12.23",
     "ffmpeg-python>=0.2.0,<0.3.0",
 ]
@@ -50,4 +50,4 @@ addopts = "-m 'not integration'"
 
 [tool.setuptools.packages.find]
 include = ["youtube_helper*"]
-exclude = ["tests*"]
+exclude = ["tests*", "assets*"]
