@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "youtube-helper"
+version = "1.1.0"
+description = "YouTube Helper — yt-dlp wrapper for downloading videos / audio / thumbnails, resolving direct media URLs, browsing video stream catalogs, and pulling no-API engagement metadata (channel / video / comments / subtitles) on YouTube, Vimeo, DailyMotion, Twitch VOD, SoundCloud, and any yt-dlp-supported source."
+readme = "README.md"
+requires-python = ">=3.10,<3.14"
+license = {text = "BSD-3-Clause"}
+authors = [
+    {name = "Warith HARCHAOUI", email = "warithmetics@deraison.ai"},
+]
+keywords = ["yt-dlp", "youtube", "vimeo", "dailymotion", "twitch", "soundcloud", "video", "audio", "branding", "engagement"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Multimedia :: Video",
+    "Topic :: Multimedia :: Sound/Audio",
+    "Topic :: Internet :: WWW/HTTP",
+]
+dependencies = [
+    "os-helper @ git+https://github.com/warith-harchaoui/os-helper.git@v1.3.0",
+    "audio-helper @ git+https://github.com/warith-harchaoui/audio-helper.git@v1.4.1",
+    "video-helper @ git+https://github.com/warith-harchaoui/video-helper.git@v1.5.0",
+    "yt-dlp>=2024.12.23",
+    "ffmpeg-python>=0.2.0,<0.3.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[project.urls]
+Homepage = "https://github.com/warith-harchaoui/youtube-helper"
+Issues = "https://github.com/warith-harchaoui/youtube-helper/issues"
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: tests that hit live external services (e.g. YouTube). Slow and fragile; skipped by default.",
+]
+addopts = "-m 'not integration'"
+
+[tool.setuptools.packages.find]
+include = ["youtube_helper*"]
+exclude = ["tests*"]
