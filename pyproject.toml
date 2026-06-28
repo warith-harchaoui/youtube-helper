@@ -33,6 +33,7 @@ dependencies = [
     "video-helper @ git+https://github.com/warith-harchaoui/video-helper.git@v1.5.1",
     "yt-dlp>=2024.12.23",
     "ffmpeg-python>=0.2.0,<0.3.0",
+    "pillow>=10,<12",
 ]
 
 [project.optional-dependencies]
