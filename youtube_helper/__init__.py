@@ -36,12 +36,13 @@ __all__ = [
     "download_thumbnail",
     "download_audio",
     "download_video",
-    # streaming — URL resolver + catalog/picker
+    # streaming — URL resolver + catalog/picker + one-call frame stream
     "resolve_direct_url",
     "DirectMediaURL",
     "list_video_streams",
     "pick_video_stream",
     "VideoStreamInfo",
+    "extract_frames_stream",
     # branding — engagement / channel helpers (no Data / Analytics API)
     "channel_info",
     "channel_videos",
@@ -66,6 +67,7 @@ from .main import (
 from .streaming import (
     DirectMediaURL,
     VideoStreamInfo,
+    extract_frames_stream,
     list_video_streams,
     pick_video_stream,
     resolve_direct_url,

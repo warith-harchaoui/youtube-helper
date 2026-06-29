@@ -46,7 +46,7 @@ sudo apt install ffmpeg
 
 ## Install `YouTube Helper`:
 ```bash
-pip install --force-reinstall --no-cache-dir git+https://github.com/warith-harchaoui/youtube-helper.git@v1.1.2
+pip install --force-reinstall --no-cache-dir git+https://github.com/warith-harchaoui/youtube-helper.git@v1.2.0
 ```
 
 # Usage
@@ -124,6 +124,7 @@ YouTube Helper is a thin wrapper around `yt-dlp` and `ffmpeg`. You are responsib
 - `resolve_direct_url(url, prefer="audio"|"video")` → quick "give me one direct ffmpeg-ready URL".
 - `list_video_streams(url)` → enumerate every video format yt-dlp finds (codec, resolution, fps, bitrate, …).
 - `pick_video_stream(url, prefer_codec=, prefer_format=, max_fps=, language=, cookies_from_browser=)` → constrained picker, returns one `VideoStreamInfo` ready to feed `video_helper.extract_frames`.
+- `extract_frames_stream(url, ..., **extract_frames_kwargs)` → one-call composition of `pick_video_stream` + `video_helper.extract_frames`, auto-wires headers, forwards any `extract_frames` kwarg (`destination`, `device`, `batch_size`, `output_width`, `frame_step`, …). The shortest path from a YouTube / Vimeo / Twitch URL to ML-ready frames.
 - Audio stream catalog / picker intentionally lives in **podcast-helper** (single owner for audio PCM streaming).
 
 **No-API engagement metadata** — `youtube_helper.branding`

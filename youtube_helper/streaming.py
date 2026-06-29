@@ -472,3 +472,150 @@ def pick_video_stream(
         len(matching),
     )
     return chosen
+
+
+# ──────────────────────────────────────────────────────────────────────────
+#  extract_frames_stream — one-call composition over pick_video_stream +
+#  video_helper.extract_frames
+# ──────────────────────────────────────────────────────────────────────────
+
+
+def extract_frames_stream(
+    url: str,
+    *,
+    # ── pick_video_stream constraints ────────────────────────────────────
+    prefer_codec: str | None = None,
+    prefer_format: str | None = None,
+    max_fps: float | None = None,
+    language: str | None = None,
+    include_video_only: bool = True,
+    include_combined: bool = True,
+    cookies_from_browser: str | None = None,
+    verbose: bool = False,
+    # ── extract_frames passthrough (loose kwargs since there are many) ───
+    **extract_frames_kwargs: Any,
+) -> Any:
+    """
+    Stream frames from any yt-dlp-supported URL through
+    :func:`video_helper.extract_frames`.
+
+    One-call composition of:
+
+    1. :func:`pick_video_stream` — resolves ``url`` to a single
+       :class:`VideoStreamInfo` matching the codec / format / fps /
+       language constraints.
+    2. :func:`video_helper.extract_frames` — opens the resolved direct
+       media URL with the right ``http_headers`` and yields frames
+       under the destination of your choice (numpy BGR, torch RGB, or
+       PIL).
+
+    Why this exists
+    ---------------
+    The two-step pattern is the published recipe (see
+    ``ai-helpers/EXAMPLES.md`` and ``youtube-helper/EXAMPLES.md``):
+
+    >>> stream = yth.pick_video_stream(url, prefer_codec="h264")
+    >>> for frame in vh.extract_frames(
+    ...     stream["url"], http_headers=stream["headers"],
+    ...     destination="torch", device="auto", batch_size=32,
+    ... ):
+    ...     model(frame)
+
+    ``extract_frames_stream`` collapses both calls into one, plumbs the
+    headers automatically, and lets the caller forward any
+    ``extract_frames`` kwarg (``destination``, ``device``,
+    ``batch_size``, ``output_width``, ``frame_step``, …) verbatim.
+
+    Parameters
+    ----------
+    url : str
+        Any URL ``yt-dlp`` can extract (YouTube / Vimeo / DailyMotion /
+        Twitch VOD / …). Live streams are accepted as well — the
+        returned iterator runs until the live source ends.
+    prefer_codec, prefer_format, max_fps, language : optional
+        Forwarded to :func:`pick_video_stream`. See its docstring for
+        the matching semantics. Defaults pick yt-dlp's best
+        candidate.
+    include_video_only, include_combined : bool, optional
+        Forwarded to :func:`pick_video_stream`. Defaults keep both.
+    cookies_from_browser : str, optional
+        Forwarded to :func:`pick_video_stream`. Required for age-gated
+        / members-only content.
+    verbose : bool, optional
+        Forwarded to :func:`pick_video_stream`.
+    **extract_frames_kwargs
+        Any keyword accepted by :func:`video_helper.extract_frames`:
+        ``start_index`` / ``end_index`` / ``start_instant`` /
+        ``end_instant`` / ``stabilize`` / ``frame_step`` /
+        ``frame_interval`` / ``frame_indices`` / ``frame_times`` /
+        ``backend`` / ``hwaccel`` / ``output_width`` /
+        ``output_height`` / ``pad_color`` / ``destination`` /
+        ``device`` / ``batch_size`` / ``layout``.
+
+        Note: ``http_headers`` is **wired automatically** from the
+        resolved stream — passing it yourself overrides the resolver's
+        headers (rare; mostly useful when the caller already authored
+        a stable header dict).
+
+    Returns
+    -------
+    Iterator
+        The same iterator type that :func:`video_helper.extract_frames`
+        returns — numpy / torch / PIL frames or batches per the
+        passed-in ``destination`` and ``batch_size``.
+
+    Raises
+    ------
+    RuntimeError
+        If yt-dlp can't extract the URL (private / removed / geo-blocked).
+    ValueError
+        If no stream matches the codec / format / fps / language
+        constraints (the catalog itself was non-empty, but every entry
+        got filtered out).
+
+    Examples
+    --------
+    >>> import youtube_helper as yth
+    >>> # Sequential decode at 1 frame per second, 224×224 letterboxed.
+    >>> for frame in yth.extract_frames_stream(
+    ...     "https://www.youtube.com/watch?v=YE7VzlLtp-4",
+    ...     prefer_codec="h264", prefer_format="mp4", max_fps=30,
+    ...     frame_interval=1.0, output_width=224, output_height=224,
+    ... ):
+    ...     model(frame)
+
+    >>> # Batched torch tensors on a GPU device — same downstream code as
+    >>> # the file-based path.
+    >>> for batch in yth.extract_frames_stream(
+    ...     "https://vimeo.com/123",
+    ...     destination="torch", device="auto", batch_size=32,
+    ... ):
+    ...     logits = model(batch.float() / 255.0)
+    """
+    # Lazy import: keeps the top-level ``import youtube_helper`` cheap and
+    # avoids a hard import cycle if a future revision of video-helper
+    # ever imports from youtube-helper.
+    from video_helper import extract_frames
+
+    # Step 1: resolve the URL into a direct-media URL + auth headers.
+    stream = pick_video_stream(
+        url,
+        prefer_codec=prefer_codec,
+        prefer_format=prefer_format,
+        max_fps=max_fps,
+        language=language,
+        include_video_only=include_video_only,
+        include_combined=include_combined,
+        cookies_from_browser=cookies_from_browser,
+        verbose=verbose,
+    )
+
+    # Step 2: forward to extract_frames. We splice the resolver's
+    # ``headers`` into ``http_headers`` only when the caller hasn't
+    # already provided one — explicit caller headers win for users who
+    # know better than the resolver (rare but possible for
+    # custom-mirror URLs).
+    if "http_headers" not in extract_frames_kwargs:
+        extract_frames_kwargs["http_headers"] = stream["headers"]
+
+    return extract_frames(stream["url"], **extract_frames_kwargs)
