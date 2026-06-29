@@ -29,7 +29,7 @@ on macOS).
 
 ```bash
 pip install --force-reinstall --no-cache-dir \
-  git+https://github.com/warith-harchaoui/youtube-helper.git@v1.1.0
+  git+https://github.com/warith-harchaoui/youtube-helper.git@v1.1.2
 ```
 
 Brings in `os-helper` / `audio-helper` / `video-helper` automatically.
