@@ -1,6 +1,6 @@
 # YouTube Helper
 
-> 🌐 Version française : [LISEZMOI.md](LISEZMOI.md)
+[🇫🇷](LISEZMOI.md) · [🇬🇧](README.md)
 
 `YouTube Helper` belongs to a collection of libraries called `AI Helpers` developed for building Artificial Intelligence.
 
@@ -44,7 +44,7 @@ sudo apt install ffmpeg
 
 ## Install `YouTube Helper`:
 ```bash
-pip install --force-reinstall --no-cache-dir git+https://github.com/warith-harchaoui/youtube-helper.git@v1.1.0
+pip install --force-reinstall --no-cache-dir git+https://github.com/warith-harchaoui/youtube-helper.git@v1.1.2
 ```
 
 # Usage
