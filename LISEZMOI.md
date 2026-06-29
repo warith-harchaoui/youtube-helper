@@ -126,7 +126,7 @@ YouTube Helper est un wrapper léger autour de `yt-dlp` et `ffmpeg`. Vous êtes 
 - Bâti uniquement sur les métadonnées publiques de yt-dlp — **pas d'API Google Data, pas d'API Vimeo, pas d'OAuth, pas de quota.**
 
 # Auteur
- - [Warith HARCHAOUI](https://harchaoui.org/warith)
+ - [Warith HARCHAOUI](https://linkedin.com/in/warith-harchaoui)
 
 # Remerciements
 Special thanks to [Mohamed Chelali](https://mchelali.github.io) and [Bachir Zerroug](https://www.linkedin.com/in/bachirzerroug) for fruitful discussions.
