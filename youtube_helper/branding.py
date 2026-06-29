@@ -24,7 +24,7 @@ becomes necessary for **per-video retention curves** (Analytics API) and
 **comments at scale** (the public commentThreads endpoint).
 
 Author:
-- Warith HARCHAOUI, https://harchaoui.org/warith
+- Warith HARCHAOUI, https://linkedin.com/in/warith-harchaoui
 """
 from __future__ import annotations
 

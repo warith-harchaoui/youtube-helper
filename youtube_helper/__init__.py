@@ -25,7 +25,7 @@ Dependencies
 - os-helper / audio-helper / video-helper
 
 Author:
-- Warith HARCHAOUI, https://harchaoui.org/warith
+- Warith HARCHAOUI, https://linkedin.com/in/warith-harchaoui
 """
 
 __all__ = [

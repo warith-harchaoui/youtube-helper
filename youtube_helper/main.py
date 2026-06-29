@@ -14,7 +14,7 @@ Dependencies
 - video_helper (custom video processing utility)
 
 Author:
-- Warith HARCHAOUI, https://harchaoui.org/warith
+- Warith HARCHAOUI, https://linkedin.com/in/warith-harchaoui
 """
 
 import yt_dlp
