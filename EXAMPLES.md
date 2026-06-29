@@ -107,6 +107,8 @@ but a single call.
 The whole point of the catalog/picker: feed the direct URL + headers to
 `video_helper.extract_frames` and decode without re-fetching the page.
 
+### Two-step composition (low-level)
+
 ```python
 import video_helper as vh
 
@@ -115,7 +117,7 @@ pick = yth.pick_video_stream("https://www.youtube.com/watch?v=YE7VzlLtp-4",
 
 for frame in vh.extract_frames(
     pick["url"],
-    # http_headers=pick["headers"],   # ← coming in video-helper v1.5.0
+    http_headers=pick["headers"],
     start_instant=10.0, end_instant=20.0,
     frame_interval=1.0,
     destination="torch", device="mps", batch_size=10, layout="image",
@@ -124,14 +126,33 @@ for frame in vh.extract_frames(
     embeddings = model(frame)
 ```
 
-> **Heads-up**: passing `http_headers=` to `extract_frames` lands in
-> video-helper v1.5.0. Until then, plain `http://` / `https://` URLs
-> work fine for most yt-dlp-resolved YouTube videos, but live streams
-> and members-only / age-gated content will 403 without the headers.
+### One-call composition — `extract_frames_stream` (v1.2.0)
 
-A convenience wrapper **`yth.extract_frames_stream(url, ...)`** that
-hides the picker + delegates is planned for youtube-helper v1.2.0, after the
-`http_headers=` support lands.
+`extract_frames_stream` collapses the two-step recipe into a single
+call. It runs `pick_video_stream` under the hood, splices the
+resolver's `http_headers` automatically, and forwards every
+`extract_frames` kwarg verbatim:
+
+```python
+for frame in yth.extract_frames_stream(
+    "https://www.youtube.com/watch?v=YE7VzlLtp-4",
+    # picker constraints
+    prefer_codec="h264", prefer_format="mp4", max_fps=30,
+    # extract_frames passthrough
+    start_instant=10.0, end_instant=20.0, frame_interval=1.0,
+    destination="torch", device="mps", batch_size=10, layout="image",
+):
+    embeddings = model(frame)
+```
+
+Same code drives a CPU numpy pipeline (the default) or a GPU torch
+pipeline (just by changing `destination` / `device` / `batch_size`).
+The picker is invoked once and the resolved stream is reused for the
+entire iteration.
+
+> **Heads-up**: `extract_frames_stream` requires `video-helper >= v1.5.2`
+> (URL-aware `is_valid_video_file` + `video_dimensions(http_headers=)`).
+> The youtube-helper v1.2.0 release pins it automatically.
 
 ## Branding — engagement metadata without API keys
 

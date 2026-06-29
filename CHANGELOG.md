@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-06-29
+
+### Added
+
+- `extract_frames_stream(url, ...)` — one-call composition of
+  `pick_video_stream` + `video_helper.extract_frames`. Resolves a
+  yt-dlp-supported URL to its best matching video stream, plumbs the
+  resolver's `http_headers` automatically into the decoder, and
+  forwards any `extract_frames` kwarg (`destination`, `device`,
+  `batch_size`, `output_width` / `output_height`, `frame_step` /
+  `frame_interval`, `backend`, `hwaccel`, …) verbatim. Lets the
+  documented "stream-to-frames" recipe collapse from two calls into
+  one without losing any of the existing knobs.
+
+### Changed
+
+- Bump `video-helper` pin from `v1.5.1` to `v1.5.2` — adds URL-aware
+  `is_valid_video_file` (short-circuits to `True` for `http(s)://`
+  inputs) and `video_dimensions(http_headers=...)` so the resolved
+  direct media URL passes through the assertion + metadata probe at
+  the top of `extract_frames`.
+
+### Tests
+
+- `tests/test_extract_frames_stream.py` — 7 unit tests covering the
+  wrapper's URL forwarding, picker constraint passthrough, automatic
+  header wiring, explicit-header override, extract_frames kwarg
+  passthrough, and package-root export. Network-free
+  (`pick_video_stream` and `video_helper.extract_frames` are
+  monkeypatched).
+
 ### Documentation
 
 - Establish suite-wide Python coding-style mandate in `CONTRIBUTING.md`:
