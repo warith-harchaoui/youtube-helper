@@ -5,10 +5,13 @@ assumes:
 
 ```python
 import youtube_helper as yth
+import os_helper as osh
+
+osh.verbosity(2)   # so osh.info(...) calls surface on stdout
 ```
 
 and that `yt-dlp` + `ffmpeg` are installed (`brew install yt-dlp ffmpeg`
-on macOS).
+on macOS — install `brew` thanks to [brew.sh](https://brew.sh/)).
 
 ---
 
@@ -47,6 +50,7 @@ yth.download_thumbnail("https://www.youtube.com/watch?v=YE7VzlLtp-4", "bunny.jpg
 # Cheap metadata probe (no download)
 meta = yth.video_url_meta_data("https://www.youtube.com/watch?v=YE7VzlLtp-4")
 print(meta["title"], meta["duration"])
+# Big Buck Bunny 596
 ```
 
 ## Stream Catalog & Picker
@@ -139,12 +143,15 @@ no quota**.
 # One-video snapshot
 meta = yth.video_engagement("https://www.youtube.com/watch?v=YE7VzlLtp-4")
 print(meta["view_count"], meta["like_count"], meta["comment_count"])
+# 412309876 1893422 156003
 print(meta["kind"])   # "short" / "long" / "live"
+# long
 
 # Channel snapshot — subs, total views, video count
 ch = yth.channel_info("https://www.youtube.com/@Blender")
 print(f"{ch['title']}: {ch['follower_count']:,} subscribers, "
       f"{ch['video_count']:,} videos")
+# Blender: 1,920,000 subscribers, 487 videos
 
 # Channel video list with per-video engagement (paginated, slow due to per-vid fetch)
 videos = yth.channel_videos(
@@ -155,14 +162,19 @@ videos = yth.channel_videos(
 )
 for v in videos:
     print(f"{v['upload_date']}  {v['view_count']:>10,} views  {v['title']}")
+    # 2026-06-20    132,485 views  Blender Conference 2026 — call for talks
+    # 2026-06-12  1,840,201 views  Cycles X — what's new in 4.5
+    # ...
 
 # Batched engagement across a list of URLs — tolerant (bad URLs → _error stub)
 batch = yth.engagement_batch([url1, url2, url3])
 for entry in batch:
     if "_error" in entry:
         print(f"skip {entry['url']}: {entry['_error']}")
+        # skip https://www.youtube.com/watch?v=removed: Video unavailable
     else:
         print(entry["title"], entry["view_count"])
+        # Big Buck Bunny 412309876
 ```
 
 **Normalised schema** (same fields whether the source is YouTube,
@@ -196,6 +208,9 @@ comments = yth.video_comments(
 )
 for c in comments[:3]:
     print(f"@{c['author']} ({c['like_count']} ♥): {c['text'][:80]}")
+    # @alice_dev (842 ♥): Bunny still holds up after 20 years. Render in Cycles X now?
+    # @rab_animator (519 ♥): Where can I get the .blend file? Was archived on...
+    # @kid_pixels (308 ♥): My 6yo watches this on loop. Eternal classic.
 
 # Heuristic: is this a Short / vertical clip?
 yth.is_short(yth.video_engagement(url))   # True / False
