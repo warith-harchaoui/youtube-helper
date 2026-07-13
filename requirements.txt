@@ -1,0 +1,17 @@
+# youtube-helper — pip requirements (portable, no `file://` deps).
+#
+# For a plain install:
+#     pip install -r requirements.txt
+#     pip install -e .           # youtube-helper itself (editable) or `pip install .`
+#
+# Optional surfaces (CLI/API/MCP) live behind extras, e.g. `.[cli]`, `.[api,mcp]`.
+# Suite pins are kept in lock-step with their release tags below.
+
+# --- Suite dependencies ---------------------------------------------------
+os-helper>=1.4.2
+audio-helper>=1.5.5
+video-helper @ git+https://github.com/warith-harchaoui/video-helper.git@v1.6.2
+# --- Core runtime ---------------------------------------------------------
+yt-dlp>=2024.12.23
+ffmpeg-python>=0.2.0,<0.3.0
+pillow>=10,<12

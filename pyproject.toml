@@ -1,0 +1,109 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "youtube-helper"
+version = "1.3.3"
+description = "YouTube Helper — yt-dlp wrapper for downloading videos / audio / thumbnails, resolving direct media URLs, browsing video stream catalogs, and pulling no-API engagement metadata (channel / video / comments / subtitles) on YouTube, Vimeo, DailyMotion, Twitch VOD, SoundCloud, and any yt-dlp-supported source."
+readme = "README.md"
+requires-python = ">=3.10,<3.14"
+license = {text = "BSD-3-Clause"}
+authors = [
+    {name = "Warith HARCHAOUI", email = "warithmetics@deraison.ai"},
+]
+keywords = ["yt-dlp", "youtube", "vimeo", "dailymotion", "twitch", "soundcloud", "video", "audio", "branding", "engagement"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Multimedia :: Video",
+    "Topic :: Multimedia :: Sound/Audio",
+    "Topic :: Internet :: WWW/HTTP",
+]
+dependencies = [
+    "os-helper>=1.4.2",
+    "audio-helper>=1.5.5",
+    "video-helper @ git+https://github.com/warith-harchaoui/video-helper.git@v1.6.2",
+    "yt-dlp>=2024.12.23",
+    "ffmpeg-python>=0.2.0,<0.3.0",
+    "pillow>=10,<12",
+]
+
+[project.optional-dependencies]
+# CLI-only-with-click extra. argparse variant needs no runtime dep and
+# is always available.
+cli = ["click>=8.1,<9"]
+# FastAPI HTTP surface (youtube_helper.api). uvicorn + python-multipart
+# so multipart file uploads work out of the box.
+api = [
+    "fastapi>=0.111,<1",
+    "uvicorn>=0.30,<1",
+    "python-multipart>=0.0.9,<1",
+]
+# MCP surface (youtube_helper.mcp). Depends on the `api` extra
+# — fastapi-mcp wraps the FastAPI app.
+mcp = [
+    "fastapi-mcp>=0.3,<1",
+    "fastapi>=0.111,<1",
+    "uvicorn>=0.30,<1",
+    "python-multipart>=0.0.9,<1",
+]
+# `dev` keeps the bar low for CI — pytest + httpx (for FastAPI TestClient)
+# + click (so the click CLI import always resolves in tests) + fastapi-mcp
+# (so the MCP smoke test can import the module).
+dev = [
+    "pytest>=8",
+    "httpx>=0.27",
+    "click>=8.1,<9",
+    "fastapi>=0.111,<1",
+    "python-multipart>=0.0.9,<1",
+    "fastapi-mcp>=0.3,<1",
+]
+
+[project.scripts]
+# argparse-based CLI — no runtime dep beyond stdlib + core package.
+youtube-helper = "youtube_helper.cli_argparse:main"
+# click-based twin — install with [cli] extra.
+youtube-helper-click = "youtube_helper.cli_click:cli"
+# MCP server (over FastAPI) — install with [api,mcp] extras.
+youtube-helper-mcp = "youtube_helper.mcp:main"
+
+[project.urls]
+Homepage = "https://github.com/warith-harchaoui/youtube-helper"
+Issues = "https://github.com/warith-harchaoui/youtube-helper/issues"
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: tests that hit live external services (e.g. YouTube). Slow and fragile; skipped by default.",
+]
+addopts = "-m 'not integration'"
+
+[tool.setuptools.packages.find]
+include = ["youtube_helper*"]
+exclude = ["tests*", "assets*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+extend-exclude = ["assets", "tests"]
+
+[tool.ruff.lint]
+# Conservative starter set: pyflakes (F), pycodestyle errors (E), warnings (W),
+# isort (I), bugbear (B), comprehensions (C4), pyupgrade (UP), simplify (SIM).
+# Easy to tighten later; this is the baseline.
+select = ["E", "F", "W", "I", "B", "C4", "UP", "SIM"]
+ignore = [
+    "E501",  # line-too-long — handled by formatter / context-dependent
+    "B008",  # function call in argument default — too noisy for our style
+    "SIM108",  # ternary preferred over if/else — sometimes hurts readability
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B011"]  # assert False in pytest is fine
