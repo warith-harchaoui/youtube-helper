@@ -13,6 +13,12 @@
 YouTube Helper est une bibliothèque Python qui fournit des fonctions utilitaires pour télécharger des vidéos, de l'audio et des vignettes depuis des plateformes comme YouTube, Vimeo et DailyMotion grâce à `yt-dlp`.
 Elle supporte également les tâches de post-traitement comme la conversion ou la fusion de fichiers média avec `ffmpeg`.
 
+# Documentation
+
+[💻 Documentation](https://harchaoui.org/warith/ai-helpers/docs/youtube-helper-doc/)
+
+[📋 Exemples](https://github.com/warith-harchaoui/youtube-helper/blob/main/EXAMPLES.md)
+
 # Installation
 
 **Prérequis** — **Python 3.10–3.13** et **git**, **ffmpeg**, multiplateforme :
