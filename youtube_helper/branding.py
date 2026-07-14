@@ -26,16 +26,19 @@ becomes necessary for **per-video retention curves** (Analytics API) and
 Author:
 - Warith HARCHAOUI, https://linkedin.com/in/warith-harchaoui
 """
+
 from __future__ import annotations
 
-import logging
 import re
+from collections.abc import Iterable
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
+# os_helper is the suite-wide logging surface (osh.debug / warning / …),
+# used here instead of stdlib logging so verbosity stays centrally managed.
+import os_helper as osh
 import yt_dlp
-
 
 # ─── Internal helpers ────────────────────────────────────────────────────────
 
@@ -67,6 +70,23 @@ def _minimal_options(verbose: bool = False, **extra: Any) -> dict[str, Any]:
 
 
 def _safe_int(v: Any) -> int:
+    """Coerce ``v`` to ``int``, defaulting to 0 when it is missing or garbage.
+
+    yt-dlp metadata fields such as ``view_count`` are frequently ``None``
+    or absent, so a defensive cast keeps the normalised schema numeric
+    instead of leaking ``None`` to downstream scoring.
+
+    Parameters
+    ----------
+    v : Any
+        Value to coerce — typically a yt-dlp count field.
+
+    Returns
+    -------
+    int
+        ``int(v)`` when convertible, otherwise ``0``.
+    """
+    # int(None) and int("") both raise; treat any failure as "unknown → 0".
     try:
         return int(v)
     except (TypeError, ValueError):
@@ -129,11 +149,14 @@ def _normalise_video_meta(meta: dict[str, Any]) -> dict[str, Any]:
         "availability": meta.get("availability"),
         "live_status": meta.get("live_status"),
         "extractor": meta.get("extractor") or meta.get("extractor_key"),
-        "kind": "short" if is_short(meta) else ("live" if meta.get("live_status") == "is_live" else "long"),
+        "kind": "short"
+        if is_short(meta)
+        else ("live" if meta.get("live_status") == "is_live" else "long"),
     }
 
 
 # ─── Public — channel-level ──────────────────────────────────────────────────
+
 
 def channel_info(url: str, verbose: bool = False) -> dict[str, Any]:
     """Return one normalised dict describing the channel / creator page.
@@ -202,7 +225,7 @@ def channel_videos(
             try:
                 meta = ydl.extract_info(video_url, download=False)
             except yt_dlp.utils.DownloadError as e:  # noqa: BLE001
-                logging.debug("youtube-helper: skip %s (%s)", video_url, e)
+                osh.debug("youtube-helper: skip %s (%s)", video_url, e)
                 continue
             if not meta:
                 continue
@@ -216,6 +239,7 @@ def channel_videos(
 
 
 # ─── Public — single-video ───────────────────────────────────────────────────
+
 
 def video_engagement(url: str, verbose: bool = False) -> dict[str, Any]:
     """Single-video engagement snapshot. Returns the normalised dict shape."""
@@ -300,17 +324,19 @@ def video_comments(
     for c in comments[:max_count]:
         if not isinstance(c, dict):
             continue
-        normalised.append({
-            "id": c.get("id"),
-            "parent": c.get("parent"),
-            "author": c.get("author"),
-            "author_id": c.get("author_id"),
-            "text": c.get("text"),
-            "like_count": _safe_int(c.get("like_count")),
-            "timestamp": c.get("timestamp"),
-            "iso_date": _ts_to_iso(c.get("timestamp")),
-            "is_favorited": bool(c.get("is_favorited")),
-        })
+        normalised.append(
+            {
+                "id": c.get("id"),
+                "parent": c.get("parent"),
+                "author": c.get("author"),
+                "author_id": c.get("author_id"),
+                "text": c.get("text"),
+                "like_count": _safe_int(c.get("like_count")),
+                "timestamp": c.get("timestamp"),
+                "iso_date": _ts_to_iso(c.get("timestamp")),
+                "is_favorited": bool(c.get("is_favorited")),
+            }
+        )
     return normalised
 
 
@@ -329,6 +355,7 @@ def _ts_to_iso(ts: Any) -> str:
 
 
 # ─── Convenience — multi-video batched engagement ────────────────────────────
+
 
 def engagement_batch(urls: Iterable[str], verbose: bool = False) -> list[dict[str, Any]]:
     """Map a list of URLs to normalised engagement dicts, one per URL.
@@ -354,6 +381,7 @@ def engagement_batch(urls: Iterable[str], verbose: bool = False) -> list[dict[st
 
 # ─── Convenience — ensure yt-dlp is fresh ────────────────────────────────────
 
+
 def ensure_recent_ytdlp(min_version: str | None = None) -> str:
     """Return the installed yt-dlp version. Warn if older than `min_version`.
 
@@ -368,9 +396,10 @@ def ensure_recent_ytdlp(min_version: str | None = None) -> str:
             installed = tuple(int(x) for x in re.findall(r"\d+", version_str)[:3])
             wanted = tuple(int(x) for x in re.findall(r"\d+", min_version)[:3])
             if installed < wanted:
-                logging.warning(
+                osh.warning(
                     "youtube-helper: yt-dlp %s is older than %s — consider `pip install -U yt-dlp`.",
-                    version_str, min_version,
+                    version_str,
+                    min_version,
                 )
         except (ValueError, TypeError):
             pass

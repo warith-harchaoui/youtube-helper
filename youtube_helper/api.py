@@ -50,7 +50,6 @@ import shutil
 import tempfile
 import zipfile
 from pathlib import Path
-from typing import Optional
 
 try:
     from fastapi import BackgroundTasks, FastAPI, HTTPException
@@ -79,7 +78,6 @@ from . import (
     video_subtitles,
     video_url_meta_data,
 )
-
 
 # ---------------------------------------------------------------------------
 # App factory + shared plumbing
@@ -165,13 +163,13 @@ class StreamFiltersBody(BaseModel):
     """Shared body for /list-streams and /pick-stream (constraint filters)."""
 
     url: str
-    prefer_codec: Optional[str] = None
-    prefer_format: Optional[str] = None
-    max_fps: Optional[float] = None
-    language: Optional[str] = None
+    prefer_codec: str | None = None
+    prefer_format: str | None = None
+    max_fps: float | None = None
+    language: str | None = None
     include_video_only: bool = True
     include_combined: bool = True
-    cookies_from_browser: Optional[str] = None
+    cookies_from_browser: str | None = None
     verbose: bool = False
 
 
@@ -206,14 +204,14 @@ class CommentsBody(BaseModel):
 
     url: str
     max_count: int = 100
-    cookies_from_browser: Optional[str] = None
+    cookies_from_browser: str | None = None
     verbose: bool = False
 
 
 class YtDlpVersionBody(BaseModel):
     """Request body for /ytdlp-version."""
 
-    min_version: Optional[str] = None
+    min_version: str | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -332,12 +330,14 @@ def engagement_batch_endpoint(body: EngagementBatchBody) -> JSONResponse:
 @app.post("/comments", tags=["reads"])
 def comments_endpoint(body: CommentsBody) -> JSONResponse:
     """Fetch top comments for a video."""
-    return JSONResponse(video_comments(
-        url=body.url,
-        max_count=body.max_count,
-        cookies_from_browser=body.cookies_from_browser,
-        verbose=body.verbose,
-    ))
+    return JSONResponse(
+        video_comments(
+            url=body.url,
+            max_count=body.max_count,
+            cookies_from_browser=body.cookies_from_browser,
+            verbose=body.verbose,
+        )
+    )
 
 
 @app.post("/ytdlp-version", tags=["reads"])

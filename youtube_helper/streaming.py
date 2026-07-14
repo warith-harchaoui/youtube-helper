@@ -30,8 +30,11 @@ Warith HARCHAOUI — https://linkedin.com/in/warith-harchaoui
 
 from __future__ import annotations
 
-import logging
 from typing import Any, Literal, TypedDict
+
+# os_helper is the suite-wide logging surface (osh.info / warning / …),
+# used here instead of stdlib logging so verbosity stays centrally managed.
+import os_helper as osh
 
 # yt-dlp is already a dep of youtube-helper; we use its Python API rather
 # than shelling out so we keep the info dict (URL + headers + is_live).
@@ -120,9 +123,7 @@ def resolve_direct_url(
         info = ydl.extract_info(url, download=False)
 
     if info is None:
-        raise RuntimeError(
-            f"yt-dlp could not extract info for URL: {url!r}"
-        )
+        raise RuntimeError(f"yt-dlp could not extract info for URL: {url!r}")
 
     # ``yt-dlp`` may give us a playlist; resolve to the first entry.
     if "entries" in info and info["entries"]:
@@ -136,9 +137,7 @@ def resolve_direct_url(
         # Some extractors require us to walk ``formats`` ourselves.
         formats = info.get("formats", [])
         if not formats:
-            raise RuntimeError(
-                f"No usable formats for URL: {url!r}"
-            )
+            raise RuntimeError(f"No usable formats for URL: {url!r}")
         # Pick the last one — yt-dlp orders best last by default.
         chosen = formats[-1]
         direct_url = chosen["url"]
@@ -153,10 +152,7 @@ def resolve_direct_url(
     elif live == "force_vod":
         is_live = False
     else:
-        is_live = bool(
-            info.get("is_live")
-            or info.get("live_status") == "is_live"
-        )
+        is_live = bool(info.get("is_live") or info.get("live_status") == "is_live")
 
     # Container hint. We normalise a couple of common cases so the
     # caller doesn't have to.
@@ -264,7 +260,9 @@ def _container_for(ext: str, url: str) -> str:
     return ext or "mp4"
 
 
-def _to_video_stream_info(fmt: dict[str, Any], default_headers: dict[str, str], is_live: bool) -> VideoStreamInfo:
+def _to_video_stream_info(
+    fmt: dict[str, Any], default_headers: dict[str, str], is_live: bool
+) -> VideoStreamInfo:
     """Project one yt-dlp ``formats[i]`` entry into a VideoStreamInfo."""
     url = fmt.get("url") or ""
     ext = fmt.get("ext") or "mp4"
@@ -439,17 +437,44 @@ def pick_video_stream(
         raise ValueError(f"No video streams available for URL: {url!r}")
 
     def _matches(s: VideoStreamInfo) -> bool:
+        """Return whether one stream satisfies every active constraint.
+
+        Each ``prefer_*`` / ``max_fps`` / ``language`` argument from the
+        enclosing scope acts as an independent hard filter: a constraint
+        left at ``None`` is skipped, and any active constraint that fails
+        rejects the stream. A stream passes only when it clears them all.
+
+        Parameters
+        ----------
+        s : VideoStreamInfo
+            A single candidate stream from the catalog.
+
+        Returns
+        -------
+        bool
+            ``True`` if ``s`` clears every active constraint, else
+            ``False``.
+        """
+        # Codec match is a normalised substring test so caller-friendly
+        # aliases ("h264", "av1") line up with yt-dlp's raw codec strings
+        # ("avc1.640028", "av01...").
         if prefer_codec is not None:
             # Normalise common aliases: "h264" ↔ "avc1", "av1" ↔ "av01".
             wanted = prefer_codec.lower().replace("avc1", "h264").replace("av01", "av1")
             actual = s["vcodec"].lower().replace("avc1", "h264").replace("av01", "av1")
             if wanted not in actual:
                 return False
+        # Container format is an exact (case-insensitive) equality match.
         if prefer_format is not None and s["ext"].lower() != prefer_format.lower():
             return False
+        # Frame-rate ceiling: drop anything faster than the caller allows.
         if max_fps is not None and s["fps"] > max_fps:
             return False
-        if language is not None and (s["language"] or "").lower() != language.lower():
+        # Language equality; the field is often empty, so coalesce to "".
+        # noqa justified: inlining these four guards into one boolean
+        # expression (SIM103's suggestion) would be far less readable than
+        # the guard-clause form, mirroring the repo's SIM108 ignore.
+        if language is not None and (s["language"] or "").lower() != language.lower():  # noqa: SIM103
             return False
         return True
 
@@ -465,10 +490,15 @@ def pick_video_stream(
 
     # yt-dlp orders best last in `formats`; list_video_streams preserves that.
     chosen = matching[-1]
-    logging.info(
+    osh.info(
         "youtube-helper: picked %s (%dx%d %s %s @ %.0ffps, ~%.0f kbps) from %d candidate(s)",
-        chosen["format_id"], chosen["width"], chosen["height"],
-        chosen["vcodec"], chosen["ext"], chosen["fps"], chosen["vbr_kbps"],
+        chosen["format_id"],
+        chosen["width"],
+        chosen["height"],
+        chosen["vcodec"],
+        chosen["ext"],
+        chosen["fps"],
+        chosen["vbr_kbps"],
         len(matching),
     )
     return chosen

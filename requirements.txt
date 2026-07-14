@@ -8,9 +8,9 @@
 # Suite pins are kept in lock-step with their release tags below.
 
 # --- Suite dependencies ---------------------------------------------------
-os-helper>=1.4.2
+os-helper>=1.5.0
 audio-helper>=1.5.5
-video-helper @ git+https://github.com/warith-harchaoui/video-helper.git@v1.6.2
+video-helper>=1.6.3
 # --- Core runtime ---------------------------------------------------------
 yt-dlp>=2024.12.23
 ffmpeg-python>=0.2.0,<0.3.0

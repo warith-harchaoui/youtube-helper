@@ -21,7 +21,7 @@ pytestmark = pytest.mark.integration
 
 
 SAMPLE_VIDEO = "https://www.youtube.com/watch?v=YE7VzlLtp-4"  # Big Buck Bunny
-SAMPLE_CHANNEL = "https://www.youtube.com/@Blender"           # the channel that uploaded it
+SAMPLE_CHANNEL = "https://www.youtube.com/@Blender"  # the channel that uploaded it
 
 
 # ---------------------------------------------------------------------------
@@ -30,19 +30,23 @@ SAMPLE_CHANNEL = "https://www.youtube.com/@Blender"           # the channel that
 
 
 def test_is_short_by_duration():
+    """A sub-60s clip is a Short; a 90s clip is not, by duration alone."""
     assert is_short({"duration": 30}) is True
     assert is_short({"duration": 90}) is False
 
 
 def test_is_short_by_url():
+    """A ``/shorts/`` path in the webpage URL flags the video as a Short."""
     assert is_short({"webpage_url": "https://www.youtube.com/shorts/abc123"}) is True
 
 
 def test_is_short_by_hashtag():
+    """A ``#Shorts`` hashtag in the title flags the video as a Short."""
     assert is_short({"title": "Funny clip #Shorts", "description": ""}) is True
 
 
 def test_is_short_by_tag():
+    """A ``shorts`` entry in the tags list flags the video as a Short."""
     assert is_short({"tags": ["shorts", "comedy"]}) is True
 
 
@@ -52,12 +56,23 @@ def test_is_short_by_tag():
 
 
 def test_video_engagement_homogeneous_schema():
+    """Engagement metadata always carries the full, homogeneous key set."""
     meta = video_engagement(SAMPLE_VIDEO)
     assert isinstance(meta, dict)
     # Schema invariants — every field present even if 0 / "" / None.
-    for key in ("id", "url", "title", "duration_seconds",
-                "view_count", "like_count", "comment_count",
-                "channel", "channel_url", "thumbnail", "kind"):
+    for key in (
+        "id",
+        "url",
+        "title",
+        "duration_seconds",
+        "view_count",
+        "like_count",
+        "comment_count",
+        "channel",
+        "channel_url",
+        "thumbnail",
+        "kind",
+    ):
         assert key in meta, f"missing key: {key}"
     assert meta["title"]
     assert meta["duration_seconds"] > 0
@@ -71,10 +86,10 @@ def test_video_engagement_homogeneous_schema():
 
 
 def test_channel_info_returns_normalised_fields():
+    """Channel info returns every normalised field with sane values."""
     info = channel_info(SAMPLE_CHANNEL)
     assert isinstance(info, dict)
-    for key in ("id", "url", "title", "description",
-                "follower_count", "video_count", "extractor"):
+    for key in ("id", "url", "title", "description", "follower_count", "video_count", "extractor"):
         assert key in info, f"missing key: {key}"
     assert info["title"]
     assert info["follower_count"] > 0
@@ -98,10 +113,13 @@ def test_channel_videos_returns_at_least_one():
 
 
 def test_engagement_batch_tolerates_bad_urls():
-    out = engagement_batch([
-        SAMPLE_VIDEO,
-        "https://www.youtube.com/watch?v=this_should_not_exist_xyz123",
-    ])
+    """A bad URL in a batch yields an error stub, not a raised exception."""
+    out = engagement_batch(
+        [
+            SAMPLE_VIDEO,
+            "https://www.youtube.com/watch?v=this_should_not_exist_xyz123",
+        ]
+    )
     assert len(out) == 2
     # First entry is normalised meta; second is an error stub.
     assert out[0].get("title")
@@ -114,6 +132,7 @@ def test_engagement_batch_tolerates_bad_urls():
 
 
 def test_ensure_recent_ytdlp_returns_a_version_string():
+    """The yt-dlp version guard returns a non-empty version string."""
     v = ensure_recent_ytdlp()
     assert isinstance(v, str)
     assert v  # not empty

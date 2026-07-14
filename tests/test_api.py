@@ -26,15 +26,23 @@ httpx = pytest.importorskip("httpx")
 
 from fastapi.testclient import TestClient  # noqa: E402
 
-
 EXPECTED_PATHS = {
     "/health",
-    "/metadata", "/valid", "/resolve",
-    "/list-streams", "/pick-stream",
-    "/channel-info", "/channel-videos",
-    "/engagement", "/engagement-batch",
-    "/comments", "/ytdlp-version",
-    "/video", "/audio", "/thumbnail", "/subtitles",
+    "/metadata",
+    "/valid",
+    "/resolve",
+    "/list-streams",
+    "/pick-stream",
+    "/channel-info",
+    "/channel-videos",
+    "/engagement",
+    "/engagement-batch",
+    "/comments",
+    "/ytdlp-version",
+    "/video",
+    "/audio",
+    "/thumbnail",
+    "/subtitles",
 }
 
 

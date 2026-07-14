@@ -25,15 +25,24 @@ click = pytest.importorskip("click")
 
 from click.testing import CliRunner  # noqa: E402
 
-
 # The full list of subcommands exposed by both CLIs. Keeping it here
 # (single source of truth) makes drift immediately visible.
 EXPECTED_SUBCOMMANDS = {
-    "metadata", "valid", "video", "audio", "thumbnail",
-    "resolve", "list-streams", "pick-stream",
-    "channel-info", "channel-videos",
-    "engagement", "engagement-batch",
-    "subtitles", "comments", "ytdlp-version",
+    "metadata",
+    "valid",
+    "video",
+    "audio",
+    "thumbnail",
+    "resolve",
+    "list-streams",
+    "pick-stream",
+    "channel-info",
+    "channel-videos",
+    "engagement",
+    "engagement-batch",
+    "subtitles",
+    "comments",
+    "ytdlp-version",
 }
 
 

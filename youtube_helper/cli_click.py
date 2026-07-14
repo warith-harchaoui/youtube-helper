@@ -38,8 +38,7 @@ try:
     import click
 except ImportError as exc:  # pragma: no cover
     raise ImportError(
-        "The click CLI requires the [cli] extra. "
-        "Install with: pip install 'youtube-helper[cli]'"
+        "The click CLI requires the [cli] extra. Install with: pip install 'youtube-helper[cli]'"
     ) from exc
 
 # Same underlying functions as the argparse twin — one source of truth.
@@ -130,8 +129,13 @@ def video(url: str, output: str | None) -> None:
 @cli.command()
 @click.option("--url", required=True, help="Video URL.")
 @click.option("--output", type=click.Path(), default=None, help="Output path (auto if omitted).")
-@click.option("--sample-rate", type=int, default=44100, show_default=True,
-              help="Target sample rate for the output audio.")
+@click.option(
+    "--sample-rate",
+    type=int,
+    default=44100,
+    show_default=True,
+    help="Target sample rate for the output audio.",
+)
 def audio(url: str, output: str | None, sample_rate: int) -> None:
     """Download only the audio track to disk."""
     click.echo(download_audio(url=url, output_path=output, target_sample_rate=sample_rate))
@@ -158,8 +162,12 @@ def thumbnail(url: str, output: str | None) -> None:
 @cli.command()
 @click.option("--url", required=True, help="Video URL.")
 @click.option("--prefer", type=click.Choice(["audio", "video"]), default="audio", show_default=True)
-@click.option("--live", type=click.Choice(["auto", "force_live", "force_vod"]), default="auto",
-              show_default=True)
+@click.option(
+    "--live",
+    type=click.Choice(["auto", "force_live", "force_vod"]),
+    default="auto",
+    show_default=True,
+)
 def resolve(url: str, prefer: str, live: str) -> None:
     """Resolve a URL to a direct ffmpeg-ready media URL (audio or video)."""
     click.echo(_dumps(resolve_direct_url(url=url, prefer=prefer, live=live)))
@@ -174,8 +182,11 @@ def resolve(url: str, prefer: str, live: str) -> None:
 @click.option("--url", required=True, help="Video URL.")
 @click.option("--include-video-only/--no-video-only", default=True, show_default=True)
 @click.option("--include-combined/--no-combined", default=True, show_default=True)
-@click.option("--cookies-from-browser", default=None,
-              help="Browser to pull cookies from (firefox / chrome / safari / …).")
+@click.option(
+    "--cookies-from-browser",
+    default=None,
+    help="Browser to pull cookies from (firefox / chrome / safari / …).",
+)
 @click.option("--verbose", is_flag=True, default=False)
 def list_streams(
     url: str,
@@ -185,13 +196,17 @@ def list_streams(
     verbose: bool,
 ) -> None:
     """List every video format yt-dlp finds for a URL."""
-    click.echo(_dumps(list_video_streams(
-        url=url,
-        include_video_only=include_video_only,
-        include_combined=include_combined,
-        cookies_from_browser=cookies_from_browser,
-        verbose=verbose,
-    )))
+    click.echo(
+        _dumps(
+            list_video_streams(
+                url=url,
+                include_video_only=include_video_only,
+                include_combined=include_combined,
+                cookies_from_browser=cookies_from_browser,
+                verbose=verbose,
+            )
+        )
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -221,17 +236,21 @@ def pick_stream(
     verbose: bool,
 ) -> None:
     """Pick one best video stream matching the given constraints."""
-    click.echo(_dumps(pick_video_stream(
-        url=url,
-        prefer_codec=prefer_codec,
-        prefer_format=prefer_format,
-        max_fps=max_fps,
-        language=language,
-        include_video_only=include_video_only,
-        include_combined=include_combined,
-        cookies_from_browser=cookies_from_browser,
-        verbose=verbose,
-    )))
+    click.echo(
+        _dumps(
+            pick_video_stream(
+                url=url,
+                prefer_codec=prefer_codec,
+                prefer_format=prefer_format,
+                max_fps=max_fps,
+                language=language,
+                include_video_only=include_video_only,
+                include_combined=include_combined,
+                cookies_from_browser=cookies_from_browser,
+                verbose=verbose,
+            )
+        )
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -259,16 +278,24 @@ def channel_info_cmd(url: str, verbose: bool) -> None:
 @click.option("--include-lives/--no-lives", default=False, show_default=True)
 @click.option("--verbose", is_flag=True, default=False)
 def channel_videos_cmd(
-    url: str, max_videos: int, include_shorts: bool, include_lives: bool, verbose: bool,
+    url: str,
+    max_videos: int,
+    include_shorts: bool,
+    include_lives: bool,
+    verbose: bool,
 ) -> None:
     """List channel videos with normalised engagement metadata."""
-    click.echo(_dumps(channel_videos(
-        url=url,
-        max_videos=max_videos,
-        include_shorts=include_shorts,
-        include_lives=include_lives,
-        verbose=verbose,
-    )))
+    click.echo(
+        _dumps(
+            channel_videos(
+                url=url,
+                max_videos=max_videos,
+                include_shorts=include_shorts,
+                include_lives=include_lives,
+                verbose=verbose,
+            )
+        )
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -304,22 +331,38 @@ def engagement_batch_cmd(urls: tuple[str, ...], verbose: bool) -> None:
 
 @cli.command()
 @click.option("--url", required=True, help="Video URL.")
-@click.option("--output-dir", required=True, type=click.Path(),
-              help="Folder that receives the .vtt files.")
-@click.option("--langs", multiple=True, default=("fr", "en"), show_default=True,
-              help="Language code (repeat --langs for each).")
-@click.option("--auto-only/--manual", default=True, show_default=True,
-              help="Prefer auto-generated subtitles (default) or manual ones.")
+@click.option(
+    "--output-dir", required=True, type=click.Path(), help="Folder that receives the .vtt files."
+)
+@click.option(
+    "--langs",
+    multiple=True,
+    default=("fr", "en"),
+    show_default=True,
+    help="Language code (repeat --langs for each).",
+)
+@click.option(
+    "--auto-only/--manual",
+    default=True,
+    show_default=True,
+    help="Prefer auto-generated subtitles (default) or manual ones.",
+)
 @click.option("--verbose", is_flag=True, default=False)
-def subtitles(url: str, output_dir: str, langs: tuple[str, ...], auto_only: bool, verbose: bool) -> None:
+def subtitles(
+    url: str, output_dir: str, langs: tuple[str, ...], auto_only: bool, verbose: bool
+) -> None:
     """Download subtitles (auto or manual) for a video into a folder."""
-    click.echo(_dumps(video_subtitles(
-        url=url,
-        output_dir=output_dir,
-        langs=tuple(langs),
-        auto_only=auto_only,
-        verbose=verbose,
-    )))
+    click.echo(
+        _dumps(
+            video_subtitles(
+                url=url,
+                output_dir=output_dir,
+                langs=tuple(langs),
+                auto_only=auto_only,
+                verbose=verbose,
+            )
+        )
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -334,12 +377,16 @@ def subtitles(url: str, output_dir: str, langs: tuple[str, ...], auto_only: bool
 @click.option("--verbose", is_flag=True, default=False)
 def comments(url: str, max_count: int, cookies_from_browser: str | None, verbose: bool) -> None:
     """Fetch top comments for a video."""
-    click.echo(_dumps(video_comments(
-        url=url,
-        max_count=max_count,
-        cookies_from_browser=cookies_from_browser,
-        verbose=verbose,
-    )))
+    click.echo(
+        _dumps(
+            video_comments(
+                url=url,
+                max_count=max_count,
+                cookies_from_browser=cookies_from_browser,
+                verbose=verbose,
+            )
+        )
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -348,8 +395,11 @@ def comments(url: str, max_count: int, cookies_from_browser: str | None, verbose
 
 
 @cli.command("ytdlp-version")
-@click.option("--min-version", default=None,
-              help="Emit a warning to stderr if installed yt-dlp is older than this.")
+@click.option(
+    "--min-version",
+    default=None,
+    help="Emit a warning to stderr if installed yt-dlp is older than this.",
+)
 def ytdlp_version(min_version: str | None) -> None:
     """Print installed yt-dlp version; warn if stale."""
     click.echo(ensure_recent_ytdlp(min_version=min_version))

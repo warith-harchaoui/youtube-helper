@@ -22,7 +22,6 @@ import pytest
 import youtube_helper as yth
 from youtube_helper.streaming import VideoStreamInfo
 
-
 # ---------------------------------------------------------------------------
 # Test fixtures
 # ---------------------------------------------------------------------------
@@ -54,6 +53,7 @@ def patched_pick(monkeypatch: pytest.MonkeyPatch):
     calls: list[tuple[str, dict]] = []
 
     def _fake(url: str, **kwargs: Any) -> VideoStreamInfo:
+        """Record the call and return the canned stream instead of hitting yt-dlp."""
         calls.append((url, kwargs))
         return _SAMPLE_STREAM
 
@@ -67,11 +67,14 @@ def patched_extract_frames(monkeypatch: pytest.MonkeyPatch):
     calls: list[tuple[tuple, dict]] = []
 
     def _fake(*args: Any, **kwargs: Any):
+        """Record the call args and return an empty iterator (no decoding)."""
         calls.append((args, kwargs))
 
         def _empty_iter():
+            """Yield nothing — a stand-in for the real frame generator."""
             if False:
                 yield  # pragma: no cover — empty generator stub
+
         return _empty_iter()
 
     monkeypatch.setattr("video_helper.extract_frames", _fake)
@@ -84,12 +87,14 @@ def patched_extract_frames(monkeypatch: pytest.MonkeyPatch):
 
 
 def test_extract_frames_stream_returns_iterator(patched_pick, patched_extract_frames) -> None:
+    """The wrapper returns the iterator produced by ``extract_frames``."""
     it = yth.extract_frames_stream("https://www.youtube.com/watch?v=test")
     # The return value is the iterator that extract_frames yields.
     assert hasattr(it, "__iter__")
 
 
 def test_extract_frames_stream_forwards_url_to_picker(patched_pick, patched_extract_frames) -> None:
+    """The source URL is forwarded verbatim to ``pick_video_stream``."""
     yth.extract_frames_stream("https://vimeo.com/123")
     assert patched_pick[0][0] == "https://vimeo.com/123"
 
@@ -97,6 +102,7 @@ def test_extract_frames_stream_forwards_url_to_picker(patched_pick, patched_extr
 def test_extract_frames_stream_forwards_picker_constraints(
     patched_pick, patched_extract_frames
 ) -> None:
+    """All picker constraints (codec / format / fps / language / …) pass through."""
     yth.extract_frames_stream(
         "https://www.youtube.com/watch?v=test",
         prefer_codec="h264",
@@ -131,7 +137,8 @@ def test_extract_frames_stream_auto_wires_headers(patched_pick, patched_extract_
 
 
 def test_extract_frames_stream_explicit_headers_win(
-    patched_pick, patched_extract_frames,
+    patched_pick,
+    patched_extract_frames,
 ) -> None:
     """Caller-supplied ``http_headers`` override the resolver's headers."""
     custom = {"Authorization": "Bearer xyz"}
@@ -144,7 +151,8 @@ def test_extract_frames_stream_explicit_headers_win(
 
 
 def test_extract_frames_stream_forwards_extract_frames_kwargs(
-    patched_pick, patched_extract_frames,
+    patched_pick,
+    patched_extract_frames,
 ) -> None:
     """Random extract_frames kwargs pass through verbatim."""
     yth.extract_frames_stream(

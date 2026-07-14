@@ -13,7 +13,6 @@ import pytest
 
 from youtube_helper import (
     DirectMediaURL,
-    VideoStreamInfo,
     list_video_streams,
     pick_video_stream,
     resolve_direct_url,
@@ -33,6 +32,7 @@ SAMPLE_URL = "https://www.youtube.com/watch?v=YE7VzlLtp-4"
 
 
 def test_resolve_direct_url_video():
+    """Resolving with ``prefer="video"`` yields a well-formed DirectMediaURL."""
     out: DirectMediaURL = resolve_direct_url(SAMPLE_URL, prefer="video")
     assert out["url"].startswith("http")
     assert isinstance(out["headers"], dict)
@@ -41,6 +41,7 @@ def test_resolve_direct_url_video():
 
 
 def test_resolve_direct_url_audio():
+    """Resolving with ``prefer="audio"`` yields an HTTP(S) direct URL."""
     out = resolve_direct_url(SAMPLE_URL, prefer="audio")
     assert out["url"].startswith("http")
 
@@ -51,14 +52,29 @@ def test_resolve_direct_url_audio():
 
 
 def test_list_video_streams_returns_non_empty():
+    """The catalog is non-empty and every entry is a complete video stream."""
     streams = list_video_streams(SAMPLE_URL)
     assert len(streams) > 0
     # First entry should look like a complete VideoStreamInfo.
     s = streams[0]
-    for key in ("format_id", "url", "headers", "ext", "container",
-                "vcodec", "acodec", "width", "height", "fps",
-                "vbr_kbps", "filesize_bytes", "is_live",
-                "protocol", "language", "note"):
+    for key in (
+        "format_id",
+        "url",
+        "headers",
+        "ext",
+        "container",
+        "vcodec",
+        "acodec",
+        "width",
+        "height",
+        "fps",
+        "vbr_kbps",
+        "filesize_bytes",
+        "is_live",
+        "protocol",
+        "language",
+        "note",
+    ):
         assert key in s, f"missing key: {key}"
     # All entries are video (no audio-only formats leak through).
     for s in streams:
@@ -87,6 +103,7 @@ def test_list_video_streams_filter_video_only():
 
 
 def test_pick_video_stream_no_constraints():
+    """With no constraints the picker returns yt-dlp's best (last) candidate."""
     pick = pick_video_stream(SAMPLE_URL)
     assert isinstance(pick, dict)
     assert pick["url"].startswith("http")
@@ -96,16 +113,19 @@ def test_pick_video_stream_no_constraints():
 
 
 def test_pick_video_stream_prefer_format_mp4():
+    """``prefer_format="mp4"`` constrains the pick to an mp4 container."""
     pick = pick_video_stream(SAMPLE_URL, prefer_format="mp4")
     assert pick["ext"] == "mp4"
 
 
 def test_pick_video_stream_max_fps_caps_choice():
+    """``max_fps=30`` never returns a stream faster than 30 fps."""
     pick = pick_video_stream(SAMPLE_URL, max_fps=30.0)
     assert pick["fps"] <= 30.0
 
 
 def test_pick_video_stream_impossible_constraint_raises():
+    """A codec no stream can satisfy raises ValueError, not a silent pick."""
     with pytest.raises(ValueError, match="No video stream matches"):
         # No video stream is going to satisfy a contradictory codec.
         pick_video_stream(SAMPLE_URL, prefer_codec="this-codec-does-not-exist")
