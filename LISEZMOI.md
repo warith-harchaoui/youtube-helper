@@ -13,57 +13,45 @@
 YouTube Helper est une bibliothèque Python qui fournit des fonctions utilitaires pour télécharger des vidéos, de l'audio et des vignettes depuis des plateformes comme YouTube, Vimeo et DailyMotion grâce à `yt-dlp`.
 Elle supporte également les tâches de post-traitement comme la conversion ou la fusion de fichiers média avec `ffmpeg`.
 
-# Documentation
+## Documentation
 
 [💻 Documentation](https://harchaoui.org/warith/ai-helpers/docs/youtube-helper-doc/)
 
 [📋 Exemples](https://github.com/warith-harchaoui/youtube-helper/blob/main/EXAMPLES.md)
 
-# Installation
+## Installation
 
-**Prérequis** — **Python 3.10–3.13** et **git**, **ffmpeg**, multiplateforme :
+**Prérequis** — **Python 3.10–3.13**, **git**, **yt-dlp** et **ffmpeg**, multiplateforme :
 
-- 🍎 **macOS** ([Homebrew](https://brew.sh)) : `brew install python git ffmpeg`
-- 🐧 **Ubuntu/Debian** : `sudo apt update && sudo apt install -y python3 python3-pip git ffmpeg`
-- 🪟 **Windows** (PowerShell) : `winget install Python.Python.3.12 Git.Git Gyan.FFmpeg`
+- 🍎 **macOS** ([Homebrew](https://brew.sh)) : `brew install python git yt-dlp ffmpeg`
+- 🐧 **Ubuntu/Debian** : `sudo apt update && sudo apt install -y python3 python3-pip git yt-dlp ffmpeg`
+- 🪟 **Windows** (PowerShell) : `winget install Python.Python.3.12 Git.Git yt-dlp.yt-dlp Gyan.FFmpeg`
 
-Puis installer le paquet :
+Nous recommandons l'utilisation d'environnements Python. Consultez ce lien si vous ne savez pas comment faire : [🥸 Conseils techniques](https://harchaoui.org/warith/4ml/#install).
 
+### Depuis PyPI (recommandé)
 
-## Installer le paquet
-
-Nous recommandons l'utilisation d'environnements Python. Consultez ce lien si vous ne savez pas comment faire :
-
-[🥸 Conseils techniques](https://harchaoui.org/warith/4ml/#install)
-
-### Installer `yt-dlp` et `ffmpeg`
-
-Pour installer YouTube Helper, vous devez installer les dépendances suivantes :
-
-- Sous macOS 🍎
-
-Récupérez [brew](https://brew.sh) et installez les paquets nécessaires :
 ```bash
-brew install yt-dlp
-brew install ffmpeg
+pip install youtube-helper
+
+# Surfaces optionnelles
+pip install "youtube-helper[cli]"       # jumeau CLI click
+pip install "youtube-helper[api]"       # surface HTTP FastAPI
+pip install "youtube-helper[api,mcp]"   # outils MCP au-dessus de FastAPI
 ```
 
-- Sous Ubuntu 🐧
+### Depuis les sources (sans PyPI)
+
 ```bash
-sudo apt install yt-dlp
-sudo apt install ffmpeg
+pip install "git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.5"
+
+# Surfaces optionnelles
+pip install "youtube-helper[cli] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.5"
+pip install "youtube-helper[api] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.5"
+pip install "youtube-helper[api,mcp] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.5"
 ```
 
-- Sous Windows 🪟
-  - `yt-dlp` : téléchargez [yt-dlp depuis son dépôt](https://github.com/yt-dlp/yt-dlp) et suivez les instructions.
-  - `ffmpeg` : allez sur le [site FFmpeg](https://ffmpeg.org/download.html) et suivez les instructions. Il faut ajouter manuellement FFmpeg au PATH système.
-
-## Installer `YouTube Helper` :
-```bash
-pip install --force-reinstall --no-cache-dir git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.3
-```
-
-# Utilisation
+## Utilisation
 
 Pour le catalogue complet d'exemples (téléchargements, catalogue de flux / picker, résolveur d'URL directe, composition avec `video-helper`, métadonnées de branding, sous-titres et commentaires), voir [📋 EXAMPLES.md](EXAMPLES.md).
 
@@ -117,11 +105,11 @@ print(sample_rate)
 # 44100
 ```
 
-# Usage légal et éthique
+## Usage légal et éthique
 
 YouTube Helper est un wrapper léger autour de `yt-dlp` et `ffmpeg`. Vous êtes responsable de la manière dont vous l'utilisez. Ne téléchargez et ne traitez que des contenus que vous possédez, qui sont dans le domaine public, sous licence permissive (par ex. Creative Commons), ou pour lesquels vous avez une autorisation explicite du détenteur des droits. Respectez les Conditions d'Utilisation de chaque plateforme et les lois applicables en matière de droit d'auteur, de vie privée et de protection des données. Les auteurs fournissent cette bibliothèque pour des usages légitimes : archivage personnel, accessibilité, recherche, contenus dont vous détenez les droits — pas pour contourner des contrôles d'accès ou redistribuer du contenu protégé.
 
-# Fonctionnalités
+## Fonctionnalités
 
 **Téléchargements (sur disque)** — `youtube_helper.main`
 - `download_video(url, output_path)` / `download_audio(url, output_path)` / `download_thumbnail(url, output_path)`.
@@ -143,7 +131,7 @@ YouTube Helper est un wrapper léger autour de `yt-dlp` et `ffmpeg`. Vous êtes 
 - `is_short(meta)` / `ensure_recent_ytdlp(min_version)` — utilitaires.
 - Bâti uniquement sur les métadonnées publiques de yt-dlp — **pas d'API Google Data, pas d'API Vimeo, pas d'OAuth, pas de quota.**
 
-# Exposition multi-surface
+## Exposition multi-surface
 
 `youtube-helper` n'est pas seulement une bibliothèque — les mêmes
 fonctions sont exposées comme CLI, comme surface HTTP FastAPI et comme
@@ -160,16 +148,16 @@ youtube-helper resolve      --url https://www.youtube.com/watch?v=YE7VzlLtp-4 --
 youtube-helper channel-info --url https://www.youtube.com/@blender
 
 # Jumeau CLI click (nécessite l'extra [cli])
-pip install 'youtube-helper[cli] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.3'
+pip install 'youtube-helper[cli] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.5'
 youtube-helper-click metadata --url https://www.youtube.com/watch?v=YE7VzlLtp-4
 
 # Surface HTTP FastAPI (nécessite l'extra [api])
-pip install 'youtube-helper[api] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.3'
+pip install 'youtube-helper[api] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.5'
 uvicorn youtube_helper.api:app --port 8000
 # → doc OpenAPI sur http://localhost:8000/docs
 
 # Outils MCP au-dessus de FastAPI (nécessite les extras [api,mcp])
-pip install 'youtube-helper[api,mcp] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.3'
+pip install 'youtube-helper[api,mcp] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.5'
 youtube-helper-mcp                # sert FastAPI + MCP sur le port 8000
 ```
 
@@ -186,8 +174,12 @@ downloader batch) est dans [GUI.md](GUI.md).
 L'analyse du paysage concurrentiel (yt-dlp, pytubefix, YouTube Data API,
 streamlink, ArchiveBox, …) est dans [LANDSCAPE.md](LANDSCAPE.md).
 
-# Auteur
+## Auteur
  - [Warith HARCHAOUI](https://linkedin.com/in/warith-harchaoui)
 
-# Remerciements
+## Remerciements
 Remerciements chaleureux à [Mohamed Chelali](https://mchelali.github.io) et [Bachir Zerroug](https://www.linkedin.com/in/bachirzerroug) pour nos échanges fructueux.
+
+## Licence
+
+Ce projet est distribué sous licence BSD-3-Clause — voir le fichier [LICENSE](LICENSE) pour les détails.
