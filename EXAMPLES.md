@@ -32,7 +32,7 @@ on macOS — install `brew` thanks to [brew.sh](https://brew.sh/)).
 
 ```bash
 pip install --force-reinstall --no-cache-dir \
-  git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.2
+  git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.9
 ```
 
 Brings in `os-helper` / `audio-helper` / `video-helper` automatically.

@@ -43,12 +43,12 @@ pip install "youtube-helper[api,mcp]"   # outils MCP au-dessus de FastAPI
 ### Depuis les sources (sans PyPI)
 
 ```bash
-pip install "git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.5"
+pip install "git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.9"
 
 # Surfaces optionnelles
-pip install "youtube-helper[cli] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.5"
-pip install "youtube-helper[api] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.5"
-pip install "youtube-helper[api,mcp] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.5"
+pip install "youtube-helper[cli] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.9"
+pip install "youtube-helper[api] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.9"
+pip install "youtube-helper[api,mcp] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.9"
 ```
 
 ## Utilisation
@@ -148,16 +148,16 @@ youtube-helper resolve      --url https://www.youtube.com/watch?v=YE7VzlLtp-4 --
 youtube-helper channel-info --url https://www.youtube.com/@blender
 
 # Jumeau CLI click (nécessite l'extra [cli])
-pip install 'youtube-helper[cli] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.5'
+pip install 'youtube-helper[cli] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.9'
 youtube-helper-click metadata --url https://www.youtube.com/watch?v=YE7VzlLtp-4
 
 # Surface HTTP FastAPI (nécessite l'extra [api])
-pip install 'youtube-helper[api] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.5'
+pip install 'youtube-helper[api] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.9'
 uvicorn youtube_helper.api:app --port 8000
 # → doc OpenAPI sur http://localhost:8000/docs
 
 # Outils MCP au-dessus de FastAPI (nécessite les extras [api,mcp])
-pip install 'youtube-helper[api,mcp] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.5'
+pip install 'youtube-helper[api,mcp] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.9'
 youtube-helper-mcp                # sert FastAPI + MCP sur le port 8000
 ```
 
