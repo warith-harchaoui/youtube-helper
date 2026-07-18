@@ -36,7 +36,10 @@ from PIL import Image
 
 
 def default_ytdlp_options(
-    overwrites: bool = True, audio: bool = False, video: bool = False
+    overwrites: bool = True,
+    audio: bool = False,
+    video: bool = False,
+    cookie_dir: str | None = None,
 ) -> dict:
     """
     Generate default yt-dlp options based on provided parameters.
@@ -49,6 +52,11 @@ def default_ytdlp_options(
         Whether to download audio only. Default is False.
     video : bool, optional
         Whether to download video only (overrides audio). Default is False.
+    cookie_dir : str or None, optional
+        Directory in which yt-dlp's session cookie jar is written. The download
+        helpers pass their ``temporary_folder`` here so the jar disappears when
+        the ``with`` block exits; when omitted it falls back to the system temp
+        directory. It is *never* written to the current working directory.
 
     Returns
     -------
@@ -73,14 +81,8 @@ def default_ytdlp_options(
         "overwrites": overwrites,
     }
 
-    cookies_files = glob.glob("*ytdlp_cookie.txt")
-    osh.remove_files(cookies_files)
-    now = osh.now_string(fmt="filename")
-    cookie_file = f"{now}_ytdlp_cookie.txt"
-
     options.update(
         {
-            "cookiefile": cookie_file,
             "http_headers": {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:94.0) Gecko/20100101 Firefox/94.0",
                 "Accept-Language": "en-US,en;q=0.5",
@@ -89,6 +91,16 @@ def default_ytdlp_options(
             "force_generic_extractor": True,
         }
     )
+
+    # yt-dlp keeps its session cookie jar on disk only when we point it at a file.
+    # Write one solely when the caller gives a directory for it — the download
+    # helpers pass their ``osh.temporary_folder``, so the jar vanishes when their
+    # ``with`` block exits. With no directory (e.g. metadata-only calls) yt-dlp
+    # keeps cookies in memory, so nothing is ever left in the working directory
+    # (this used to litter a stray ``<timestamp>_ytdlp_cookie.txt`` next to the caller).
+    if cookie_dir:
+        now = osh.now_string(fmt="filename")
+        options["cookiefile"] = osh.join(cookie_dir, f"{now}_ytdlp_cookie.txt")
 
     options["extractor_args"] = {"youtube": {"player_skip": ["js"]}}
 
@@ -249,7 +261,7 @@ def download_thumbnail(url: str, output_path: str = None) -> str:
         o = osh.join(temp_directory, basename)
 
         # Set yt-dlp options to download only the thumbnail
-        opts = default_ytdlp_options()
+        opts = default_ytdlp_options(cookie_dir=temp_directory)
         opts["skip_download"] = True
         opts["writethumbnail"] = True
         opts["outtmpl"] = f"{o}.%(ext)s"
@@ -330,7 +342,7 @@ def download_audio(url: str, output_path: str = None, target_sample_rate: int = 
         o = osh.join(temp_directory, basename)
 
         # Set yt-dlp options to download the best quality audio
-        opts = default_ytdlp_options(audio=True)
+        opts = default_ytdlp_options(audio=True, cookie_dir=temp_directory)
         opts["outtmpl"] = f"{o}.%(ext)s"
 
         # Download the audio using yt-dlp
@@ -402,7 +414,7 @@ def download_video(url: str, output_path: str = None) -> str:
         o = osh.join([temp_directory, basename])
 
         # Set yt-dlp options to download the best quality video
-        opts = default_ytdlp_options(video=True)
+        opts = default_ytdlp_options(video=True, cookie_dir=temp_directory)
         opts["outtmpl"] = f"{o}.%(ext)s"
 
         # Download the best quality video using yt-dlp

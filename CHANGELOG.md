@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.6] - 2026-07-18
+
+### Fixed
+
+- yt-dlp's session cookie jar is no longer written to the current working
+  directory (which left a stray `<timestamp>_ytdlp_cookie.txt` next to
+  callers). `default_ytdlp_options` now takes an optional `cookie_dir`; the
+  download helpers pass their temporary folder so the jar is removed on
+  context exit, and metadata-only calls keep cookies in memory.
+
 ## [1.3.5] - 2026-07-15
 
 ### Documentation
