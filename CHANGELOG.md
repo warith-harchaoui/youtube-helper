@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.8] - 2026-07-18
+
+### Fixed
+
+- Stopped skipping the YouTube player JS (`player_skip=js`). Modern yt-dlp needs
+  it to decipher formats and negotiate a proof-of-origin (PO) token; without it,
+  downloads from datacenter IPs fail with 'Sign in to confirm you're not a bot'.
+
 ## [1.3.7] - 2026-07-18
 
 ### Fixed

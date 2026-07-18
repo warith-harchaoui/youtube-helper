@@ -104,7 +104,9 @@ def default_ytdlp_options(
         now = osh.now_string(fmt="filename")
         options["cookiefile"] = osh.join(cookie_dir, f"{now}_ytdlp_cookie.txt")
 
-    options["extractor_args"] = {"youtube": {"player_skip": ["js"]}}
+    # Do NOT skip the player JS: modern yt-dlp needs it to decipher formats and to
+    # negotiate a proof-of-origin (PO) token, without which YouTube answers "Sign in
+    # to confirm you're not a bot" from datacenter IPs (e.g. CI runners).
 
     if audio:
         options["format"] = "bestaudio/best"
