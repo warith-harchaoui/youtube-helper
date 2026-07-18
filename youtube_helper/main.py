@@ -88,7 +88,9 @@ def default_ytdlp_options(
                 "Accept-Language": "en-US,en;q=0.5",
             },
             # "proxy": "http://your.proxy.server:port", # in case we are banned
-            "force_generic_extractor": True,
+            # NOTE: do NOT force the generic extractor — it makes yt-dlp reject
+            # youtube.com / vimeo / etc. as "Unsupported URL" on modern yt-dlp
+            # (2025.07+). Let yt-dlp pick the correct site extractor.
         }
     )
 

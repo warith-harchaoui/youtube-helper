@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.7] - 2026-07-18
+
+### Fixed
+
+- Removed `force_generic_extractor` from the default yt-dlp options. It forced
+  yt-dlp's generic extractor, which modern yt-dlp (2025.07+) rejects with
+  `ERROR: Unsupported URL` on youtube.com / vimeo / etc.; yt-dlp now selects
+  the correct site extractor, so downloads work again on current yt-dlp.
+
 ## [1.3.6] - 2026-07-18
 
 ### Fixed
