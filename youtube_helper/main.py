@@ -27,6 +27,7 @@ Project maintainers.
 from __future__ import annotations
 
 import glob
+import os
 
 import audio_helper as ah
 import os_helper as osh
@@ -94,13 +95,17 @@ def default_ytdlp_options(
         }
     )
 
-    # yt-dlp keeps its session cookie jar on disk only when we point it at a file.
-    # Write one solely when the caller gives a directory for it — the download
-    # helpers pass their ``osh.temporary_folder``, so the jar vanishes when their
-    # ``with`` block exits. With no directory (e.g. metadata-only calls) yt-dlp
-    # keeps cookies in memory, so nothing is ever left in the working directory
-    # (this used to litter a stray ``<timestamp>_ytdlp_cookie.txt`` next to the caller).
-    if cookie_dir:
+    # Cookies. A user-supplied cookies file (Netscape format) takes precedence:
+    # some environments — notably CI on datacenter IPs — need authenticated cookies,
+    # or YouTube answers "Sign in to confirm you're not a bot". Point yt-dlp at it
+    # via the ``YOUTUBE_HELPER_COOKIES`` environment variable. Otherwise keep only a
+    # throwaway session jar inside the caller's ``temporary_folder`` (passed as
+    # ``cookie_dir``, auto-removed on ``with`` exit); metadata-only calls without a
+    # directory keep cookies in memory. Nothing is ever written to the CWD.
+    cookies_file = os.environ.get("YOUTUBE_HELPER_COOKIES", "").strip()
+    if cookies_file and osh.file_exists(cookies_file):
+        options["cookiefile"] = cookies_file
+    elif cookie_dir:
         now = osh.now_string(fmt="filename")
         options["cookiefile"] = osh.join(cookie_dir, f"{now}_ytdlp_cookie.txt")
 

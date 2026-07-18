@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.9] - 2026-07-18
+
+### Added
+
+- Support authenticated downloads via a cookies file: set the `YOUTUBE_HELPER_COOKIES` environment variable to a Netscape-format cookies.txt and yt-dlp uses it. This is the reliable way to download from environments YouTube bot-blocks (e.g. CI on datacenter IPs, which otherwise get 'Sign in to confirm you're not a bot').
+
 ## [1.3.8] - 2026-07-18
 
 ### Fixed
