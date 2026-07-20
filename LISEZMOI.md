@@ -2,9 +2,15 @@
 
 [🇫🇷](LISEZMOI.md) · [🇬🇧](README.md)
 
-[![CI](https://github.com/warith-harchaoui/youtube-helper/actions/workflows/ci.yml/badge.svg)](https://github.com/warith-harchaoui/youtube-helper/actions/workflows/ci.yml) [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](LICENSE) [![Python](https://img.shields.io/badge/python-3.10%E2%80%933.13-blue.svg)](#)
+[![CI](https://github.com/warith-harchaoui/youtube-helper/actions/workflows/ci.yml/badge.svg)](https://github.com/warith-harchaoui/youtube-helper/actions/workflows/ci.yml) [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](LICENSE) [![Python](https://img.shields.io/badge/python-3.10%E2%80%933.13-blue.svg)](#) [![Local-first](https://img.shields.io/badge/privacy-local--first-2f6f5e.svg)](#la-promesse)
 
 `YouTube Helper` fait partie d'une collection de bibliothèques appelée `AI Helpers`, développée pour bâtir des applications d'intelligence artificielle.
+
+## La promesse
+
+**Local-first par conception.** youtube-helper s'exécute entièrement sur votre machine — il ne récupère que les médias que vous demandez ; vos données ne sont jamais téléversées vers un service tiers, aucune télémétrie, aucun compte, aucun verrouillage propriétaire dans le cloud. Vous êtes propriétaire de toute la chaîne. Fait partie de la suite [AI Helpers](https://github.com/warith-harchaoui/ai-helpers) : la souveraineté sur vos données grâce à l'Open Source local-first.
+
+*(youtube-helper accède bien à Internet — il télécharge les médias depuis le site source que vous lui indiquez. La promesse porte sur l'absence d'exfiltration et de télémétrie : rien vous concernant, ni vos requêtes, n'est jamais envoyé ailleurs que vers le site qui héberge le média demandé.)*
 
 [🌍 AI Helpers](https://harchaoui.org/warith/ai-helpers)
 
@@ -43,12 +49,12 @@ pip install "youtube-helper[api,mcp]"   # outils MCP au-dessus de FastAPI
 ### Depuis les sources (sans PyPI)
 
 ```bash
-pip install "git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.9"
+pip install "git+https://github.com/warith-harchaoui/youtube-helper.git@v1.4.0"
 
 # Surfaces optionnelles
-pip install "youtube-helper[cli] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.9"
-pip install "youtube-helper[api] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.9"
-pip install "youtube-helper[api,mcp] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.9"
+pip install "youtube-helper[cli] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.4.0"
+pip install "youtube-helper[api] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.4.0"
+pip install "youtube-helper[api,mcp] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.4.0"
 ```
 
 ## Utilisation
@@ -134,8 +140,8 @@ YouTube Helper est un wrapper léger autour de `yt-dlp` et `ffmpeg`. Vous êtes 
 ## Exposition multi-surface
 
 `youtube-helper` n'est pas seulement une bibliothèque — les mêmes
-fonctions sont exposées comme CLI, comme surface HTTP FastAPI et comme
-outils MCP :
+fonctions sont exposées comme deux CLI, comme surface HTTP FastAPI,
+comme outils MCP et comme interface graphique navigateur :
 
 ```bash
 # Bibliothèque Python (par défaut)
@@ -148,18 +154,36 @@ youtube-helper resolve      --url https://www.youtube.com/watch?v=YE7VzlLtp-4 --
 youtube-helper channel-info --url https://www.youtube.com/@blender
 
 # Jumeau CLI click (nécessite l'extra [cli])
-pip install 'youtube-helper[cli] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.9'
+pip install 'youtube-helper[cli] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.4.0'
 youtube-helper-click metadata --url https://www.youtube.com/watch?v=YE7VzlLtp-4
 
 # Surface HTTP FastAPI (nécessite l'extra [api])
-pip install 'youtube-helper[api] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.9'
+pip install 'youtube-helper[api] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.4.0'
 uvicorn youtube_helper.api:app --port 8000
 # → doc OpenAPI sur http://localhost:8000/docs
 
 # Outils MCP au-dessus de FastAPI (nécessite les extras [api,mcp])
-pip install 'youtube-helper[api,mcp] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.3.9'
+pip install 'youtube-helper[api,mcp] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.4.0'
 youtube-helper-mcp                # sert FastAPI + MCP sur le port 8000
+
+# Interface graphique navigateur (nécessite l'extra [api]) — collez une URL,
+# choisissez audio ou vidéo
+uvicorn youtube_helper.api:app --port 8000
+# → ouvrez http://localhost:8000/gui  (ou simplement http://localhost:8000/)
 ```
+
+**Banc de téléchargement (GUI)** (`GET /gui`) : une page unique autonome
+(Tailwind via CDN + JS vanilla, sans étape de build). Collez une URL YouTube (ou
+tout site supporté par yt-dlp), choisissez **audio** (avec une fréquence
+d'échantillonnage) ou **vidéo**, cliquez sur Télécharger, et le résultat se joue
+en ligne avec un lien de téléchargement. La page POST vers les mêmes endpoints
+`/audio` / `/video` — zéro logique serveur en plus. Local-first : la page ne
+parle qu'à votre API locale.
+
+**Skill agent** (Claude Code / Claude Desktop / OpenCode) : installez
+[`skills/youtube-helper/`](skills/README.md) pour qu'un agent télécharge et
+inspecte des médias pour vous. Voir [TRIGGERS.md](TRIGGERS.md) pour le catalogue
+exhaustif des déclencheurs.
 
 Image Docker :
 
@@ -168,7 +192,7 @@ docker build -t youtube-helper .
 docker run --rm -p 8000:8000 youtube-helper
 ```
 
-Un plan innovant de GUI (bibliothèque vidéo, comparateur de chaînes,
+Un plan de GUI plus riche (bibliothèque vidéo, comparateur de chaînes,
 downloader batch) est dans [GUI.md](GUI.md).
 
 L'analyse du paysage concurrentiel (yt-dlp, pytubefix, YouTube Data API,

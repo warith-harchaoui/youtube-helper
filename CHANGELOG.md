@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-07-20
+
+### Added
+
+- **Browser GUI** — a minimal single-page "download bench" served by the
+  FastAPI app at `GET /gui` (and `GET /` redirects to it). Paste a YouTube (or
+  any yt-dlp-supported) URL, choose audio (with a target sample rate) or video,
+  hit Download, and the result plays inline with a download link. Self-contained
+  HTML + Tailwind (CDN) + vanilla JS, no build step; it POSTs to the existing
+  `/audio` / `/video` endpoints so it adds zero server-side logic. Lives in
+  `youtube_helper/gui.py`.
+- **Agent skill** — `skills/youtube-helper/` packages youtube-helper as a Claude
+  Skill and an OpenCode skill (`SKILL.md` with a trigger-rich third-person
+  description + `references/{cli-reference,surfaces,triggers}.md`), plus
+  `skills/README.md` with install instructions (symlink into `~/.claude/skills`
+  and `~/.opencode/skills`).
+- **`TRIGGERS.md`** — an exhaustive, user-facing catalogue of the phrasings,
+  commands, functions, and sites that should invoke youtube-helper, referenced
+  from README and LISEZMOI.
+- **The Promise / La promesse** — a local-first privacy statement (EN + FR) and
+  a `Local-first` badge at the top of README / LISEZMOI.
+
+### Changed
+
+- The FastAPI app now reports its version from installed package metadata
+  (`importlib.metadata`) instead of a hard-coded string that had drifted to
+  `1.3.3`.
+- `.gitignore` now covers `.private/` and stray `*_ytdlp_cookie.txt` jars.
+- README / LISEZMOI Features and multi-surface sections document the GUI and the
+  agent skill.
+
+### Preserved
+
+- All hard-won yt-dlp fixes are untouched: cookie jar kept out of the working
+  directory (temp-scoped), no `force_generic_extractor`, no `player_skip=js`,
+  and `YOUTUBE_HELPER_COOKIES` support. Live YouTube download tests stay
+  local-only (skipped in CI by design).
+
 ## [1.3.9] - 2026-07-18
 
 ### Added

@@ -251,3 +251,10 @@ cython_debug/
 nomoreclaude.sh
 .secrets/
 .pypirc
+
+# Private working notes (Ralph-loop assessment, todo, etc.) — never tracked.
+.private/
+
+# yt-dlp throwaway session cookie jars — written to a temp folder, but guard
+# against any stray copy landing next to the code.
+*_ytdlp_cookie.txt

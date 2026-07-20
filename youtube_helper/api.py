@@ -49,11 +49,19 @@ import io
 import shutil
 import tempfile
 import zipfile
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as _pkg_version
 from pathlib import Path
 
 try:
     from fastapi import BackgroundTasks, FastAPI, HTTPException
-    from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+    from fastapi.responses import (
+        FileResponse,
+        HTMLResponse,
+        JSONResponse,
+        RedirectResponse,
+        StreamingResponse,
+    )
     from pydantic import BaseModel, Field
 except ImportError as exc:  # pragma: no cover
     raise ImportError(
@@ -84,6 +92,29 @@ from . import (
 # ---------------------------------------------------------------------------
 
 
+def _resolve_version() -> str:
+    """Return the installed ``youtube-helper`` version, or a dev fallback.
+
+    Reading the version from installed package metadata keeps the FastAPI
+    ``version`` field in lock-step with ``pyproject.toml`` — a hard-coded
+    string here drifted from the real version in the past (it was stuck at
+    ``1.3.3`` while the package moved on).
+
+    Returns
+    -------
+    str
+        The distribution version (e.g. ``"1.4.0"``), or ``"0+unknown"`` when
+        the package is not installed (running straight from a source checkout
+        without an editable install).
+    """
+    # importlib.metadata raises PackageNotFoundError when the dist is not
+    # installed; degrade gracefully rather than crashing app construction.
+    try:
+        return _pkg_version("youtube-helper")
+    except PackageNotFoundError:  # pragma: no cover — source-only checkout
+        return "0+unknown"
+
+
 app = FastAPI(
     title="YouTube Helper API",
     description=(
@@ -91,7 +122,7 @@ app = FastAPI(
         "audio / thumbnails, resolve direct media URLs, browse video "
         "stream catalogs, pull no-API engagement metadata."
     ),
-    version="1.3.3",
+    version=_resolve_version(),
     docs_url="/docs",
     redoc_url="/redoc",
 )
@@ -223,6 +254,35 @@ class YtDlpVersionBody(BaseModel):
 def health() -> dict:
     """Simple liveness probe — no dependency check, just proves the app is up."""
     return {"status": "ok"}
+
+
+@app.get("/", include_in_schema=False)
+def root() -> RedirectResponse:
+    """Redirect the bare root to the GUI so opening the server just works."""
+    # A human hitting http://host:port/ almost always wants the download bench,
+    # not a 404. Machines use the documented endpoints directly, so this is safe.
+    return RedirectResponse(url="/gui")
+
+
+@app.get("/gui", response_class=HTMLResponse, tags=["meta"])
+def gui() -> HTMLResponse:
+    """Serve the self-contained single-page 'download bench' GUI.
+
+    The page (defined in :mod:`youtube_helper.gui`) is a build-step-free
+    HTML + Tailwind-CDN + vanilla-JS client that POSTs to the very same
+    ``/audio`` / ``/video`` endpoints defined below. It adds no server-side
+    logic — it is purely a friendlier front door to the API.
+
+    Returns
+    -------
+    HTMLResponse
+        The complete HTML document (status 200, ``text/html``).
+    """
+    # Import here so the (large) HTML string is only loaded when the route is
+    # actually hit, and so importing the API module stays cheap.
+    from .gui import GUI_HTML
+
+    return HTMLResponse(content=GUI_HTML)
 
 
 # ---------------------------------------------------------------------------
