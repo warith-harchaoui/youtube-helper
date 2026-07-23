@@ -200,7 +200,8 @@ A richer GUI plan (video library board, channel comparator, batch downloader)
 lives in [GUI.md](https://github.com/warith-harchaoui/youtube-helper/blob/main/GUI.md).
 
 The competitive landscape (yt-dlp, pytubefix, YouTube Data API,
-streamlink, ArchiveBox, …) is analysed in [LANDSCAPE.md](https://github.com/warith-harchaoui/youtube-helper/blob/main/LANDSCAPE.md).
+streamlink, ArchiveBox, …) is analysed, with a positioning map, in
+[LANDSCAPE.md](https://github.com/warith-harchaoui/youtube-helper/blob/main/LANDSCAPE.md).
 
 ## Author
  - [Warith HARCHAOUI](https://linkedin.com/in/warith-harchaoui)

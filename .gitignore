@@ -258,3 +258,7 @@ nomoreclaude.sh
 # yt-dlp throwaway session cookie jars — written to a temp folder, but guard
 # against any stray copy landing next to the code.
 *_ytdlp_cookie.txt
+
+# Landscape CSVs — generated from LANDSCAPE.md / PAYSAGE.md, not tracked.
+assets/landscape.csv
+assets/paysage.csv

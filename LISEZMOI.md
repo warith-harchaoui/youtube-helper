@@ -196,7 +196,8 @@ Un plan de GUI plus riche (bibliothèque vidéo, comparateur de chaînes,
 downloader batch) est dans [GUI.md](GUI.md).
 
 L'analyse du paysage concurrentiel (yt-dlp, pytubefix, YouTube Data API,
-streamlink, ArchiveBox, …) est dans [LANDSCAPE.md](LANDSCAPE.md).
+streamlink, ArchiveBox, …), avec une carte de positionnement, est dans
+[PAYSAGE.md](https://github.com/warith-harchaoui/youtube-helper/blob/main/PAYSAGE.md).
 
 ## Auteur
  - [Warith HARCHAOUI](https://linkedin.com/in/warith-harchaoui)
