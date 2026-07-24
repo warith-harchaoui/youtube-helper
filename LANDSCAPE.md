@@ -13,6 +13,7 @@ score just reflects fit to *this* niche.
 
 ## At a glance
 
+<!-- TABLE:START -->
 | Media Downloading | Multi-platform | Media download | Direct-URL resolver | Stream picker | No-API engagement | Multi-surface | Docker-ready | AI-pipeline ergonomics |
 | --- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **youtube-helper** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
@@ -25,14 +26,17 @@ score just reflects fit to *this* niche.
 | streamlink | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
 | youtube_transcript_api | ⭐ | ⭐ | ⭐ | ⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
 | ArchiveBox | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐ |
+<!-- TABLE:END -->
 
 ## Positioning map
 
+<!-- FIGURE:START -->
 2D representation of the table above.
 
 ![Positioning map](https://raw.githubusercontent.com/warith-harchaoui/youtube-helper/main/assets/landscape.png)
 
-The map is a 2-D summary of the eight criteria, so read it as a shape, not a scoreboard. `youtube-helper` is at the top-right corner. The axes read **Horizontal — Engagement ↔ Resolver** and **Vertical — Download ↔ Surface**.
+The map is a 2-D summary of the eight criteria, so read it as a shape, not a scoreboard. `youtube-helper` is at the top-right corner. The axes read **Horizontal — Simplicity ↔ Versatility** and **Vertical — Fundamentals ↔ Integration**.
+<!-- FIGURE:END -->
 
 ## Positioning
 

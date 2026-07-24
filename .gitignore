@@ -260,5 +260,3 @@ nomoreclaude.sh
 *_ytdlp_cookie.txt
 
 # Landscape CSVs — generated from LANDSCAPE.md / PAYSAGE.md, not tracked.
-assets/landscape.csv
-assets/paysage.csv

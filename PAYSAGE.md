@@ -14,6 +14,7 @@ torrent) n'est pas pénalisé — la note reflète seulement l'adéquation à
 
 ## En un coup d'œil
 
+<!-- TABLE:START -->
 | Téléchargement de médias | Multi-plateforme | Téléchargement média | Résolveur d'URL directe | Sélecteur de flux | Engagement sans API | Multi-surface | Prêt pour Docker | Ergonomie pipeline IA |
 | --- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **youtube-helper** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
@@ -26,14 +27,17 @@ torrent) n'est pas pénalisé — la note reflète seulement l'adéquation à
 | streamlink | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
 | youtube_transcript_api | ⭐ | ⭐ | ⭐ | ⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
 | ArchiveBox | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐ |
+<!-- TABLE:END -->
 
 ## Carte de positionnement
 
+<!-- FIGURE:START -->
 Représentation 2D du tableau ci-dessus.
 
 ![Carte de positionnement](https://raw.githubusercontent.com/warith-harchaoui/youtube-helper/main/assets/paysage.png)
 
 La carte est un résumé en 2D des 8 critères : à lire comme une forme, pas comme un classement. « youtube-helper » se situe dans le coin en haut à droite. Les axes se lisent **Horizontal — Engagement ↔ Solveur** et **Vertical — Chargement ↔ Surface**.
+<!-- FIGURE:END -->
 
 ## Positionnement
 
