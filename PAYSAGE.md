@@ -14,7 +14,7 @@ torrent) n'est pas pénalisé — la note reflète seulement l'adéquation à
 
 ## En un coup d'œil
 
-| Acquisition de médias | Multi-plateforme | Téléchargement média | Résolveur d'URL directe | Sélecteur de flux | Engagement sans API | Multi-surface | Prêt pour Docker | Ergonomie pipeline IA |
+| Téléchargement de médias | Multi-plateforme | Téléchargement média | Résolveur d'URL directe | Sélecteur de flux | Engagement sans API | Multi-surface | Prêt pour Docker | Ergonomie pipeline IA |
 | --- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **youtube-helper** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
 | yt-dlp | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ |
@@ -22,7 +22,6 @@ torrent) n'est pas pénalisé — la note reflète seulement l'adéquation à
 | pytube | ⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
 | pytubefix | ⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
 | YouTube Data API | ⭐ | ⭐ | ⭐ | ⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
-| Playwright / Selenium | ⭐⭐⭐ | ⭐⭐ | ⭐ | ⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐ |
 | you-get | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ |
 | streamlink | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
 | youtube_transcript_api | ⭐ | ⭐ | ⭐ | ⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
@@ -30,15 +29,11 @@ torrent) n'est pas pénalisé — la note reflète seulement l'adéquation à
 
 ## Carte de positionnement
 
-Une ACP du tableau ci-dessus, projetée sur deux axes lisibles. La référence est placée en haut à droite ; plus on va vers le haut et la droite, plus l'outil est fort sur ces dimensions.
+Représentation 2D du tableau ci-dessus.
 
 ![Carte de positionnement](https://raw.githubusercontent.com/warith-harchaoui/youtube-helper/main/assets/paysage.png)
 
-La carte positionne les outils selon un axe horizontal allant d'une interaction minimale sans interface à une efficacité directe, et un axe vertical variant du téléchargement immédiat à une intégration fluide. La référence **youtube-helper** se situe en haut à droite, où l'efficacité et l'intégration sont maximisées, confirmant son statut de meilleur outil. **yt-dlp** se distingue par son innovation, positionné vers la droite, tandis que **ArchiveBox** incarne la fiabilité, proche de la zone haute. Les outils comme **streamlink** et **pytubefix** occupent des positions intermédiaires, reflétant un équilibre entre performance et adaptabilité. Le classement global met en avant une progression de la fiabilité à l'innovation, avec **youtube-helper** en tête, suivi de **yt-dlp** et **ArchiveBox**, soulignant une tendance vers des solutions plus intégrées et fiables.
-
-- **Horizontal — Interaction sans Interface ↔ Efficacité directe** (58% de variance)
-- **Vertical — Téléchargement direct ↔ Intégration fluide** (21% de variance)
-
+La carte est un résumé en 2D des 8 critères : à lire comme une forme, pas comme un classement. « youtube-helper » se situe dans le coin en haut à droite. Les axes se lisent **Horizontal — Engagement ↔ Solveur** et **Vertical — Chargement ↔ Surface**.
 
 ## Positionnement
 
@@ -86,8 +81,6 @@ apporte :
 - **API YouTube Data** — vous avez besoin des compteurs canoniques de
   vues / likes / abonnés, de données de rétention / d'analytics, ou vous
   payez déjà le coût OAuth + quota.
-- **Playwright / Selenium** — le site n'expose pas d'extracteur et vous
-  devez scraper la page rendue.
 - **`you-get`** — un téléchargeur multi-sites large quand yt-dlp n'est pas
   envisageable ; la couverture est vaste mais inférieure à yt-dlp.
 - **`streamlink`** — flux de travail orienté direct ; vous voulez passer

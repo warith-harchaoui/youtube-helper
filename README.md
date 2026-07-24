@@ -23,6 +23,8 @@ It also supports post-processing tasks such as converting or merging media files
 
 [💻 Documentation](https://harchaoui.org/warith/ai-helpers/docs/youtube-helper-doc/)
 
+[🗺️ Landscape](https://github.com/warith-harchaoui/youtube-helper/blob/main/LANDSCAPE.md)
+
 [📋 Examples](https://github.com/warith-harchaoui/youtube-helper/blob/main/EXAMPLES.md)
 
 ## Installation

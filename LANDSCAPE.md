@@ -13,7 +13,7 @@ score just reflects fit to *this* niche.
 
 ## At a glance
 
-| Media Acquisition | Multi-platform | Media download | Direct-URL resolver | Stream picker | No-API engagement | Multi-surface | Docker-ready | AI-pipeline ergonomics |
+| Media Downloading | Multi-platform | Media download | Direct-URL resolver | Stream picker | No-API engagement | Multi-surface | Docker-ready | AI-pipeline ergonomics |
 | --- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **youtube-helper** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
 | yt-dlp | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ |
@@ -21,7 +21,6 @@ score just reflects fit to *this* niche.
 | pytube | ⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
 | pytubefix | ⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
 | YouTube Data API | ⭐ | ⭐ | ⭐ | ⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
-| Playwright / Selenium | ⭐⭐⭐ | ⭐⭐ | ⭐ | ⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐ |
 | you-get | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ |
 | streamlink | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
 | youtube_transcript_api | ⭐ | ⭐ | ⭐ | ⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
@@ -29,15 +28,11 @@ score just reflects fit to *this* niche.
 
 ## Positioning map
 
-A PCA of the table above, projected onto two readable axes. The reference is rotated to the top-right; higher and further right is stronger on these dimensions.
+2D representation of the table above.
 
 ![Positioning map](https://raw.githubusercontent.com/warith-harchaoui/youtube-helper/main/assets/landscape.png)
 
-The positioning map organizes tools along two dimensions: horizontal simplicity to integration, reflecting ease of use versus system compatibility, and vertical direct access to versatility, indicating straightforward functionality versus adaptability. The reference 'youtube-helper' occupies the top-right quadrant, balancing high versatility and integration, which aligns with its status as the top performer. Tools like yt-dlp cluster near the upper range of versatility, emphasizing innovation, while ArchiveBox sits toward the middle of the vertical axis, highlighting its focus on trustworthiness over broad integration. The leaderboard reveals a concentration of top tools in the upper-right, where versatility and integration converge, but also highlights distinct clusters: innovative tools in the upper-middle, trustworthy options in the middle-right, and simpler, more direct solutions toward the lower ends. This distribution underscores trade-offs between ease of use, adaptability, and specialized strengths across the toolset.
-
-- **Horizontal — Simplicity ↔ Integration** (58% of variance)
-- **Vertical — Direct Access ↔ Versatility** (21% of variance)
-
+The map is a 2-D summary of the eight criteria, so read it as a shape, not a scoreboard. `youtube-helper` is at the top-right corner. The axes read **Horizontal — Engagement ↔ Resolver** and **Vertical — Download ↔ Surface**.
 
 ## Positioning
 
@@ -81,8 +76,6 @@ the hood). What it adds:
 - **YouTube Data API** — you need canonical view / like / subscriber
   counts, retention / analytics data, or you are already paying the
   OAuth + quota cost.
-- **Playwright / Selenium** — the site does not expose an extractor and
-  you need to scrape the rendered page.
 - **`you-get`** — a broad multi-site downloader when yt-dlp is not an
   option; coverage is wide but below yt-dlp.
 - **`streamlink`** — live-first workflow; you want to hand a live URL

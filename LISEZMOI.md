@@ -23,6 +23,8 @@ Elle supporte également les tâches de post-traitement comme la conversion ou l
 
 [💻 Documentation](https://harchaoui.org/warith/ai-helpers/docs/youtube-helper-doc/)
 
+[🗺️ Paysage](https://github.com/warith-harchaoui/youtube-helper/blob/main/PAYSAGE.md)
+
 [📋 Exemples](https://github.com/warith-harchaoui/youtube-helper/blob/main/EXAMPLES.md)
 
 ## Installation
