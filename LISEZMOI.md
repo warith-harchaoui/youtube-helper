@@ -8,16 +8,16 @@
 
 ## La promesse
 
-**Local-first par conception.** youtube-helper s'exécute entièrement sur votre machine — il ne récupère que les médias que vous demandez ; vos données ne sont jamais téléversées vers un service tiers, aucune télémétrie, aucun compte, aucun verrouillage propriétaire dans le cloud. Vous êtes propriétaire de toute la chaîne. Fait partie de la suite [AI Helpers](https://github.com/warith-harchaoui/ai-helpers) : la souveraineté sur vos données grâce à l'Open Source local-first.
+**Local-first par conception.** youtube-helper s'exécute entièrement sur votre machine — il ne récupère que les médias que vous demandez ; vos données ne partent jamais vers un service tiers, aucune télémétrie, aucun compte, aucun verrouillage propriétaire dans le cloud. Vous gardez la main sur toute la chaîne. Fait partie de la suite [AI Helpers](https://github.com/warith-harchaoui/ai-helpers) : la souveraineté sur vos données grâce à l'Open Source local-first.
 
-*(youtube-helper accède bien à Internet — il télécharge les médias depuis le site source que vous lui indiquez. La promesse porte sur l'absence d'exfiltration et de télémétrie : rien vous concernant, ni vos requêtes, n'est jamais envoyé ailleurs que vers le site qui héberge le média demandé.)*
+*(youtube-helper accède bien à Internet — il télécharge les médias depuis le site source que vous lui indiquez. La promesse porte sur l'absence d'exfiltration et de télémétrie : rien vous concernant, ni vos requêtes, n'est envoyé ailleurs que vers le site qui héberge le média demandé.)*
 
 [🌍 AI Helpers](https://harchaoui.org/warith/ai-helpers)
 
 [![logo](assets/logo.png)](https://harchaoui.org/warith/ai-helpers)
 
-YouTube Helper est une bibliothèque Python qui fournit des fonctions utilitaires pour télécharger des vidéos, de l'audio et des vignettes depuis des plateformes comme YouTube, Vimeo et DailyMotion grâce à `yt-dlp`.
-Elle supporte également les tâches de post-traitement comme la conversion ou la fusion de fichiers média avec `ffmpeg`.
+YouTube Helper est une bibliothèque Python de fonctions utilitaires pour télécharger vidéos, audio et vignettes depuis des plateformes comme YouTube, Vimeo et DailyMotion, via `yt-dlp`.
+Elle gère aussi le post-traitement : conversion ou fusion de fichiers média avec `ffmpeg`.
 
 ## Documentation
 
@@ -35,7 +35,7 @@ Elle supporte également les tâches de post-traitement comme la conversion ou l
 - 🐧 **Ubuntu/Debian** : `sudo apt update && sudo apt install -y python3 python3-pip git yt-dlp ffmpeg`
 - 🪟 **Windows** (PowerShell) : `winget install Python.Python.3.12 Git.Git yt-dlp.yt-dlp Gyan.FFmpeg`
 
-Nous recommandons l'utilisation d'environnements Python. Consultez ce lien si vous ne savez pas comment faire : [🥸 Conseils techniques](https://harchaoui.org/warith/4ml/#install).
+On recommande de travailler dans un environnement Python. Si vous ne savez pas en créer un, voir [🥸 Conseils techniques](https://harchaoui.org/warith/4ml/#install).
 
 ### Depuis PyPI (recommandé)
 
@@ -121,14 +121,14 @@ YouTube Helper est un wrapper léger autour de `yt-dlp` et `ffmpeg`. Vous êtes 
 
 **Téléchargements (sur disque)** — `youtube_helper.main`
 - `download_video(url, output_path)` / `download_audio(url, output_path)` / `download_thumbnail(url, output_path)`.
-- `video_url_meta_data(url)` / `is_valid_video_url(url)` pour des sondes de métadonnées légères.
+- `video_url_meta_data(url)` / `is_valid_video_url(url)` pour interroger les métadonnées sans télécharger.
 - `default_ytdlp_options(verbose, ...)` pour personnaliser les options yt-dlp.
 
 **Catalogue de flux & résolution d'URL directe** — `youtube_helper.streaming`
 - `resolve_direct_url(url, prefer="audio"|"video")` → un raccourci "donne-moi une URL directe prête à passer à ffmpeg".
 - `list_video_streams(url)` → énumère chaque format vidéo trouvé par yt-dlp (codec, résolution, fps, bitrate, …).
 - `pick_video_stream(url, prefer_codec=, prefer_format=, max_fps=, language=, cookies_from_browser=)` → picker contraint, retourne un `VideoStreamInfo` prêt à alimenter `video_helper.extract_frames`.
-- `extract_frames_stream(url, ..., **extract_frames_kwargs)` → composition en un appel de `pick_video_stream` + `video_helper.extract_frames`, câble les headers automatiquement, forwarde n'importe quel kwarg d'`extract_frames` (`destination`, `device`, `batch_size`, `output_width`, `frame_step`, …). Le chemin le plus court d'une URL YouTube / Vimeo / Twitch vers des frames prêtes pour le ML.
+- `extract_frames_stream(url, ..., **extract_frames_kwargs)` → composition en un appel de `pick_video_stream` + `video_helper.extract_frames` ; câble les headers tout seul et transmet n'importe quel kwarg d'`extract_frames` (`destination`, `device`, `batch_size`, `output_width`, `frame_step`, …). Le chemin le plus court d'une URL YouTube / Vimeo / Twitch vers des frames prêtes pour le ML.
 - Le catalogue / picker de flux audio vit volontairement dans **podcast-helper** (propriétaire unique du streaming PCM audio).
 
 **Métadonnées d'engagement sans API** — `youtube_helper.branding`

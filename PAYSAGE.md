@@ -45,7 +45,7 @@ La carte est un résumé en 2D des 8 critères : à lire comme une forme, pas co
 **couverture brute de yt-dlp** et de l'**ergonomie des pipelines d'IA /
 personal branding**. Il ne cherche pas à concurrencer yt-dlp sur
 l'ampleur des extracteurs (il *est* yt-dlp sous le capot). Ce qu'il
-apporte :
+ajoute :
 
 - **Formes de retour normalisées** — les métriques d'engagement suivent
   le même schéma sur YouTube / Vimeo / DailyMotion / Twitch, si bien que
@@ -66,7 +66,7 @@ apporte :
 - **Surfaces multiples** — les mêmes opérations sont disponibles comme
   bibliothèque Python, CLI argparse, CLI click, surface HTTP FastAPI et
   outils MCP. `yt-dlp` vous donne les deux premières ; les trois
-  dernières sont propres à cet emballage.
+  dernières sont propres à ce wrapper.
 - **Prêt pour Docker** — un seul `docker run` et vous avez un serveur
   HTTP + MCP local pour n'importe quelle URL prise en charge par yt-dlp.
 
