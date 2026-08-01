@@ -13,7 +13,7 @@ files, transcribe, synthesize, or upload.
 
 ## Operations → how to invoke
 
-| Intent | CLI | Library | API / MCP |
+| Intent | CLI | Library | API |
 |--------|-----|---------|-----------|
 | Download video (best video+audio) | `youtube-helper video` | `download_video` | `POST /video` |
 | Download audio only (mp3) | `youtube-helper audio` | `download_audio` | `POST /audio` |
@@ -46,7 +46,7 @@ same flags) and the download bench GUI at `GET /gui` (audio/video downloads).
 - **Streams**: "resolve this to a direct mp4 / audio URL", "list the available
   formats / resolutions", "pick the 1080p h264 stream", "stream frames from
   this URL".
-- **Surfaces**: "run the youtube-helper API / MCP server", "open the download
+- **Surfaces**: "run the youtube-helper API server", "open the download
   GUI", "install youtube-helper".
 
 ## Sites it supports

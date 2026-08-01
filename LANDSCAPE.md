@@ -60,16 +60,16 @@ the hood). What it adds:
   + quota.
 - **Multi-surface exposure** — the same operations are available as a
   Python library, an argparse CLI, a click CLI, a FastAPI HTTP
-  surface, and MCP tools. `yt-dlp` gives you the first two; the last
-  three are unique to this wrapper.
-- **Docker-ready** — one `docker run` and you have a local HTTP + MCP
+  surface. `yt-dlp` gives you the first two; the last two are unique
+  to this wrapper.
+- **Docker-ready** — one `docker run` and you have a local HTTP
   server for any yt-dlp-supported URL.
 
 ## When to pick what
 
 - **`youtube-helper`** — download + engagement metadata for AI /
   personal-branding pipelines, especially when you want the same
-  toolkit as library, CLI, HTTP, and MCP.
+  toolkit as library, CLI, and HTTP.
 - **`yt-dlp`** (direct) — you already own the pipeline and just need
   the raw info dict / files, no normalisation layer needed.
 - **`youtube-dl`** — legacy code paths; the extractor set has drifted,

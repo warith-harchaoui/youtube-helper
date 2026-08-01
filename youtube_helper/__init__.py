@@ -29,8 +29,6 @@ The same functions are also available as:
   ``youtube-helper-click``. Requires the ``[cli]`` extra.
 - ``youtube_helper.api``          — FastAPI HTTP surface. Requires the
   ``[api]`` extra.
-- ``youtube_helper.mcp``          — MCP tools over the FastAPI app,
-  entry point ``youtube-helper-mcp``. Requires the ``[api,mcp]`` extras.
 
 Dependencies
 - yt-dlp

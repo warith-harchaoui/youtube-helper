@@ -31,7 +31,7 @@ human-reviewable full list). Keep the two in sync, and mirror the repo-root
 - "stream frames from this URL", "URL to ML-ready frames"
 
 **Explicit command / function mentions**
-- `youtube-helper`, `youtube-helper-click`, `youtube-helper-mcp`
+- `youtube-helper`, `youtube-helper-click`
 - subcommands `metadata valid video audio thumbnail resolve list-streams
   pick-stream channel-info channel-videos engagement engagement-batch subtitles
   comments ytdlp-version`
@@ -42,7 +42,7 @@ human-reviewable full list). Keep the two in sync, and mirror the repo-root
   ensure_recent_ytdlp default_ytdlp_options`
 
 **Surfaces**
-- "run the youtube-helper API / download server", "expose these as HTTP / MCP tools"
+- "run the youtube-helper API / download server", "expose these as HTTP"
 - "open the download GUI / download bench", "paste-a-URL downloader"
 - "how do I install / run youtube-helper"
 

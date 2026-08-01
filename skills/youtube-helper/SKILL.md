@@ -11,9 +11,9 @@ description: >-
   auto-subtitles, comments) across YouTube, Vimeo, DailyMotion, Twitch VOD,
   SoundCloud, and any other site yt-dlp supports. Exposed as a Python library
   (`import youtube_helper as yth`), two CLIs (`youtube-helper` argparse and
-  `youtube-helper-click`), a FastAPI HTTP surface, an MCP tool set, and a minimal
-  browser GUI at `/gui` (paste a URL → audio or video + quality → download).
-  Local-first: it fetches only the media you ask for, no telemetry, no account.
+  `youtube-helper-click`), a FastAPI HTTP surface, and a minimal browser GUI
+  at `/gui` (paste a URL → audio or video + quality → download). Local-first:
+  it fetches only the media you ask for, no telemetry, no account.
 
   TRIGGER — any of: the user pastes or references a media URL and wants it
   saved locally ("download this YouTube video / audio / mp3 / mp4", "grab the
@@ -28,7 +28,7 @@ description: >-
   mp4/audio URL", "list the available streams / formats / resolutions", "pick
   the 1080p h264 stream", "stream frames from this URL"); the user types or
   references a command (`youtube-helper`, `youtube-helper-click`,
-  `youtube-helper-mcp`, subcommands `metadata|valid|video|audio|thumbnail|
+  subcommands `metadata|valid|video|audio|thumbnail|
   resolve|list-streams|pick-stream|channel-info|channel-videos|engagement|
   engagement-batch|subtitles|comments|ytdlp-version`) or a library function
   (`download_video`, `download_audio`, `download_thumbnail`,
@@ -36,7 +36,7 @@ description: >-
   `list_video_streams`, `pick_video_stream`, `extract_frames_stream`,
   `channel_info`, `channel_videos`, `video_engagement`, `engagement_batch`,
   `video_subtitles`, `video_comments`, `is_short`, `ensure_recent_ytdlp`); the
-  user wants the download API/MCP server run, or the paste-a-URL GUI; the user
+  user wants the download API server run, or the paste-a-URL GUI; the user
   asks to install/run youtube-helper.
 
   SKIP when: the media is already a LOCAL file and the task is transforming it —
@@ -55,8 +55,8 @@ description: >-
 
 `youtube-helper` is a small, local-first Python toolkit that wraps `yt-dlp` and
 `ffmpeg`. You give it a page URL, it writes a file on disk (or returns a metadata
-dict). The same functions are reachable five ways (library, two CLIs, HTTP API,
-MCP, GUI) so an agent can pick whichever fits.
+dict). The same functions are reachable four ways (library, two CLIs, HTTP API,
+GUI) so an agent can pick whichever fits.
 
 ## Before anything: verify it is installed
 
@@ -71,7 +71,6 @@ If missing, install it (yt-dlp and ffmpeg are hard system dependencies):
 pip install youtube-helper                 # core (download / metadata / streams)
 pip install 'youtube-helper[cli]'          # + click CLI twin
 pip install 'youtube-helper[api]'          # + FastAPI HTTP surface + GUI
-pip install 'youtube-helper[api,mcp]'      # + MCP tools over FastAPI
 ```
 
 yt-dlp and ffmpeg must be on PATH:
@@ -81,7 +80,7 @@ yt-dlp and ffmpeg must be on PATH:
 
 ## The core operations
 
-Same names across the library, both CLIs, the API, and the MCP tools:
+Same names across the library, both CLIs, and the API:
 
 | Intent | CLI | Library function |
 |--------|-----|------------------|
@@ -119,7 +118,7 @@ yth.download_video("https://www.youtube.com/watch?v=YE7VzlLtp-4", "out.mp4")
 ```
 
 For the full flag matrix and every option, read `references/cli-reference.md`.
-For the API / MCP / GUI surfaces (endpoints, ports, the `/gui` download bench),
+For the API / GUI surfaces (endpoints, ports, the `/gui` download bench),
 read `references/surfaces.md`. For the exhaustive, auditable trigger list, read
 `references/triggers.md`.
 

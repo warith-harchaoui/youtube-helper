@@ -45,18 +45,16 @@ pip install youtube-helper
 # Surfaces optionnelles
 pip install "youtube-helper[cli]"       # jumeau CLI click
 pip install "youtube-helper[api]"       # surface HTTP FastAPI
-pip install "youtube-helper[api,mcp]"   # outils MCP au-dessus de FastAPI
 ```
 
 ### Depuis les sources (sans PyPI)
 
 ```bash
-pip install "git+https://github.com/warith-harchaoui/youtube-helper.git@v1.4.0"
+pip install "git+https://github.com/warith-harchaoui/youtube-helper.git@v1.5.0"
 
 # Surfaces optionnelles
-pip install "youtube-helper[cli] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.4.0"
-pip install "youtube-helper[api] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.4.0"
-pip install "youtube-helper[api,mcp] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.4.0"
+pip install "youtube-helper[cli] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.5.0"
+pip install "youtube-helper[api] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.5.0"
 ```
 
 ## Utilisation
@@ -143,7 +141,7 @@ YouTube Helper est un wrapper léger autour de `yt-dlp` et `ffmpeg`. Vous êtes 
 
 `youtube-helper` n'est pas seulement une bibliothèque — les mêmes
 fonctions sont exposées comme deux CLI, comme surface HTTP FastAPI,
-comme outils MCP et comme interface graphique navigateur :
+et comme interface graphique navigateur :
 
 ```bash
 # Bibliothèque Python (par défaut)
@@ -156,17 +154,13 @@ youtube-helper resolve      --url https://www.youtube.com/watch?v=YE7VzlLtp-4 --
 youtube-helper channel-info --url https://www.youtube.com/@blender
 
 # Jumeau CLI click (nécessite l'extra [cli])
-pip install 'youtube-helper[cli] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.4.0'
+pip install 'youtube-helper[cli] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.5.0'
 youtube-helper-click metadata --url https://www.youtube.com/watch?v=YE7VzlLtp-4
 
 # Surface HTTP FastAPI (nécessite l'extra [api])
-pip install 'youtube-helper[api] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.4.0'
+pip install 'youtube-helper[api] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.5.0'
 uvicorn youtube_helper.api:app --port 8000
 # → doc OpenAPI sur http://localhost:8000/docs
-
-# Outils MCP au-dessus de FastAPI (nécessite les extras [api,mcp])
-pip install 'youtube-helper[api,mcp] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.4.0'
-youtube-helper-mcp                # sert FastAPI + MCP sur le port 8000
 
 # Interface graphique navigateur (nécessite l'extra [api]) — collez une URL,
 # choisissez audio ou vidéo

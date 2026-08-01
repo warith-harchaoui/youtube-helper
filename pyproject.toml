@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "youtube-helper"
-version = "1.4.0"
+version = "1.5.0"
 description = "YouTube Helper — yt-dlp wrapper for downloading videos / audio / thumbnails, resolving direct media URLs, browsing video stream catalogs, and pulling no-API engagement metadata (channel / video / comments / subtitles) on YouTube, Vimeo, DailyMotion, Twitch VOD, SoundCloud, and any yt-dlp-supported source."
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
@@ -47,24 +47,14 @@ api = [
     "uvicorn>=0.30,<1",
     "python-multipart>=0.0.9,<1",
 ]
-# MCP surface (youtube_helper.mcp). Depends on the `api` extra
-# — fastapi-mcp wraps the FastAPI app.
-mcp = [
-    "fastapi-mcp>=0.3,<1",
-    "fastapi>=0.111,<1",
-    "uvicorn>=0.30,<1",
-    "python-multipart>=0.0.9,<1",
-]
 # `dev` keeps the bar low for CI — pytest + httpx (for FastAPI TestClient)
-# + click (so the click CLI import always resolves in tests) + fastapi-mcp
-# (so the MCP smoke test can import the module).
+# + click (so the click CLI import always resolves in tests).
 dev = [
     "pytest>=8",
     "httpx>=0.27",
     "click>=8.1,<9",
     "fastapi>=0.111,<1",
     "python-multipart>=0.0.9,<1",
-    "fastapi-mcp>=0.3,<1",
 ]
 
 [project.scripts]
@@ -72,8 +62,6 @@ dev = [
 youtube-helper = "youtube_helper.cli_argparse:main"
 # click-based twin — install with [cli] extra.
 youtube-helper-click = "youtube_helper.cli_click:cli"
-# MCP server (over FastAPI) — install with [api,mcp] extras.
-youtube-helper-mcp = "youtube_helper.mcp:main"
 
 [project.urls]
 Homepage = "https://github.com/warith-harchaoui/youtube-helper"

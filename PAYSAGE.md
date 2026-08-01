@@ -64,17 +64,17 @@ ajoute :
   qu'elle est canonique, mais elle ne renvoie aucun fichier média et coûte
   OAuth + quota.
 - **Surfaces multiples** — les mêmes opérations sont disponibles comme
-  bibliothèque Python, CLI argparse, CLI click, surface HTTP FastAPI et
-  outils MCP. `yt-dlp` vous donne les deux premières ; les trois
-  dernières sont propres à ce wrapper.
+  bibliothèque Python, CLI argparse, CLI click et surface HTTP FastAPI.
+  `yt-dlp` vous donne les deux premières ; les deux dernières sont
+  propres à ce wrapper.
 - **Prêt pour Docker** — un seul `docker run` et vous avez un serveur
-  HTTP + MCP local pour n'importe quelle URL prise en charge par yt-dlp.
+  HTTP local pour n'importe quelle URL prise en charge par yt-dlp.
 
 ## Quand choisir quoi
 
 - **`youtube-helper`** — téléchargement + métadonnées d'engagement pour
   les pipelines d'IA / personal branding, surtout quand on veut le même
-  outillage en bibliothèque, CLI, HTTP et MCP.
+  outillage en bibliothèque, CLI et HTTP.
 - **`yt-dlp`** (direct) — vous possédez déjà le pipeline et il vous faut
   seulement l'info dict brut / les fichiers, sans couche de normalisation.
 - **`youtube-dl`** — chemins de code hérités ; le jeu d'extracteurs a

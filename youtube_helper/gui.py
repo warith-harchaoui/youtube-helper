@@ -20,8 +20,8 @@ What the page does
 ------------------
 - Paste a YouTube (or any yt-dlp-supported) URL — kept client-side until Run.
 - Choose *audio* or *video*, and (for audio) a target sample rate.
-- POST a JSON request to the SAME FastAPI endpoints the CLI and MCP surfaces
-  use (``/audio`` / ``/video``) — the GUI adds zero new server logic.
+- POST a JSON request to the SAME FastAPI endpoints the CLI surface
+  uses (``/audio`` / ``/video``) — the GUI adds zero new server logic.
 - Show a progress indicator while the (potentially long) download runs, then a
   download link and an inline ``<audio>`` / ``<video>`` player for the result.
 

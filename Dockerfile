@@ -4,13 +4,13 @@
 #
 # Two-stage build: the base stage pulls system deps (ffmpeg is
 # mandatory for the whole toolkit) and installs the package with the
-# [api,mcp] extras so the container can serve the HTTP + MCP surfaces
-# out of the box.
+# [api] extra so the container can serve the HTTP surface out of the
+# box.
 #
 # Build:
 #   docker build -t youtube-helper .
 #
-# Run (HTTP + MCP on 0.0.0.0:8000):
+# Run (HTTP on 0.0.0.0:8000):
 #   docker run --rm -p 8000:8000 youtube-helper
 #
 # Run CLI one-shot:
@@ -43,7 +43,7 @@ COPY --chown=app:app pyproject.toml README.md LICENSE ./
 COPY --chown=app:app youtube_helper ./youtube_helper
 
 RUN pip install --no-cache-dir --upgrade pip \
- && pip install --no-cache-dir '.[api,mcp]'
+ && pip install --no-cache-dir '.[api]'
 
 # --- runtime ----------------------------------------------------------------
 USER app
@@ -54,5 +54,5 @@ ENV PYTHONUNBUFFERED=1 \
 
 # tini reaps orphan children (ffmpeg / yt-dlp subprocesses) cleanly on SIGTERM.
 ENTRYPOINT ["/usr/bin/tini", "--"]
-# Default: serve FastAPI + MCP. Override for one-shot CLI usage.
-CMD ["youtube-helper-mcp"]
+# Default: serve the FastAPI surface. Override for one-shot CLI usage.
+CMD ["uvicorn", "youtube_helper.api:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -63,19 +63,7 @@ Endpoints:
   resulting file streamed back (temp dir cleaned via `BackgroundTasks`).
 - `POST /subtitles` — JSON body → a `.zip` of the `.vtt` files.
 
-## 4. MCP server — FastAPI-MCP (`youtube-helper[api,mcp]`)
-
-```bash
-pip install 'youtube-helper[api,mcp]'
-youtube-helper-mcp                 # serves FastAPI + MCP on :8000
-# or: python -m youtube_helper.mcp
-```
-
-Wraps the exact FastAPI app with `fastapi_mcp` — the same endpoints become MCP
-tools for any MCP-aware host. Bind via `YOUTUBE_HELPER_HOST` /
-`YOUTUBE_HELPER_PORT` env vars.
-
-## 5. GUI — minimal download bench (`GET /gui`)
+## 4. GUI — minimal download bench (`GET /gui`)
 
 Served by the FastAPI app; no build step, no framework — a single self-contained
 HTML page (Tailwind via CDN + vanilla ES-module JS) defined in

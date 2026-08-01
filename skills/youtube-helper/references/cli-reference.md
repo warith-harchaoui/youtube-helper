@@ -78,4 +78,4 @@ youtube-helper ytdlp-version    [--min-version 2024.12.23]
 - `YOUTUBE_HELPER_COOKIES` — path to a Netscape cookies.txt for authenticated /
   bot-blocked downloads.
 - `YOUTUBE_HELPER_HOST` / `YOUTUBE_HELPER_PORT` — bind host/port for the
-  `youtube-helper-mcp` server (default `0.0.0.0:8000`).
+  FastAPI server (default `0.0.0.0:8000`).
