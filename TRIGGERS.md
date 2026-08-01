@@ -2,9 +2,7 @@
 
 This is the user-facing, exhaustive catalogue of what `youtube-helper` can do and
 the natural-language phrasings, commands, functions, and site cues that should
-invoke it — whether you call it yourself or drive it as a Claude / OpenCode
-**skill** (see [`skills/youtube-helper/SKILL.md`](skills/youtube-helper/SKILL.md)
-and its [`references/triggers.md`](skills/youtube-helper/references/triggers.md)).
+invoke it.
 
 `youtube-helper` **fetches** online media and metadata from a page URL (yt-dlp +
 ffmpeg) and writes files locally. It is local-first: it downloads only what you
@@ -71,4 +69,3 @@ YouTube, Vimeo, DailyMotion, Twitch VOD, SoundCloud, and any other site
 - [`README.md`](README.md) — features, install, quick start.
 - [`EXAMPLES.md`](EXAMPLES.md) — runnable recipes.
 - [`GUI.md`](GUI.md) — the shipped minimal GUI + the roadmap for a richer one.
-- [`skills/README.md`](skills/README.md) — installing this as an agent skill.

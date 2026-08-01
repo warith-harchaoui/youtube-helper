@@ -176,10 +176,7 @@ en ligne avec un lien de téléchargement. La page POST vers les mêmes endpoint
 `/audio` / `/video` — zéro logique serveur en plus. Local-first : la page ne
 parle qu'à votre API locale.
 
-**Skill agent** (Claude Code / Claude Desktop / OpenCode) : installez
-[`skills/youtube-helper/`](skills/README.md) pour qu'un agent télécharge et
-inspecte des médias pour vous. Voir [TRIGGERS.md](TRIGGERS.md) pour le catalogue
-exhaustif des déclencheurs.
+Voir [TRIGGERS.md](TRIGGERS.md) pour le catalogue exhaustif des déclencheurs.
 
 Image Docker :
 

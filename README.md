@@ -179,11 +179,8 @@ plays inline with a download link. It POSTs to the same `/audio` / `/video`
 endpoints — zero extra server logic. Local-first: the page only talks to your
 local API.
 
-**Agent skill** (Claude Code / Claude Desktop / OpenCode): install
-[`skills/youtube-helper/`](https://github.com/warith-harchaoui/youtube-helper/blob/main/skills/README.md)
-so an agent can download and inspect media on your behalf. See
-[TRIGGERS.md](https://github.com/warith-harchaoui/youtube-helper/blob/main/TRIGGERS.md)
-for the exhaustive catalogue of what fires it.
+See [TRIGGERS.md](https://github.com/warith-harchaoui/youtube-helper/blob/main/TRIGGERS.md)
+for the exhaustive catalogue of what fires each operation.
 
 Docker image:
 
