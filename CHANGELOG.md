@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-08-02
+
+Major release: youtube-helper moves onto the 2.x AI Helpers foundation. The
+public API is unchanged; the bump is major because three pinned suite
+dependencies crossed a major boundary at once.
+
+### Changed
+
+- **Adopts the 2.x suite majors:** `os-helper>=2.0.0,<3` (was `>=1.5.0`),
+  `audio-helper>=2.0.0,<3` (was `>=1.5.5`), `video-helper>=2.0.0,<3` (was
+  `>=1.6.3`). This brings the hardened logging / file-management / smart-download
+  foundation and the audio/video 2.x contracts under youtube-helper.
+- **CI is now a real gate.** The lint job dropped its `continue-on-error: true`
+  and `ruff check . || true` — both silently swallowed lint failures — and now
+  runs a blocking `ruff check .` plus `ruff format --check .`. The test matrix
+  is trimmed to a single Python (the full sweep runs locally before push).
+
+### Fixed
+
+- README / LISEZMOI install commands no longer self-pin to a git tag (`@v1.5.0`);
+  they use `pip install youtube-helper`, which always resolves to the latest
+  published release.
+
+### Added
+
+- `tests/test_readme_install_pin.py` guards against the stale git self-pin ever
+  returning to any Markdown file.
+
 ## [1.5.1] - 2026-08-01
 
 ### Removed

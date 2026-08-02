@@ -1,8 +1,8 @@
 # YouTube Helper
 
-[🇫🇷](LISEZMOI.md) · [🇬🇧](README.md)
+[🇫🇷](https://github.com/warith-harchaoui/youtube-helper/blob/main/LISEZMOI.md) · [🇬🇧](https://github.com/warith-harchaoui/youtube-helper/blob/main/README.md)
 
-[![CI](https://github.com/warith-harchaoui/youtube-helper/actions/workflows/ci.yml/badge.svg)](https://github.com/warith-harchaoui/youtube-helper/actions/workflows/ci.yml) [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](LICENSE) [![Python](https://img.shields.io/badge/python-3.10%E2%80%933.13-blue.svg)](#) [![Local-first](https://img.shields.io/badge/privacy-local--first-2f6f5e.svg)](#la-promesse)
+[![CI](https://github.com/warith-harchaoui/youtube-helper/actions/workflows/ci.yml/badge.svg)](https://github.com/warith-harchaoui/youtube-helper/actions/workflows/ci.yml) [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://github.com/warith-harchaoui/youtube-helper/blob/main/LICENSE) [![Python](https://img.shields.io/badge/python-3.10%E2%80%933.13-blue.svg)](#) [![Local-first](https://img.shields.io/badge/privacy-local--first-2f6f5e.svg)](#la-promesse)
 
 `YouTube Helper` fait partie d'une collection de bibliothèques appelée `AI Helpers`, développée pour bâtir des applications d'intelligence artificielle.
 
@@ -14,7 +14,7 @@
 
 [🌍 AI Helpers](https://harchaoui.org/warith/ai-helpers)
 
-[![logo](assets/logo.png)](https://harchaoui.org/warith/ai-helpers)
+[![logo](https://raw.githubusercontent.com/warith-harchaoui/youtube-helper/main/assets/logo.png)](https://harchaoui.org/warith/ai-helpers)
 
 YouTube Helper est une bibliothèque Python de fonctions utilitaires pour télécharger vidéos, audio et vignettes depuis des plateformes comme YouTube, Vimeo et DailyMotion, via `yt-dlp`.
 Elle gère aussi le post-traitement : conversion ou fusion de fichiers média avec `ffmpeg`.
@@ -50,16 +50,16 @@ pip install "youtube-helper[api]"       # surface HTTP FastAPI
 ### Depuis les sources (sans PyPI)
 
 ```bash
-pip install "git+https://github.com/warith-harchaoui/youtube-helper.git@v1.5.0"
+pip install youtube-helper
 
 # Surfaces optionnelles
-pip install "youtube-helper[cli] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.5.0"
-pip install "youtube-helper[api] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.5.0"
+pip install "youtube-helper[cli]"
+pip install "youtube-helper[api]"
 ```
 
 ## Utilisation
 
-Pour le catalogue complet d'exemples (téléchargements, catalogue de flux / picker, résolveur d'URL directe, composition avec `video-helper`, métadonnées de branding, sous-titres et commentaires), voir [📋 EXAMPLES.md](EXAMPLES.md).
+Pour le catalogue complet d'exemples (téléchargements, catalogue de flux / picker, résolveur d'URL directe, composition avec `video-helper`, métadonnées de branding, sous-titres et commentaires), voir [📋 EXAMPLES.md](https://github.com/warith-harchaoui/youtube-helper/blob/main/EXAMPLES.md).
 
 Démarrage rapide — télécharger une vidéo, extraire les métadonnées, et télécharger l'audio :
 
@@ -154,11 +154,11 @@ youtube-helper resolve      --url https://www.youtube.com/watch?v=YE7VzlLtp-4 --
 youtube-helper channel-info --url https://www.youtube.com/@blender
 
 # Jumeau CLI click (nécessite l'extra [cli])
-pip install 'youtube-helper[cli] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.5.0'
+pip install "youtube-helper[cli]"
 youtube-helper-click metadata --url https://www.youtube.com/watch?v=YE7VzlLtp-4
 
 # Surface HTTP FastAPI (nécessite l'extra [api])
-pip install 'youtube-helper[api] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.5.0'
+pip install "youtube-helper[api]"
 uvicorn youtube_helper.api:app --port 8000
 # → doc OpenAPI sur http://localhost:8000/docs
 
@@ -176,7 +176,7 @@ en ligne avec un lien de téléchargement. La page POST vers les mêmes endpoint
 `/audio` / `/video` — zéro logique serveur en plus. Local-first : la page ne
 parle qu'à votre API locale.
 
-Voir [TRIGGERS.md](TRIGGERS.md) pour le catalogue exhaustif des déclencheurs.
+Voir [TRIGGERS.md](https://github.com/warith-harchaoui/youtube-helper/blob/main/TRIGGERS.md) pour le catalogue exhaustif des déclencheurs.
 
 Image Docker :
 
@@ -186,7 +186,7 @@ docker run --rm -p 8000:8000 youtube-helper
 ```
 
 Un plan de GUI plus riche (bibliothèque vidéo, comparateur de chaînes,
-downloader batch) est dans [GUI.md](GUI.md).
+downloader batch) est dans [GUI.md](https://github.com/warith-harchaoui/youtube-helper/blob/main/GUI.md).
 
 ## Auteur
  - [Warith HARCHAOUI](https://linkedin.com/in/warith-harchaoui)
@@ -196,4 +196,4 @@ Remerciements chaleureux à [Mohamed Chelali](https://mchelali.github.io) et [Ba
 
 ## Licence
 
-Ce projet est distribué sous licence BSD-3-Clause — voir le fichier [LICENSE](LICENSE) pour les détails.
+Ce projet est distribué sous licence BSD-3-Clause — voir le fichier [LICENSE](https://github.com/warith-harchaoui/youtube-helper/blob/main/LICENSE) pour les détails.

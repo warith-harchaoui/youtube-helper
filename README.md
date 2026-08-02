@@ -50,11 +50,11 @@ pip install "youtube-helper[api]"       # FastAPI HTTP surface
 ### From source (no PyPI)
 
 ```bash
-pip install "git+https://github.com/warith-harchaoui/youtube-helper.git@v1.5.0"
+pip install youtube-helper
 
 # Optional surfaces
-pip install "youtube-helper[cli] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.5.0"
-pip install "youtube-helper[api] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.5.0"
+pip install "youtube-helper[cli]"
+pip install "youtube-helper[api]"
 ```
 
 ## Usage
@@ -159,11 +159,11 @@ youtube-helper resolve      --url https://www.youtube.com/watch?v=YE7VzlLtp-4 --
 youtube-helper channel-info --url https://www.youtube.com/@blender
 
 # click-based CLI twin (needs the [cli] extra)
-pip install 'youtube-helper[cli] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.5.0'
+pip install "youtube-helper[cli]"
 youtube-helper-click metadata --url https://www.youtube.com/watch?v=YE7VzlLtp-4
 
 # FastAPI HTTP surface (needs the [api] extra)
-pip install 'youtube-helper[api] @ git+https://github.com/warith-harchaoui/youtube-helper.git@v1.5.0'
+pip install "youtube-helper[api]"
 uvicorn youtube_helper.api:app --port 8000
 # → OpenAPI docs at http://localhost:8000/docs
 
@@ -200,4 +200,4 @@ Special thanks to [Mohamed Chelali](https://mchelali.github.io) and [Bachir Zerr
 
 ## License
 
-This project is licensed under the BSD-3-Clause License — see the [LICENSE](LICENSE) file for details.
+This project is licensed under the BSD-3-Clause License — see the [LICENSE](https://github.com/warith-harchaoui/youtube-helper/blob/main/LICENSE) file for details.
