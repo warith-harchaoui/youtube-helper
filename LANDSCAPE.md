@@ -17,15 +17,15 @@ score just reflects fit to *this* niche.
 | Media Downloading | Multi-platform | Media download | Direct-URL resolver | Stream picker | No-API engagement | Multi-surface | Docker-ready | AI-pipeline ergonomics |
 | --- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **youtube-helper** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| yt-dlp | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ |
-| youtube-dl | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ |
-| pytube | ⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
-| pytubefix | ⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
-| YouTube Data API | ⭐ | ⭐ | ⭐ | ⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
-| you-get | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ |
-| streamlink | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
-| youtube_transcript_api | ⭐ | ⭐ | ⭐ | ⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
-| ArchiveBox | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐ |
+| yt-dlp | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ |
+| youtube-dl | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ |
+| pytube | ⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
+| pytubefix | ⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
+| streamlink | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
+| gallery-dl | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
+| scrapetube | ⭐ | ⭐ | ⭐ | ⭐ | ⭐⭐⭐ | ⭐ | ⭐⭐ | ⭐⭐⭐ |
+| youtube-comment-downloader | ⭐ | ⭐ | ⭐ | ⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
+| google-api-python-client | ⭐ | ⭐ | ⭐ | ⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
 <!-- TABLE:END -->
 
 ## Positioning map
@@ -35,7 +35,7 @@ score just reflects fit to *this* niche.
 
 ![Positioning map](https://raw.githubusercontent.com/warith-harchaoui/youtube-helper/main/assets/landscape.png)
 
-The map is a 2-D summary of the eight criteria, so read it as a shape, not a scoreboard. `youtube-helper` is at the top-right corner. The axes read **Horizontal — Self-contained ↔ Media-centric** and **Vertical — Multi-platform ↔ No-API**.
+The map is a 2-D summary of the eight criteria, so read it as a shape, not a scoreboard. `youtube-helper` is at the top-right corner. The axes read **Horizontal — Self-contained ↔ Media-centric** and **Vertical — Direct-access ↔ API-agnostic**.
 <!-- FIGURE:END -->
 
 ## Positioning
@@ -55,7 +55,7 @@ the hood). What it adds:
 - **No-API branding metadata** — channel-level snapshots, per-video
   engagement, comment samples, subtitle downloads without touching the
   Google Data API (no OAuth, no quota, no client_id / secret dance).
-  The `YouTube Data API` scores top marks on engagement precisely
+  `google-api-python-client` scores top marks on engagement precisely
   because it is canonical, but it returns no media files and costs OAuth
   + quota.
 - **Multi-surface exposure** — the same operations are available as a
@@ -77,14 +77,15 @@ the hood). What it adds:
 - **`pytube` / `pytubefix`** — pure Python, no yt-dlp dependency, but
   YouTube-only and slightly behind on extractor updates (`pytubefix`
   is the maintained fork).
-- **YouTube Data API** — you need canonical view / like / subscriber
-  counts, retention / analytics data, or you are already paying the
-  OAuth + quota cost.
-- **`you-get`** — a broad multi-site downloader when yt-dlp is not an
-  option; coverage is wide but below yt-dlp.
+- **`google-api-python-client`** — you need canonical view / like /
+  subscriber counts, retention / analytics data, or you are already
+  paying the OAuth + quota cost.
 - **`streamlink`** — live-first workflow; you want to hand a live URL
   straight to a player without recording.
-- **`youtube_transcript_api`** — you only need transcripts, no
-  downloads, no other metadata.
-- **ArchiveBox** — you are building a personal archive of URLs with a
-  self-hosted UI, not a code-native pipeline.
+- **`gallery-dl`** — bulk image / media gallery downloads across many
+  sites; coverage is broad but it is not built around video streams or
+  engagement metadata.
+- **`scrapetube`** — you only need to enumerate a channel / playlist /
+  search result's video IDs without the Data API, no downloads.
+- **`youtube-comment-downloader`** — you only need to bulk-scrape a
+  video's comments without touching the Data API, nothing else.

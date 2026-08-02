@@ -18,15 +18,15 @@ torrent) n'est pas pénalisé — la note reflète seulement l'adéquation à
 | Téléchargement de médias | Multi-plateforme | Téléchargement média | Résolveur d'URL directe | Sélecteur de flux | Engagement sans API | Multi-surface | Prêt pour Docker | Ergonomie pipeline IA |
 | --- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **youtube-helper** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| yt-dlp | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ |
-| youtube-dl | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ |
-| pytube | ⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
-| pytubefix | ⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
-| YouTube Data API | ⭐ | ⭐ | ⭐ | ⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
-| you-get | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ |
-| streamlink | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
-| youtube_transcript_api | ⭐ | ⭐ | ⭐ | ⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
-| ArchiveBox | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐ |
+| yt-dlp | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ |
+| youtube-dl | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ |
+| pytube | ⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
+| pytubefix | ⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
+| streamlink | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
+| gallery-dl | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
+| scrapetube | ⭐ | ⭐ | ⭐ | ⭐ | ⭐⭐⭐ | ⭐ | ⭐⭐ | ⭐⭐⭐ |
+| youtube-comment-downloader | ⭐ | ⭐ | ⭐ | ⭐ | ⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ⭐⭐⭐ |
+| google-api-python-client | ⭐ | ⭐ | ⭐ | ⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐ | ⭐⭐ |
 <!-- TABLE:END -->
 
 ## Carte de positionnement
@@ -59,10 +59,10 @@ ajoute :
 - **Métadonnées de branding sans API** — instantanés au niveau de la
   chaîne, engagement par vidéo, échantillons de commentaires,
   téléchargements de sous-titres sans toucher à l'API Google Data (pas
-  d'OAuth, pas de quota, pas de valse client_id / secret). L'`API
-  YouTube Data` obtient la note maximale sur l'engagement justement parce
-  qu'elle est canonique, mais elle ne renvoie aucun fichier média et coûte
-  OAuth + quota.
+  d'OAuth, pas de quota, pas de valse client_id / secret).
+  `google-api-python-client` obtient la note maximale sur l'engagement
+  justement parce qu'il est canonique, mais il ne renvoie aucun fichier
+  média et coûte OAuth + quota.
 - **Surfaces multiples** — les mêmes opérations sont disponibles comme
   bibliothèque Python, CLI argparse, CLI click et surface HTTP FastAPI.
   `yt-dlp` vous donne les deux premières ; les deux dernières sont
@@ -82,14 +82,17 @@ ajoute :
 - **`pytube` / `pytubefix`** — Python pur, sans dépendance yt-dlp, mais
   limité à YouTube et légèrement en retard sur les mises à jour
   d'extracteurs (`pytubefix` est le fork maintenu).
-- **API YouTube Data** — vous avez besoin des compteurs canoniques de
-  vues / likes / abonnés, de données de rétention / d'analytics, ou vous
-  payez déjà le coût OAuth + quota.
-- **`you-get`** — un téléchargeur multi-sites large quand yt-dlp n'est pas
-  envisageable ; la couverture est vaste mais inférieure à yt-dlp.
+- **`google-api-python-client`** — vous avez besoin des compteurs
+  canoniques de vues / likes / abonnés, de données de rétention /
+  d'analytics, ou vous payez déjà le coût OAuth + quota.
 - **`streamlink`** — flux de travail orienté direct ; vous voulez passer
   une URL live directement à un lecteur sans enregistrer.
-- **`youtube_transcript_api`** — vous n'avez besoin que des
-  transcriptions, sans téléchargement ni autres métadonnées.
-- **ArchiveBox** — vous construisez une archive personnelle d'URL avec une
-  interface auto-hébergée, pas un pipeline natif code.
+- **`gallery-dl`** — téléchargements en masse de galeries d'images /
+  médias sur de nombreux sites ; la couverture est large mais l'outil
+  n'est pas pensé pour les flux vidéo ni les métadonnées d'engagement.
+- **`scrapetube`** — vous n'avez besoin que d'énumérer les identifiants
+  de vidéos d'une chaîne / playlist / recherche sans l'API Data, sans
+  téléchargement.
+- **`youtube-comment-downloader`** — vous n'avez besoin que d'aspirer en
+  masse les commentaires d'une vidéo sans toucher à l'API Data, rien
+  d'autre.
