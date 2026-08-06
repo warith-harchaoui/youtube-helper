@@ -61,7 +61,7 @@ pip install "youtube-helper[api]"
 
 Pour le catalogue complet d'exemples (téléchargements, catalogue de flux / picker, résolveur d'URL directe, composition avec `video-helper`, métadonnées de branding, sous-titres et commentaires), voir [📋 EXAMPLES.md](https://github.com/warith-harchaoui/youtube-helper/blob/main/EXAMPLES.md).
 
-Démarrage rapide — télécharger une vidéo, extraire les métadonnées, et télécharger l'audio :
+Démarrage rapide — télécharger une vidéo, extraire les métadonnées et télécharger l'audio :
 
 ```python
 import youtube_helper as yth
@@ -113,7 +113,7 @@ print(sample_rate)
 
 ## Usage légal et éthique
 
-YouTube Helper est un wrapper léger autour de `yt-dlp` et `ffmpeg`. Vous êtes responsable de la manière dont vous l'utilisez. Ne téléchargez et ne traitez que des contenus que vous possédez, qui sont dans le domaine public, sous licence permissive (par ex. Creative Commons), ou pour lesquels vous avez une autorisation explicite du détenteur des droits. Respectez les Conditions d'Utilisation de chaque plateforme et les lois applicables en matière de droit d'auteur, de vie privée et de protection des données. Les auteurs fournissent cette bibliothèque pour des usages légitimes : archivage personnel, accessibilité, recherche, contenus dont vous détenez les droits — pas pour contourner des contrôles d'accès ou redistribuer du contenu protégé.
+YouTube Helper est un wrapper léger autour de `yt-dlp` et `ffmpeg`. Vous êtes responsable de la manière dont vous l'utilisez. Ne téléchargez et ne traitez que des contenus que vous possédez, qui sont dans le domaine public, sous licence permissive (par ex. Creative Commons) ou pour lesquels vous avez une autorisation explicite du détenteur des droits. Respectez les Conditions d'Utilisation de chaque plateforme et les lois applicables en matière de droit d'auteur, de vie privée et de protection des données. Les auteurs fournissent cette bibliothèque pour des usages légitimes : archivage personnel, accessibilité, recherche, contenus dont vous détenez les droits — pas pour contourner des contrôles d'accès ou redistribuer du contenu protégé.
 
 ## Fonctionnalités
 
@@ -171,7 +171,7 @@ uvicorn youtube_helper.api:app --port 8000
 **Banc de téléchargement (GUI)** (`GET /gui`) : une page unique autonome
 (Tailwind via CDN + JS vanilla, sans étape de build). Collez une URL YouTube (ou
 tout site supporté par yt-dlp), choisissez **audio** (avec une fréquence
-d'échantillonnage) ou **vidéo**, cliquez sur Télécharger, et le résultat se joue
+d'échantillonnage) ou **vidéo**, cliquez sur Télécharger et le résultat se joue
 en ligne avec un lien de téléchargement. La page POST vers les mêmes endpoints
 `/audio` / `/video` — zéro logique serveur en plus. Local-first : la page ne
 parle qu'à votre API locale.

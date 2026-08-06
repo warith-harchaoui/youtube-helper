@@ -84,7 +84,7 @@ ajoute :
   d'extracteurs (`pytubefix` est le fork maintenu).
 - **`google-api-python-client`** — vous avez besoin des compteurs
   canoniques de vues / likes / abonnés, de données de rétention /
-  d'analytics, ou vous payez déjà le coût OAuth + quota.
+  d'analytics ou vous payez déjà le coût OAuth + quota.
 - **`streamlink`** — flux de travail orienté direct ; vous voulez passer
   une URL live directement à un lecteur sans enregistrer.
 - **`gallery-dl`** — téléchargements en masse de galeries d'images /
