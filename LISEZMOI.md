@@ -141,7 +141,7 @@ YouTube Helper est un wrapper léger autour de `yt-dlp` et `ffmpeg`. Vous êtes 
 
 `youtube-helper` n'est pas seulement une bibliothèque — les mêmes
 fonctions sont exposées comme deux CLI, comme surface HTTP FastAPI,
-et comme interface graphique navigateur :
+comme outils MCP et comme interface graphique navigateur :
 
 ```bash
 # Bibliothèque Python (par défaut)
@@ -166,6 +166,10 @@ uvicorn youtube_helper.api:app --port 8000
 # choisissez audio ou vidéo
 uvicorn youtube_helper.api:app --port 8000
 # → ouvrez http://localhost:8000/gui  (ou simplement http://localhost:8000/)
+
+# Outils MCP (nécessite l'extra [mcp]) — même app, plus un endpoint /mcp
+pip install "youtube-helper[mcp]"
+youtube-helper-mcp
 ```
 
 **Banc de téléchargement (GUI)** (`GET /gui`) : une page unique autonome

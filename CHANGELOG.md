@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **MCP surface** (`youtube_helper.mcp`, `[mcp]` extra, entry point
+  `youtube-helper-mcp`): exposes the existing FastAPI app as MCP tools via
+  `fastapi-mcp`, mirroring the pattern shipped in `standpoint` / `vocal-helper`
+  / `md2star` / `os-helper`. Closes the CLI/API/MCP surface gap flagged in
+  `ai-helpers/.private/do.md` §7.
+
 ## [2.0.0] - 2026-08-02
 
 Major release: youtube-helper moves onto the 2.x AI Helpers foundation. The

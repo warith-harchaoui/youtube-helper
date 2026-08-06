@@ -146,7 +146,7 @@ YouTube Helper is a thin wrapper around `yt-dlp` and `ffmpeg`. You are responsib
 ## Multi-surface exposure
 
 `youtube-helper` is not just a library — the same functions are exposed
-as two CLIs, a FastAPI HTTP surface, and a browser GUI:
+as two CLIs, a FastAPI HTTP surface, MCP tools, and a browser GUI:
 
 ```bash
 # Python library (default)
@@ -170,6 +170,10 @@ uvicorn youtube_helper.api:app --port 8000
 # Browser GUI (needs the [api] extra) — paste a URL, pick audio or video
 uvicorn youtube_helper.api:app --port 8000
 # → open http://localhost:8000/gui  (or just http://localhost:8000/)
+
+# MCP tools (needs the [mcp] extra) — same app, plus an /mcp endpoint
+pip install "youtube-helper[mcp]"
+youtube-helper-mcp
 ```
 
 **Download bench GUI** (`GET /gui`): a single self-contained page (Tailwind via
