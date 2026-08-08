@@ -35,7 +35,7 @@ score just reflects fit to *this* niche.
 
 ![Positioning map](https://raw.githubusercontent.com/warith-harchaoui/youtube-helper/main/assets/landscape.png)
 
-The map is a 2-D summary of the eight criteria, so read it as a shape, not a scoreboard. `youtube-helper` is at the top-right corner. The axes read **Horizontal — Self-contained ↔ Media-centric** and **Vertical — Direct-access ↔ API-agnostic**.
+The map is a 2-D summary of the eight criteria, so read it as a shape, not a scoreboard. `youtube-helper` is at the top-right corner. The axes read **Horizontal — Accessible ↔ Versatile** and **Vertical — Convenient ↔ Adaptable**.
 <!-- FIGURE:END -->
 
 ## Positioning
