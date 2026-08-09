@@ -27,6 +27,28 @@ It also supports post-processing tasks such as converting or merging media files
 
 [📋 Examples](https://github.com/warith-harchaoui/youtube-helper/blob/main/EXAMPLES.md)
 
+## Features
+
+**Downloads (to disk)** — `youtube_helper.main`
+- `download_video(url, output_path)` / `download_audio(url, output_path)` / `download_thumbnail(url, output_path)`.
+- `video_url_meta_data(url)` / `is_valid_video_url(url)` for cheap metadata probes.
+- `default_ytdlp_options(verbose, ...)` for customisable yt-dlp options.
+
+**Stream catalog & direct-URL resolution** — `youtube_helper.streaming`
+- `resolve_direct_url(url, prefer="audio"|"video")` → quick "give me one direct ffmpeg-ready URL".
+- `list_video_streams(url)` → enumerate every video format yt-dlp finds (codec, resolution, fps, bitrate, …).
+- `pick_video_stream(url, prefer_codec=, prefer_format=, max_fps=, language=, cookies_from_browser=)` → constrained picker, returns one `VideoStreamInfo` ready to feed `video_helper.extract_frames`.
+- `extract_frames_stream(url, ..., **extract_frames_kwargs)` → one-call composition of `pick_video_stream` + `video_helper.extract_frames`, auto-wires headers, forwards any `extract_frames` kwarg (`destination`, `device`, `batch_size`, `output_width`, `frame_step`, …). The shortest path from a YouTube / Vimeo / Twitch URL to ML-ready frames.
+- Audio stream catalog / picker intentionally lives in **podcast-helper** (single owner for audio PCM streaming).
+
+**No-API engagement metadata** — `youtube_helper.branding`
+- `channel_info(url)` / `channel_videos(url, max_videos, include_shorts, include_lives)` — channel snapshot + paginated video list with normalised engagement metrics, cross-platform schema.
+- `video_engagement(url)` / `engagement_batch([urls])` — per-video views / likes / comments / channel follower count, tolerant batched variant.
+- `video_subtitles(url, output_dir, langs=("fr","en"))` — auto-subtitle download.
+- `video_comments(url, max_count, cookies_from_browser="firefox"|"chrome"|...)` — comments sample.
+- `is_short(meta)` / `ensure_recent_ytdlp(min_version)` — helpers.
+- Built on yt-dlp's public metadata only — **no Google Data API, no Vimeo API, no OAuth, no quota.**
+
 ## Installation
 
 **Prerequisites** — **Python 3.10–3.13**, **git**, **yt-dlp**, and **ffmpeg**, cross-platform:
@@ -120,28 +142,6 @@ print(sample_rate)
 ## Legal and Ethical Use
 
 YouTube Helper is a thin wrapper around `yt-dlp` and `ffmpeg`. You are responsible for how you use it. Only download or process media that you own, that is in the public domain or under a permissive license (e.g. Creative Commons), or for which you have explicit permission from the rights holder. Respect each platform's Terms of Service and any applicable copyright, privacy, and data-protection laws in your jurisdiction. The authors provide this library for legitimate uses such as personal archiving, accessibility, research, and content you have rights to — not for circumventing access controls or redistributing copyrighted material.
-
-## Features
-
-**Downloads (to disk)** — `youtube_helper.main`
-- `download_video(url, output_path)` / `download_audio(url, output_path)` / `download_thumbnail(url, output_path)`.
-- `video_url_meta_data(url)` / `is_valid_video_url(url)` for cheap metadata probes.
-- `default_ytdlp_options(verbose, ...)` for customisable yt-dlp options.
-
-**Stream catalog & direct-URL resolution** — `youtube_helper.streaming`
-- `resolve_direct_url(url, prefer="audio"|"video")` → quick "give me one direct ffmpeg-ready URL".
-- `list_video_streams(url)` → enumerate every video format yt-dlp finds (codec, resolution, fps, bitrate, …).
-- `pick_video_stream(url, prefer_codec=, prefer_format=, max_fps=, language=, cookies_from_browser=)` → constrained picker, returns one `VideoStreamInfo` ready to feed `video_helper.extract_frames`.
-- `extract_frames_stream(url, ..., **extract_frames_kwargs)` → one-call composition of `pick_video_stream` + `video_helper.extract_frames`, auto-wires headers, forwards any `extract_frames` kwarg (`destination`, `device`, `batch_size`, `output_width`, `frame_step`, …). The shortest path from a YouTube / Vimeo / Twitch URL to ML-ready frames.
-- Audio stream catalog / picker intentionally lives in **podcast-helper** (single owner for audio PCM streaming).
-
-**No-API engagement metadata** — `youtube_helper.branding`
-- `channel_info(url)` / `channel_videos(url, max_videos, include_shorts, include_lives)` — channel snapshot + paginated video list with normalised engagement metrics, cross-platform schema.
-- `video_engagement(url)` / `engagement_batch([urls])` — per-video views / likes / comments / channel follower count, tolerant batched variant.
-- `video_subtitles(url, output_dir, langs=("fr","en"))` — auto-subtitle download.
-- `video_comments(url, max_count, cookies_from_browser="firefox"|"chrome"|...)` — comments sample.
-- `is_short(meta)` / `ensure_recent_ytdlp(min_version)` — helpers.
-- Built on yt-dlp's public metadata only — **no Google Data API, no Vimeo API, no OAuth, no quota.**
 
 ## Multi-surface exposure
 
