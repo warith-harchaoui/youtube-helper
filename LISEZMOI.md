@@ -25,7 +25,7 @@ Elle gère aussi le post-traitement : conversion ou fusion de fichiers média av
 
 [🗺️ Paysage](https://github.com/warith-harchaoui/youtube-helper/blob/main/PAYSAGE.md)
 
-[📋 Exemples](https://github.com/warith-harchaoui/youtube-helper/blob/main/EXAMPLES.md)
+[📋 Exemples](https://github.com/warith-harchaoui/youtube-helper/blob/main/EXEMPLES.md)
 
 ## Fonctionnalités
 
