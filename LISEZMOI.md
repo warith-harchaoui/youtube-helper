@@ -8,9 +8,9 @@
 
 ## La promesse
 
-**Local-first par conception.** youtube-helper s'exécute entièrement sur votre machine — il ne récupère que les médias que vous demandez ; vos données ne partent jamais vers un service tiers, aucune télémétrie, aucun compte, aucun verrouillage propriétaire dans le cloud. Vous gardez la main sur toute la chaîne. Fait partie de la suite [AI Helpers](https://github.com/warith-harchaoui/ai-helpers) : la souveraineté sur vos données grâce à l'Open Source local-first.
+**Local-first par conception.** youtube-helper s'exécute entièrement sur votre machine : il ne récupère que les médias que vous demandez ; vos données ne partent jamais vers un service tiers. Aucune télémétrie, aucun compte, aucun verrouillage propriétaire dans le cloud. Vous gardez la main sur toute la chaîne. Fait partie de la suite [AI Helpers](https://github.com/warith-harchaoui/ai-helpers) : la souveraineté sur vos données grâce à l'open source local-first.
 
-*(youtube-helper accède bien à Internet — il télécharge les médias depuis le site source que vous lui indiquez. La promesse porte sur l'absence d'exfiltration et de télémétrie : rien vous concernant, ni vos requêtes, n'est envoyé ailleurs que vers le site qui héberge le média demandé.)*
+*(youtube-helper accède bien à Internet : il télécharge les médias depuis le site source que vous lui indiquez. La promesse porte sur l'absence d'exfiltration et de télémétrie, rien vous concernant, ni vos requêtes, n'est envoyé ailleurs que vers le site qui héberge le média demandé.)*
 
 [🌍 AI Helpers](https://harchaoui.org/warith/ai-helpers)
 
@@ -29,29 +29,29 @@ Elle gère aussi le post-traitement : conversion ou fusion de fichiers média av
 
 ## Fonctionnalités
 
-**Téléchargements (sur disque)** — `youtube_helper.main`
+Fonctions de **téléchargement (sur disque)**, dans `youtube_helper.main` :
 - `download_video(url, output_path)` / `download_audio(url, output_path)` / `download_thumbnail(url, output_path)`.
 - `video_url_meta_data(url)` / `is_valid_video_url(url)` pour interroger les métadonnées sans télécharger.
 - `default_ytdlp_options(verbose, ...)` pour personnaliser les options yt-dlp.
 
-**Catalogue de flux & résolution d'URL directe** — `youtube_helper.streaming`
+**Catalogue de flux et résolution d'URL directe**, dans `youtube_helper.streaming` :
 - `resolve_direct_url(url, prefer="audio"|"video")` → un raccourci "donne-moi une URL directe prête à passer à ffmpeg".
 - `list_video_streams(url)` → énumère chaque format vidéo trouvé par yt-dlp (codec, résolution, fps, bitrate, …).
 - `pick_video_stream(url, prefer_codec=, prefer_format=, max_fps=, language=, cookies_from_browser=)` → picker contraint, retourne un `VideoStreamInfo` prêt à alimenter `video_helper.extract_frames`.
 - `extract_frames_stream(url, ..., **extract_frames_kwargs)` → composition en un appel de `pick_video_stream` + `video_helper.extract_frames` ; câble les headers tout seul et transmet n'importe quel kwarg d'`extract_frames` (`destination`, `device`, `batch_size`, `output_width`, `frame_step`, …). Le chemin le plus court d'une URL YouTube / Vimeo / Twitch vers des frames prêtes pour le ML.
 - Le catalogue / picker de flux audio vit volontairement dans **podcast-helper** (propriétaire unique du streaming PCM audio).
 
-**Métadonnées d'engagement sans API** — `youtube_helper.branding`
-- `channel_info(url)` / `channel_videos(url, max_videos, include_shorts, include_lives)` — snapshot de chaîne + liste paginée de vidéos avec métriques d'engagement normalisées, schéma multi-plateforme.
-- `video_engagement(url)` / `engagement_batch([urls])` — vues / likes / commentaires par vidéo et nombre d'abonnés de la chaîne, variante batch tolérante.
-- `video_subtitles(url, output_dir, langs=("fr","en"))` — téléchargement automatique de sous-titres.
-- `video_comments(url, max_count, cookies_from_browser="firefox"|"chrome"|...)` — échantillon de commentaires.
-- `is_short(meta)` / `ensure_recent_ytdlp(min_version)` — utilitaires.
-- Bâti uniquement sur les métadonnées publiques de yt-dlp — **pas d'API Google Data, pas d'API Vimeo, pas d'OAuth, pas de quota.**
+**Métadonnées d'engagement sans API**, dans `youtube_helper.branding` :
+- `channel_info(url)` / `channel_videos(url, max_videos, include_shorts, include_lives)` : instantané de chaîne et liste paginée de vidéos, avec métriques d'engagement normalisées sur un schéma multiplateforme.
+- `video_engagement(url)` / `engagement_batch([urls])` : vues, likes, commentaires par vidéo et nombre d'abonnés de la chaîne, avec une variante en lot tolérante aux erreurs.
+- `video_subtitles(url, output_dir, langs=("fr","en"))` : téléchargement automatique de sous-titres.
+- `video_comments(url, max_count, cookies_from_browser="firefox"|"chrome"|...)` : échantillon de commentaires.
+- `is_short(meta)` / `ensure_recent_ytdlp(min_version)` : fonctions utilitaires.
+- Bâti uniquement sur les métadonnées publiques de yt-dlp : **pas d'API Google Data, pas d'API Vimeo, pas d'OAuth, pas de quota.**
 
 ## Installation
 
-**Prérequis** — **Python 3.10–3.13**, **git**, **yt-dlp** et **ffmpeg**, multiplateforme :
+**Prérequis** : **Python 3.10-3.13**, **git**, **yt-dlp** et **ffmpeg**, multiplateforme :
 
 - 🍎 **macOS** ([Homebrew](https://brew.sh)) : `brew install python git yt-dlp ffmpeg`
 - 🐧 **Ubuntu/Debian** : `sudo apt update && sudo apt install -y python3 python3-pip git yt-dlp ffmpeg`
@@ -72,18 +72,20 @@ pip install "youtube-helper[api]"       # surface HTTP FastAPI
 ### Depuis les sources (sans PyPI)
 
 ```bash
-pip install youtube-helper
+git clone https://github.com/warith-harchaoui/youtube-helper.git
+cd youtube-helper
+pip install -e .
 
 # Surfaces optionnelles
-pip install "youtube-helper[cli]"
-pip install "youtube-helper[api]"
+pip install -e ".[cli]"
+pip install -e ".[api]"
 ```
 
 ## Utilisation
 
 Pour le catalogue complet d'exemples (téléchargements, catalogue de flux / picker, résolveur d'URL directe, composition avec `video-helper`, métadonnées de branding, sous-titres et commentaires), voir [📋 EXAMPLES.md](https://github.com/warith-harchaoui/youtube-helper/blob/main/EXAMPLES.md).
 
-Démarrage rapide — télécharger une vidéo, extraire les métadonnées et télécharger l'audio :
+Démarrage rapide : télécharger une vidéo, extraire les métadonnées et télécharger l'audio.
 
 ```python
 import youtube_helper as yth
@@ -135,13 +137,13 @@ print(sample_rate)
 
 ## Usage légal et éthique
 
-YouTube Helper est un wrapper léger autour de `yt-dlp` et `ffmpeg`. Vous êtes responsable de la manière dont vous l'utilisez. Ne téléchargez et ne traitez que des contenus que vous possédez, qui sont dans le domaine public, sous licence permissive (par ex. Creative Commons) ou pour lesquels vous avez une autorisation explicite du détenteur des droits. Respectez les Conditions d'Utilisation de chaque plateforme et les lois applicables en matière de droit d'auteur, de vie privée et de protection des données. Les auteurs fournissent cette bibliothèque pour des usages légitimes : archivage personnel, accessibilité, recherche, contenus dont vous détenez les droits — pas pour contourner des contrôles d'accès ou redistribuer du contenu protégé.
+YouTube Helper est un wrapper léger autour de `yt-dlp` et `ffmpeg`. Vous êtes responsable de la manière dont vous l'utilisez. Ne téléchargez et ne traitez que des contenus que vous possédez, qui sont dans le domaine public, sous licence permissive (par ex. Creative Commons) ou pour lesquels vous avez une autorisation explicite du détenteur des droits. Respectez les Conditions d'Utilisation de chaque plateforme et les lois applicables en matière de droit d'auteur, de vie privée et de protection des données. Les auteurs fournissent cette bibliothèque pour des usages légitimes : archivage personnel, accessibilité, recherche, contenus dont vous détenez les droits, pas pour contourner des contrôles d'accès ou redistribuer du contenu protégé.
 
 ## Exposition multi-surface
 
-`youtube-helper` n'est pas seulement une bibliothèque — les mêmes
-fonctions sont exposées comme deux CLI, comme surface HTTP FastAPI,
-comme outils MCP et comme interface graphique navigateur :
+`youtube-helper` n'est pas seulement une bibliothèque : les mêmes
+fonctions sont exposées comme deux CLI, une surface HTTP FastAPI,
+des outils MCP et une interface graphique dans le navigateur.
 
 ```bash
 # Bibliothèque Python (par défaut)
@@ -162,12 +164,12 @@ pip install "youtube-helper[api]"
 uvicorn youtube_helper.api:app --port 8000
 # → doc OpenAPI sur http://localhost:8000/docs
 
-# Interface graphique navigateur (nécessite l'extra [api]) — collez une URL,
+# Interface graphique navigateur (nécessite l'extra [api]) : collez une URL,
 # choisissez audio ou vidéo
 uvicorn youtube_helper.api:app --port 8000
 # → ouvrez http://localhost:8000/gui  (ou simplement http://localhost:8000/)
 
-# Outils MCP (nécessite l'extra [mcp]) — même app, plus un endpoint /mcp
+# Outils MCP (nécessite l'extra [mcp]) : même appli, plus un point d'entrée /mcp
 pip install "youtube-helper[mcp]"
 youtube-helper-mcp
 ```
@@ -177,7 +179,7 @@ youtube-helper-mcp
 tout site supporté par yt-dlp), choisissez **audio** (avec une fréquence
 d'échantillonnage) ou **vidéo**, cliquez sur Télécharger et le résultat se joue
 en ligne avec un lien de téléchargement. La page POST vers les mêmes endpoints
-`/audio` / `/video` — zéro logique serveur en plus. Local-first : la page ne
+`/audio` / `/video` : zéro logique serveur en plus. Local-first, la page ne
 parle qu'à votre API locale.
 
 Voir [TRIGGERS.md](https://github.com/warith-harchaoui/youtube-helper/blob/main/TRIGGERS.md) pour le catalogue exhaustif des déclencheurs.
@@ -200,4 +202,4 @@ Remerciements chaleureux à [Mohamed Chelali](https://mchelali.github.io) et [Ba
 
 ## Licence
 
-Ce projet est distribué sous licence BSD-3-Clause — voir le fichier [LICENSE](https://github.com/warith-harchaoui/youtube-helper/blob/main/LICENSE) pour les détails.
+Ce projet est distribué sous licence BSD-3-Clause. Voir le fichier [LICENSE](https://github.com/warith-harchaoui/youtube-helper/blob/main/LICENSE) pour les détails.

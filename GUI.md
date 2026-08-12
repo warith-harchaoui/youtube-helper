@@ -1,8 +1,8 @@
-# GUI — YouTube Helper
+# GUI: YouTube Helper
 
 > A design plan, not a CLI mirror. The CLI already handles "give me the
-> audio / video / thumbnail / metadata of one URL". A GUI must go further
-> — otherwise why build one? This document lays out an ambitious,
+> audio, video, thumbnail, or metadata of one URL." A GUI must go further,
+> otherwise why build one? This document lays out an ambitious,
 > opinionated visual product for the yt-dlp-backed
 > download-and-branding workflow.
 
@@ -10,11 +10,11 @@
 
 > **A single searchable board where every URL you have ever downloaded,
 > every channel you have ever inspected, and every engagement metric you
-> have ever pulled is one click away — with side-by-side comparison of
+> have ever pulled is one click away, with side-by-side comparison of
 > videos, channels, and streams.**
 
 `yt-dlp` is powerful but each shell invocation is a black box. The GUI's
-job is to make the **library visible, browseable, and comparable** —
+job is to make the **library visible, browseable, and comparable**,
 not to reproduce yt-dlp flags with checkboxes.
 
 ## Three surfaces, one product
@@ -23,14 +23,14 @@ not to reproduce yt-dlp flags with checkboxes.
 
 - A left rail listing every URL the user has fed into `youtube-helper`,
   grouped by channel then by upload date.
-- Center pane: the selected video's **card** — thumbnail, title,
+- Center pane: the selected video's **card**: thumbnail, title,
   duration, view / like / comment counts, direct-URL resolver output,
   cached transcripts, downloaded artifacts (video / audio / thumbnail
   paths, byte sizes).
 - Right pane: a **stream catalog table** for that video (from
-  `list_video_streams`) — one row per format (h264 1080p60, vp9 720p,
-  av1 480p, …). Click a row to preview a 5-second sample decoded from
-  the direct URL. This is the "we can only do this in a GUI" moment.
+  `list_video_streams`), one row per format (h264 1080p60, vp9 720p,
+  av1 480p, and so on). Click a row to preview a 5-second sample decoded
+  from the direct URL. This is the "we can only do this in a GUI" moment.
 - Search bar (top): fuzzy over title / channel / description / tags,
   hits render as candidates in the left rail.
 
@@ -43,7 +43,7 @@ Two channels side by side (drag one URL onto another). Renders:
 - **Distribution histograms** of view / like / comment counts, marked
   medians.
 - **Shorts vs long-form split** (`is_short`) per channel with a
-  quarter-by-quarter breakdown — the ratio that tells you whether a
+  quarter-by-quarter breakdown, the ratio that tells you whether a
   creator is pivoting.
 - **Retention proxy**: like-to-view ratio, comment-to-view ratio, both
   medians and standard deviations. yt-dlp does not give real retention
@@ -67,7 +67,7 @@ that reads cookies from the selected browser profile.
   network calls happen only when you press "refresh".
 - **Paths, not blobs.** The recipe engine writes downloaded artifacts
   to a project folder. The CLI outputs and the GUI outputs are
-  byte-identical — no "GUI produces different files".
+  byte-identical: no "GUI produces different files".
 - **Explain the metadata.** Tooltips over each metric explain what
   yt-dlp field it came from and how normalisation was applied
   (upload_date reformat, kind heuristic, …). No mystery numbers.
@@ -80,8 +80,8 @@ that reads cookies from the selected browser profile.
 
 ## What we deliberately don't do
 
-- **No video editor.** DAWs / NLEs already exist. We are not competing
-  with them. Trims happen via external tooling — we just download.
+- **No video editor.** DAWs and NLEs already exist. We are not competing
+  with them. Trims happen via external tooling; we just download.
 - **No annotation UI.** Comments and subtitles are viewable but not
   editable. The GUI is a *dashboard*, not a workspace.
 - **No cloud lock-in.** Everything runs on the same local FastAPI
@@ -90,7 +90,7 @@ that reads cookies from the selected browser profile.
 ## Stack
 
 - Front end: TypeScript + Svelte 5 + WaveSurfer.js (audio preview) +
-  Vega-Lite (comparator charts). No React — matches the `front-ui`
+  Vega-Lite (comparator charts). No React, matching the `front-ui`
   companion skill's stack.
 - Back end: the FastAPI app already exists (`youtube_helper.api`) and
   covers 100 % of the operations. GUI is a client only.
@@ -117,8 +117,8 @@ that reads cookies from the selected browser profile.
 ## Success metric
 
 > A creator preparing a competitor audit gets a side-by-side of the
-> five channels they care about — growth curves, engagement ratios,
-> shorts ratio, top-comments samples — in under 10 minutes, in one
+> five channels they care about: growth curves, engagement ratios,
+> shorts ratio, top-comments samples, in under 10 minutes, in one
 > window, and finishes with a committable `report.md` per channel.
 
 If we ship that, we win.

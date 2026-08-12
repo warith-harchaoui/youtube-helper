@@ -154,9 +154,9 @@ GPU en torch, selon les seuls réglages de `destination`, `device` et
 `batch_size`. Le sélecteur n'est invoqué qu'une fois : le flux résolu
 sert pour toute l'itération.
 
-> **À noter** : `extract_frames_stream` requiert `video-helper >= v1.5.2`
-> (`is_valid_video_file` compatible URL, `video_dimensions(http_headers=)`).
-> La version v1.2.0 de youtube-helper l'épingle automatiquement.
+> **À noter** : `extract_frames_stream` requiert une version de `video-helper`
+> avec `is_valid_video_file` compatible URL et `video_dimensions(http_headers=)` ;
+> le `pyproject.toml` de youtube-helper épingle `video-helper>=2.0.0,<3` pour ça.
 
 ## Branding : métadonnées d'engagement sans clé d'API
 

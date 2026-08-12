@@ -1,4 +1,4 @@
-# TRIGGERS — youtube-helper
+# TRIGGERS: youtube-helper
 
 This is the user-facing, exhaustive catalogue of what `youtube-helper` can do and
 the natural-language phrasings, commands, functions, and site cues that should
@@ -50,7 +50,7 @@ same flags) and the download bench GUI at `GET /gui` (audio/video downloads).
 ## Sites it supports
 
 YouTube, Vimeo, DailyMotion, Twitch VOD, SoundCloud, and any other site
-`yt-dlp` supports — do not assume YouTube-only.
+`yt-dlp` supports. Do not assume YouTube-only.
 
 ## When NOT to use youtube-helper (SKIP)
 
@@ -61,11 +61,11 @@ YouTube, Vimeo, DailyMotion, Twitch VOD, SoundCloud, and any other site
   `vocal-helper` / a whisper skill. (Downloading a video's *existing* subtitle
   track is youtube-helper.)
 - Text-to-speech, voice cloning, synthesis, music generation.
-- Uploading / publishing to YouTube — youtube-helper is download + read only.
+- Uploading or publishing to YouTube: youtube-helper is download and read only.
 - Decoding a resolved stream to PCM for a podcast pipeline → `podcast-helper`.
 
 ## See also
 
-- [`README.md`](README.md) — features, install, quick start.
-- [`EXAMPLES.md`](EXAMPLES.md) — runnable recipes.
-- [`GUI.md`](GUI.md) — the shipped minimal GUI + the roadmap for a richer one.
+- [`README.md`](README.md): features, install, quick start.
+- [`EXAMPLES.md`](EXAMPLES.md): runnable recipes.
+- [`GUI.md`](GUI.md): the shipped minimal GUI and the roadmap for a richer one.
