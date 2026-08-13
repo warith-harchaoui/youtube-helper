@@ -337,7 +337,7 @@ def download_audio(url: str, output_path: str = None, target_sample_rate: int = 
         output_path = osh.relative2absolute_path(output_path)
 
     if osh.file_exists(output_path) and ah.is_valid_audio_file(output_path):
-        osh.info(f"Thumbnail already exists:\n\t{output_path}")
+        osh.info(f"Audio already exists:\n\t{output_path}")
         return output_path
 
     osh.info(f"Downloading audio from:\n\t{url} to:\n\t{output_path}")
