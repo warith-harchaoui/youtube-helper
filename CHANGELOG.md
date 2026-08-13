@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.1] - 2026-08-13
+
+### Fixed
+
+- `download_audio`'s already-exists log message said "Thumbnail already
+  exists" (copy-pasted from `download_thumbnail`) instead of "Audio already
+  exists" — misleading log output only, no functional impact.
+
+### Changed
+
+- Added a conda `environment.yaml`; the Dockerfile now installs
+  `requirements.txt` as its own cached layer.
+- `requirements-dev.txt` is now derived from `pyproject.toml`'s `[dev]`
+  extra instead of maintained by hand.
+- Added `EXEMPLES.md` (French sibling of `EXAMPLES.md`); documentation
+  freshness pass for WRITING.md/ECRITURE.md compliance; regenerated
+  LANDSCAPE/PAYSAGE positioning figures; moved Features to canonical
+  position in the README.
+
 ## [2.1.0] - 2026-08-08
 
 ### Added
