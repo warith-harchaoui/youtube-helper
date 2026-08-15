@@ -15,3 +15,4 @@ video-helper>=1.6.3
 yt-dlp>=2024.12.23
 ffmpeg-python>=0.2.0,<0.3.0
 pillow>=10,<12
+PySocks>=1.7,<2

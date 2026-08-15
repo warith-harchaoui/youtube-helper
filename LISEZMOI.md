@@ -135,6 +135,25 @@ print(sample_rate)
 # 44100
 ```
 
+## Résilience du téléchargement
+
+Chaque appel yt-dlp de `youtube_helper.main` (métadonnées, miniature, audio,
+vidéo) réessaie automatiquement quand l'approche normale se fait bloquer
+(limitation de débit, détection de bot, bannissement d'IP) :
+
+1. **Normal** : la requête par défaut, telle que configurée par
+   `default_ytdlp_options`.
+2. **User-Agent navigateur** : nouvelle tentative avec un User-Agent Chrome
+   de bureau complet et à jour, ainsi que les en-têtes correspondants.
+   Surchargeable via la variable d'environnement `YOUTUBE_HELPER_USER_AGENT`.
+3. **Tor** : nouvelle tentative via un proxy SOCKS Tor local
+   (`socks5h://127.0.0.1:9050` par défaut, la résolution DNS passant aussi
+   par Tor). Nécessite un démon Tor lancé localement, par ex.
+   `brew install tor && brew services start tor`. Surchargeable via
+   `YOUTUBE_HELPER_TOR_PROXY`.
+
+Si les trois échouent, l'erreur d'origine de la dernière tentative est levée.
+
 ## Usage légal et éthique
 
 YouTube Helper est un wrapper léger autour de `yt-dlp` et `ffmpeg`. Vous êtes responsable de la manière dont vous l'utilisez. Ne téléchargez et ne traitez que des contenus que vous possédez, qui sont dans le domaine public, sous licence permissive (par ex. Creative Commons) ou pour lesquels vous avez une autorisation explicite du détenteur des droits. Respectez les Conditions d'Utilisation de chaque plateforme et les lois applicables en matière de droit d'auteur, de vie privée et de protection des données. Les auteurs fournissent cette bibliothèque pour des usages légitimes : archivage personnel, accessibilité, recherche, contenus dont vous détenez les droits, pas pour contourner des contrôles d'accès ou redistribuer du contenu protégé.

@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-08-15
+
+### Added
+
+- **Download resilience**: every yt-dlp call in `youtube_helper.main`
+  (metadata, thumbnail, audio, video) now retries automatically when the
+  normal request gets blocked, in order: (1) the normal request, (2) a
+  fully-populated browser User-Agent (overridable via
+  `YOUTUBE_HELPER_USER_AGENT`), (3) a local Tor SOCKS proxy (overridable via
+  `YOUTUBE_HELPER_TOR_PROXY`, requires a Tor daemon running locally). Added
+  `PySocks` as a runtime dependency for SOCKS proxy support.
+
 ## [2.1.2] - 2026-08-15
 
 ### Fixed

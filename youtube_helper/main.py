@@ -28,12 +28,35 @@ from __future__ import annotations
 
 import glob
 import os
+from collections.abc import Callable
+from typing import Any
 
 import audio_helper as ah
 import os_helper as osh
 import video_helper as vh
 import yt_dlp
 from PIL import Image
+
+# Fallback #1: a fully-populated, up-to-date desktop browser User-Agent (Chrome
+# on Windows), used to look less like a bare script when the site rejects the
+# lighter default UA. Overridable via YOUTUBE_HELPER_USER_AGENT.
+_BROWSER_USER_AGENT = os.environ.get(
+    "YOUTUBE_HELPER_USER_AGENT",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+)
+_BROWSER_HEADERS = {
+    "User-Agent": _BROWSER_USER_AGENT,
+    "Accept-Language": "en-US,en;q=0.5",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Sec-Fetch-Mode": "navigate",
+}
+
+# Fallback #2: route through a local Tor SOCKS proxy (socks5h resolves DNS
+# through Tor too, avoiding leaks). Requires a Tor daemon running locally
+# (e.g. `brew install tor && brew services start tor`). Overridable via
+# YOUTUBE_HELPER_TOR_PROXY.
+_TOR_PROXY = os.environ.get("YOUTUBE_HELPER_TOR_PROXY", "socks5h://127.0.0.1:9050")
 
 
 def default_ytdlp_options(
@@ -88,7 +111,6 @@ def default_ytdlp_options(
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:94.0) Gecko/20100101 Firefox/94.0",
                 "Accept-Language": "en-US,en;q=0.5",
             },
-            # "proxy": "http://your.proxy.server:port", # in case we are banned
             # NOTE: do NOT force the generic extractor — it makes yt-dlp reject
             # youtube.com / vimeo / etc. as "Unsupported URL" on modern yt-dlp
             # (2025.07+). Let yt-dlp pick the correct site extractor.
@@ -122,6 +144,62 @@ def default_ytdlp_options(
     return options
 
 
+def _ytdlp_option_variants(options: dict) -> list[dict]:
+    """
+    Build the ordered list of yt-dlp option variants to try in turn.
+
+    1. the caller's options as-is
+    2. the same options with a fully-populated browser User-Agent
+    3. the same again, routed through a local Tor SOCKS proxy
+
+    These are the two default fallback mechanisms used whenever the normal
+    approach gets blocked (rate-limiting, bot checks, IP bans, ...).
+    """
+    browser_headers = dict(options.get("http_headers", {}))
+    browser_headers.update(_BROWSER_HEADERS)
+    with_browser_ua = {**options, "http_headers": browser_headers}
+
+    with_tor = {**with_browser_ua, "proxy": _TOR_PROXY}
+
+    return [options, with_browser_ua, with_tor]
+
+
+def _run_ytdlp(options: dict, action: Callable[[yt_dlp.YoutubeDL], Any]) -> Any:
+    """
+    Run a yt-dlp action, falling back to a browser User-Agent then to Tor on failure.
+
+    Parameters
+    ----------
+    options : dict
+        Base yt-dlp options, as produced by :func:`default_ytdlp_options`.
+    action : Callable[[yt_dlp.YoutubeDL], Any]
+        Called with a live ``YoutubeDL`` instance; its return value is
+        propagated back to the caller.
+
+    Returns
+    -------
+    Any
+        Whatever ``action`` returns on the first attempt that succeeds.
+
+    Raises
+    ------
+    Exception
+        The last error encountered, if every fallback also fails.
+    """
+    last_error: Exception | None = None
+    for attempt, opts in enumerate(_ytdlp_option_variants(options)):
+        try:
+            with yt_dlp.YoutubeDL(opts) as ydl:
+                return action(ydl)
+        except Exception as e:
+            last_error = e
+            if attempt == 0:
+                osh.info("yt-dlp failed with default options; retrying with a browser User-Agent")
+            elif attempt == 1:
+                osh.info("yt-dlp failed with a browser User-Agent; retrying over Tor")
+    raise last_error
+
+
 def _aux_ytdlp_meta_data(url: str) -> dict | None:
     """
     Extract metadata from a video URL using yt-dlp.
@@ -144,8 +222,7 @@ def _aux_ytdlp_meta_data(url: str) -> dict | None:
     meta = None
     try:
         opt = default_ytdlp_options()
-        with yt_dlp.YoutubeDL(opt) as ydl:
-            meta = ydl.extract_info(url, download=False)
+        meta = _run_ytdlp(opt, lambda ydl: ydl.extract_info(url, download=False))
     except Exception:
         pass
     return meta
@@ -276,8 +353,7 @@ def download_thumbnail(url: str, output_path: str = None) -> str:
         opts["outtmpl"] = f"{o}.%(ext)s"
 
         # Download the thumbnail using yt-dlp
-        with yt_dlp.YoutubeDL(opts) as ydl:
-            ydl.download([url])
+        _run_ytdlp(opts, lambda ydl: ydl.download([url]))
 
         # Find the downloaded thumbnail file
         thumb_file = glob.glob(f"{o}.*")
@@ -355,8 +431,7 @@ def download_audio(url: str, output_path: str = None, target_sample_rate: int = 
         opts["outtmpl"] = f"{o}.%(ext)s"
 
         # Download the audio using yt-dlp
-        with yt_dlp.YoutubeDL(opts) as ydl:
-            ydl.download([url])
+        _run_ytdlp(opts, lambda ydl: ydl.download([url]))
 
         # Find the downloaded audio file
         received_file = glob.glob(f"{o}.*")
@@ -427,8 +502,7 @@ def download_video(url: str, output_path: str = None) -> str:
         opts["outtmpl"] = f"{o}.%(ext)s"
 
         # Download the best quality video using yt-dlp
-        with yt_dlp.YoutubeDL(opts) as ydl:
-            ydl.download([url])
+        _run_ytdlp(opts, lambda ydl: ydl.download([url]))
 
         # Find the downloaded video file
         received_file = glob.glob(f"{o}.*")

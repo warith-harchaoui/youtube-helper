@@ -141,6 +141,24 @@ print(sample_rate)
 # 44100
 ```
 
+## Download resilience
+
+Every yt-dlp call in `youtube_helper.main` (metadata, thumbnail, audio, video)
+retries automatically when the normal approach gets blocked (rate-limiting,
+bot checks, IP bans):
+
+1. **Normal**: the default request, as configured by `default_ytdlp_options`.
+2. **Browser User-Agent**: retried with a fully-populated, up-to-date desktop
+   Chrome User-Agent and matching headers. Override with the
+   `YOUTUBE_HELPER_USER_AGENT` environment variable.
+3. **Tor**: retried again over a local Tor SOCKS proxy
+   (`socks5h://127.0.0.1:9050` by default, so DNS is resolved through Tor
+   too). Requires a Tor daemon running locally, e.g.
+   `brew install tor && brew services start tor`. Override the proxy URL with
+   `YOUTUBE_HELPER_TOR_PROXY`.
+
+If all three fail, the original error from the last attempt is raised.
+
 ## Legal and Ethical Use
 
 YouTube Helper is a thin wrapper around `yt-dlp` and `ffmpeg`. You are responsible for how you use it. Only download or process media that you own, that is in the public domain or under a permissive license (e.g. Creative Commons), or for which you have explicit permission from the rights holder. Respect each platform's Terms of Service and any applicable copyright, privacy, and data-protection laws in your jurisdiction. The authors provide this library for legitimate uses such as personal archiving, accessibility, research, and content you have rights to, not for circumventing access controls or redistributing copyrighted material.
