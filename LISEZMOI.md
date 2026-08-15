@@ -57,6 +57,12 @@ Fonctions de **téléchargement (sur disque)**, dans `youtube_helper.main` :
 - 🐧 **Ubuntu/Debian** : `sudo apt update && sudo apt install -y python3 python3-pip git yt-dlp ffmpeg`
 - 🪟 **Windows** (PowerShell) : `winget install Python.Python.3.12 Git.Git yt-dlp.yt-dlp Gyan.FFmpeg`
 
+**Optionnel — Tor** (uniquement nécessaire pour le repli n°3 de la [résilience du téléchargement](#résilience-du-téléchargement)) :
+
+- 🍎 **macOS** ([Homebrew](https://brew.sh)) : `brew install tor && brew services start tor`
+- 🐧 **Ubuntu/Debian** : `sudo apt update && sudo apt install -y tor` (le service systemd du paquet démarre automatiquement ; sinon `sudo systemctl enable --now tor`)
+- 🪟 **Windows** : `choco install tor` ([Chocolatey](https://chocolatey.org)), puis lancez `tor` dans un terminal — ou installez le [Tor Browser](https://www.torproject.org/download/) et définissez `YOUTUBE_HELPER_TOR_PROXY=socks5h://127.0.0.1:9150` (son proxy embarqué écoute sur le port 9150, pas le 9050 par défaut du démon autonome)
+
 On recommande de travailler dans un environnement Python. Si vous ne savez pas en créer un, voir [🥸 Conseils techniques](https://harchaoui.org/warith/4ml/#install).
 
 ### Depuis PyPI (recommandé)
@@ -148,9 +154,9 @@ vidéo) réessaie automatiquement quand l'approche normale se fait bloquer
    Surchargeable via la variable d'environnement `YOUTUBE_HELPER_USER_AGENT`.
 3. **Tor** : nouvelle tentative via un proxy SOCKS Tor local
    (`socks5h://127.0.0.1:9050` par défaut, la résolution DNS passant aussi
-   par Tor). Nécessite un démon Tor lancé localement, par ex.
-   `brew install tor && brew services start tor`. Surchargeable via
-   `YOUTUBE_HELPER_TOR_PROXY`.
+   par Tor). Nécessite un démon Tor lancé localement — voir les commandes
+   d'installation par OS dans la section [Installation](#installation).
+   Surchargeable via `YOUTUBE_HELPER_TOR_PROXY`.
 
 Si les trois échouent, l'erreur d'origine de la dernière tentative est levée.
 

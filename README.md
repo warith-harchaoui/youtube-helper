@@ -57,6 +57,12 @@ It also supports post-processing tasks such as converting or merging media files
 - 🐧 **Ubuntu/Debian**: `sudo apt update && sudo apt install -y python3 python3-pip git yt-dlp ffmpeg`
 - 🪟 **Windows** (PowerShell): `winget install Python.Python.3.12 Git.Git yt-dlp.yt-dlp Gyan.FFmpeg`
 
+**Optional — Tor** (only needed for the [download resilience](#download-resilience) fallback #3):
+
+- 🍎 **macOS** ([Homebrew](https://brew.sh)): `brew install tor && brew services start tor`
+- 🐧 **Ubuntu/Debian**: `sudo apt update && sudo apt install -y tor` (the package's systemd service starts automatically; if not, `sudo systemctl enable --now tor`)
+- 🪟 **Windows**: `choco install tor` ([Chocolatey](https://chocolatey.org)), then run `tor` in a terminal — or install the [Tor Browser](https://www.torproject.org/download/) and set `YOUTUBE_HELPER_TOR_PROXY=socks5h://127.0.0.1:9150` (its bundled proxy listens on 9150, not the standalone daemon's default 9050)
+
 We recommend using Python environments. Check this link if you're unfamiliar with setting one up: [🥸 Tech tips](https://harchaoui.org/warith/4ml/#install).
 
 ### From PyPI (recommended)
@@ -153,8 +159,8 @@ bot checks, IP bans):
    `YOUTUBE_HELPER_USER_AGENT` environment variable.
 3. **Tor**: retried again over a local Tor SOCKS proxy
    (`socks5h://127.0.0.1:9050` by default, so DNS is resolved through Tor
-   too). Requires a Tor daemon running locally, e.g.
-   `brew install tor && brew services start tor`. Override the proxy URL with
+   too). Requires a Tor daemon running locally — see the per-OS install
+   commands under [Installation](#installation). Override the proxy URL with
    `YOUTUBE_HELPER_TOR_PROXY`.
 
 If all three fail, the original error from the last attempt is raised.
