@@ -126,3 +126,32 @@ def test_click_valid_empty_url_exits_nonzero():
     # click's Exit exception maps to non-zero exit code.
     assert result.exit_code == 1
     assert "false" in result.output.strip().lower()
+
+
+def test_argparse_library_exception_prints_clean_error_not_a_traceback(capsys):
+    """An invalid URL raises AssertionError deep in main.py; main() must not leak it."""
+    from youtube_helper.cli_argparse import main
+
+    rc = main(["metadata", "--url", "not a real url"])
+    assert rc == 1
+    err = capsys.readouterr().err
+    assert "Error:" in err and "Invalid URL" in err
+
+
+def test_click_main_prints_clean_error_on_a_real_library_exception(capsys):
+    # CliRunner.invoke (used by every test above) catches exceptions itself,
+    # so it never exercises main() -- the actual `youtube-helper-click`
+    # console-script entry point. Drive main() directly.
+    import sys
+
+    from youtube_helper.cli_click import main
+
+    old_argv = sys.argv
+    sys.argv = ["youtube-helper-click", "metadata", "--url", "not a real url"]
+    try:
+        with pytest.raises(SystemExit) as exc:
+            main()
+    finally:
+        sys.argv = old_argv
+    assert exc.value.code == 1
+    assert "Error:" in capsys.readouterr().err

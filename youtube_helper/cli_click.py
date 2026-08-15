@@ -15,8 +15,10 @@ Design notes
 - Flags reuse the argparse names (``--url`` / ``--output`` / …) rather
   than the more idiomatic click positional style — consistency across
   the two CLIs beats micro-idiomaticity here.
-- Errors from the library propagate unchanged; click handles the
-  formatting.
+- A library exception is caught by the ``main()`` entry point (not
+  click's own error handling, which only special-cases
+  ``ClickException``/``Abort``) and printed as a clean ``Error: ...``
+  line + exit 1, instead of a raw Python traceback.
 
 Usage Example
 -------------
@@ -33,6 +35,7 @@ Warith Harchaoui, Ph.D. — https://linkedin.com/in/warith-harchaoui/
 from __future__ import annotations
 
 import json
+import sys
 
 try:
     import click
@@ -405,5 +408,25 @@ def ytdlp_version(min_version: str | None) -> None:
     click.echo(ensure_recent_ytdlp(min_version=min_version))
 
 
+def main() -> None:
+    """Console entry point (``youtube-helper-click``).
+
+    click's own ``main()`` only special-cases ``ClickException``/``Abort``
+    (and a broken pipe); a plain library exception (e.g. ``AssertionError``
+    from an invalid URL) would otherwise propagate as a raw Python
+    traceback instead of a clean CLI error. This wraps the whole
+    invocation and translates that last case into a one-line stderr
+    message + exit 1 — click's own control flow (usage errors, ``--help``,
+    an explicit ``sys.exit(1)`` in a subcommand) already raises
+    ``SystemExit``, a ``BaseException`` this does not catch, so it passes
+    through untouched.
+    """
+    try:
+        cli()
+    except Exception as err:  # noqa: BLE001 — last resort: see docstring
+        click.echo(f"Error: {err}", err=True)
+        sys.exit(1)
+
+
 if __name__ == "__main__":  # pragma: no cover
-    cli()
+    main()

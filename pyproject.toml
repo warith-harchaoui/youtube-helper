@@ -75,7 +75,7 @@ dev = [
 # argparse-based CLI — no runtime dep beyond stdlib + core package.
 youtube-helper = "youtube_helper.cli_argparse:main"
 # click-based twin — install with [cli] extra.
-youtube-helper-click = "youtube_helper.cli_click:cli"
+youtube-helper-click = "youtube_helper.cli_click:main"
 # MCP server — install with [mcp] extra.
 youtube-helper-mcp = "youtube_helper.mcp:main"
 
