@@ -5,7 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.1.2] - 2026-08-15
+
+### Fixed
+
+- **CLI**: a library exception (e.g. `AssertionError` on an invalid URL)
+  used to propagate as a raw Python traceback on both CLI twins instead of
+  a clean `Error: ...` line + exit 1. `youtube-helper-click`'s
+  console-script entry point now points at a new `cli_click.main()`
+  wrapper (was the bare `cli` group).
 
 ## [2.1.1] - 2026-08-13
 
