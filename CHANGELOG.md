@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **`download_audio`/`download_video` could pick up a stale partial file
+  after a retry.** The normal -> browser-UA -> Tor fallback chain reuses the
+  same temp directory across attempts; a failed attempt can leave a
+  `.part` file behind (a network drop mid-download, not just a block), and
+  without cleanup a leftover from attempt N could still be sitting next to
+  attempt N+1's real output when the post-download glob ran, making the
+  picked file order-dependent instead of always the actual result.
+  `_run_ytdlp` now takes an `on_attempt_start` hook, called before every
+  attempt including the first; both download functions use it to purge any
+  `<base>.*` leftovers first. Reproduced against the pre-fix code (the
+  stale `.part` file was picked over the real download) before fixing.
+- **The download-resilience fallback chain only covered `youtube_helper.main`
+  — `branding.py`'s 6 yt-dlp call sites (`channel_info`, `channel_videos`,
+  `video_engagement`, `video_subtitles`, `video_comments`,
+  `engagement_batch`) never retried at all**, despite being exactly as
+  exposed to the same blocking/rate-limiting/bot-check failures the v2.2.0
+  fallback chain was built to solve. All six now route through the same
+  `_run_ytdlp`. `channel_videos`' per-video loop and `engagement_batch`'s
+  per-URL loop no longer share one `YoutubeDL` instance across the whole
+  loop — each item gets its own independent fallback chain, since a block
+  can hit mid-walk, not only on the very first request.
+
 ## [2.2.0] - 2026-08-15
 
 ### Added

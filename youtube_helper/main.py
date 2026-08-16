@@ -164,7 +164,12 @@ def _ytdlp_option_variants(options: dict) -> list[dict]:
     return [options, with_browser_ua, with_tor]
 
 
-def _run_ytdlp(options: dict, action: Callable[[yt_dlp.YoutubeDL], Any]) -> Any:
+def _run_ytdlp(
+    options: dict,
+    action: Callable[[yt_dlp.YoutubeDL], Any],
+    *,
+    on_attempt_start: Callable[[], None] | None = None,
+) -> Any:
     """
     Run a yt-dlp action, falling back to a browser User-Agent then to Tor on failure.
 
@@ -175,6 +180,14 @@ def _run_ytdlp(options: dict, action: Callable[[yt_dlp.YoutubeDL], Any]) -> Any:
     action : Callable[[yt_dlp.YoutubeDL], Any]
         Called with a live ``YoutubeDL`` instance; its return value is
         propagated back to the caller.
+    on_attempt_start : Callable[[], None] or None, optional
+        Called before every attempt, including the first. Download callers
+        use this to purge any partial output left behind by a prior failed
+        attempt (e.g. a ``.part`` file from a network drop mid-download) —
+        without it, a stale leftover can outlive a successful retry and get
+        picked up by the caller's own post-download file glob instead of the
+        actual result. Metadata-only callers, which write nothing to disk,
+        can omit it.
 
     Returns
     -------
@@ -188,6 +201,8 @@ def _run_ytdlp(options: dict, action: Callable[[yt_dlp.YoutubeDL], Any]) -> Any:
     """
     last_error: Exception | None = None
     for attempt, opts in enumerate(_ytdlp_option_variants(options)):
+        if on_attempt_start is not None:
+            on_attempt_start()
         try:
             with yt_dlp.YoutubeDL(opts) as ydl:
                 return action(ydl)
@@ -430,8 +445,17 @@ def download_audio(url: str, output_path: str = None, target_sample_rate: int = 
         opts = default_ytdlp_options(audio=True, cookie_dir=temp_directory)
         opts["outtmpl"] = f"{o}.%(ext)s"
 
-        # Download the audio using yt-dlp
-        _run_ytdlp(opts, lambda ydl: ydl.download([url]))
+        # Download the audio using yt-dlp. Purge any partial output before each
+        # attempt (including the first) — a failed attempt can leave a `.part`
+        # file behind (e.g. a network drop mid-download, not just a block), and
+        # without cleanup a stale leftover from attempt N could still be sitting
+        # next to attempt N+1's real output when the glob below runs, making the
+        # picked file order-dependent instead of deterministic.
+        _run_ytdlp(
+            opts,
+            lambda ydl: ydl.download([url]),
+            on_attempt_start=lambda: osh.remove_files(glob.glob(f"{o}.*")),
+        )
 
         # Find the downloaded audio file
         received_file = glob.glob(f"{o}.*")
@@ -501,8 +525,15 @@ def download_video(url: str, output_path: str = None) -> str:
         opts = default_ytdlp_options(video=True, cookie_dir=temp_directory)
         opts["outtmpl"] = f"{o}.%(ext)s"
 
-        # Download the best quality video using yt-dlp
-        _run_ytdlp(opts, lambda ydl: ydl.download([url]))
+        # Download the best quality video using yt-dlp. Purge any partial output
+        # before each attempt (including the first) — see the matching comment
+        # in download_audio for why this matters once a retry can follow a
+        # partially-completed attempt.
+        _run_ytdlp(
+            opts,
+            lambda ydl: ydl.download([url]),
+            on_attempt_start=lambda: osh.remove_files(glob.glob(f"{o}.*")),
+        )
 
         # Find the downloaded video file
         received_file = glob.glob(f"{o}.*")

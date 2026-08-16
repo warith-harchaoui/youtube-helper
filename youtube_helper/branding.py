@@ -40,6 +40,11 @@ from typing import Any
 import os_helper as osh
 import yt_dlp
 
+# Same normal -> browser-UA -> Tor fallback chain main.py's downloads use, for
+# the same reason: a blocked/rate-limited request is just as likely on a
+# metadata-only call as on a download.
+from .main import _run_ytdlp
+
 # ─── Internal helpers ────────────────────────────────────────────────────────
 
 _SHORT_DURATION_THRESHOLD_SEC = 60
@@ -166,8 +171,7 @@ def channel_info(url: str, verbose: bool = False) -> dict[str, Any]:
     title, description, total view count when available.
     """
     options = _minimal_options(verbose=verbose, extract_flat="in_playlist")
-    with yt_dlp.YoutubeDL(options) as ydl:
-        meta = ydl.extract_info(url, download=False)
+    meta = _run_ytdlp(options, lambda ydl: ydl.extract_info(url, download=False))
     if not meta:
         return {}
     return {
@@ -208,33 +212,37 @@ def channel_videos(
         extract_flat=True,
         playlistend=max_videos,
     )
-    with yt_dlp.YoutubeDL(flat_options) as ydl:
-        page = ydl.extract_info(url, download=False)
+    page = _run_ytdlp(flat_options, lambda ydl: ydl.extract_info(url, download=False))
     entries = page.get("entries") or []
 
-    # Pass 2: per-video metadata fetch (limited to the cap).
+    # Pass 2: per-video metadata fetch (limited to the cap). Each video gets
+    # its own fallback chain (a block/rate-limit can hit mid-walk, not just on
+    # the very first request), so this no longer shares one YoutubeDL instance
+    # across the loop — a fresh one per attempt, same as every other call site.
     full_options = _minimal_options(verbose=verbose, skip_download=True)
     detailed: list[dict[str, Any]] = []
-    with yt_dlp.YoutubeDL(full_options) as ydl:
-        for entry in entries[:max_videos]:
-            if not entry:
-                continue
-            video_url = entry.get("url") or entry.get("webpage_url")
-            if not video_url:
-                continue
-            try:
-                meta = ydl.extract_info(video_url, download=False)
-            except yt_dlp.utils.DownloadError as e:  # noqa: BLE001
-                osh.debug("youtube-helper: skip %s (%s)", video_url, e)
-                continue
-            if not meta:
-                continue
-            norm = _normalise_video_meta(meta)
-            if not include_shorts and norm["kind"] == "short":
-                continue
-            if not include_lives and norm["kind"] == "live":
-                continue
-            detailed.append(norm)
+    for entry in entries[:max_videos]:
+        if not entry:
+            continue
+        video_url = entry.get("url") or entry.get("webpage_url")
+        if not video_url:
+            continue
+        try:
+            meta = _run_ytdlp(
+                full_options,
+                lambda ydl, video_url=video_url: ydl.extract_info(video_url, download=False),
+            )
+        except yt_dlp.utils.DownloadError as e:  # noqa: BLE001
+            osh.debug("youtube-helper: skip %s (%s)", video_url, e)
+            continue
+        if not meta:
+            continue
+        norm = _normalise_video_meta(meta)
+        if not include_shorts and norm["kind"] == "short":
+            continue
+        if not include_lives and norm["kind"] == "live":
+            continue
+        detailed.append(norm)
     return detailed
 
 
@@ -244,8 +252,7 @@ def channel_videos(
 def video_engagement(url: str, verbose: bool = False) -> dict[str, Any]:
     """Single-video engagement snapshot. Returns the normalised dict shape."""
     options = _minimal_options(verbose=verbose)
-    with yt_dlp.YoutubeDL(options) as ydl:
-        meta = ydl.extract_info(url, download=False)
+    meta = _run_ytdlp(options, lambda ydl: ydl.extract_info(url, download=False))
     if not meta:
         return {}
     return _normalise_video_meta(meta)
@@ -275,8 +282,7 @@ def video_subtitles(
         skip_download=True,
         outtmpl=str(out_dir / "%(id)s.%(ext)s"),
     )
-    with yt_dlp.YoutubeDL(options) as ydl:
-        meta = ydl.extract_info(url, download=True)
+    meta = _run_ytdlp(options, lambda ydl: ydl.extract_info(url, download=True))
 
     video_id = (meta or {}).get("id") or ""
     out: dict[str, str] = {}
@@ -316,8 +322,7 @@ def video_comments(
         extra["cookiesfrombrowser"] = (cookies_from_browser,)
 
     options = _minimal_options(verbose=verbose, **extra)
-    with yt_dlp.YoutubeDL(options) as ydl:
-        meta = ydl.extract_info(url, download=False)
+    meta = _run_ytdlp(options, lambda ydl: ydl.extract_info(url, download=False))
 
     comments = (meta or {}).get("comments") or []
     normalised: list[dict[str, Any]] = []
@@ -365,17 +370,16 @@ def engagement_batch(urls: Iterable[str], verbose: bool = False) -> list[dict[st
     """
     out: list[dict[str, Any]] = []
     options = _minimal_options(verbose=verbose)
-    with yt_dlp.YoutubeDL(options) as ydl:
-        for u in urls:
-            try:
-                meta = ydl.extract_info(u, download=False)
-            except yt_dlp.utils.DownloadError as e:  # noqa: BLE001
-                out.append({"url": u, "_error": str(e)[:200]})
-                continue
-            if not meta:
-                out.append({"url": u, "_error": "empty metadata"})
-                continue
-            out.append(_normalise_video_meta(meta))
+    for u in urls:
+        try:
+            meta = _run_ytdlp(options, lambda ydl, u=u: ydl.extract_info(u, download=False))
+        except yt_dlp.utils.DownloadError as e:  # noqa: BLE001
+            out.append({"url": u, "_error": str(e)[:200]})
+            continue
+        if not meta:
+            out.append({"url": u, "_error": "empty metadata"})
+            continue
+        out.append(_normalise_video_meta(meta))
     return out
 
 
