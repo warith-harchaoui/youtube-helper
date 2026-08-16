@@ -16,8 +16,8 @@
 
 [![logo](https://raw.githubusercontent.com/warith-harchaoui/youtube-helper/main/assets/logo.png)](https://harchaoui.org/warith/ai-helpers)
 
-YouTube Helper is a Python library that provides utility functions for downloading videos, audio, and thumbnails from platforms like YouTube, Vimeo, and DailyMotion using `yt-dlp`.
-It also supports post-processing tasks such as converting or merging media files with `ffmpeg`.
+YouTube Helper is a Python library that provides utility functions for downloading videos, audio, and thumbnails from platforms like YouTube, Vimeo, and DailyMotion. It does the actual fetching through `yt-dlp`, an open-source tool that already knows how to talk to hundreds of video sites, each with its own quirks; youtube-helper wraps it in one consistent Python interface so you never have to learn those quirks yourself.
+It also supports post-processing tasks such as converting or merging media files with `ffmpeg`, the standard command-line tool for reading, converting, and combining audio and video.
 
 ## Documentation
 
@@ -47,7 +47,7 @@ It also supports post-processing tasks such as converting or merging media files
 - `video_subtitles(url, output_dir, langs=("fr","en"))`: auto-subtitle download.
 - `video_comments(url, max_count, cookies_from_browser="firefox"|"chrome"|...)`: a comments sample.
 - `is_short(meta)` / `ensure_recent_ytdlp(min_version)`: helpers.
-- Built on yt-dlp's public metadata only: **no Google Data API, no Vimeo API, no OAuth, no quota.**
+- Built on yt-dlp's public metadata only: **no Google Data API, no Vimeo API, no OAuth, no quota.** In plain terms, the official platform APIs require you to register an application, obtain credentials through OAuth (the login handshake that proves your app is allowed to act on a user's behalf), and stay under a quota (a hard cap on how many requests you can make per day). Reading the same public page a browser sees needs none of that: no account to register, no key to request, no daily ceiling to run into.
 
 ## Installation
 
@@ -157,10 +157,17 @@ bot checks, IP bans):
 2. **Browser User-Agent**: retried with a fully-populated, up-to-date desktop
    Chrome User-Agent and matching headers. Override with the
    `YOUTUBE_HELPER_USER_AGENT` environment variable.
-3. **Tor**: retried again over a local Tor SOCKS proxy
-   (`socks5h://127.0.0.1:9050` by default, so DNS is resolved through Tor
-   too). Requires a Tor daemon running locally — see the per-OS install
-   commands under [Installation](#installation). Override the proxy URL with
+3. **Tor**: retried again over a local Tor SOCKS proxy. Tor routes the request
+   through a chain of relays before it reaches the site, so the site sees a
+   different, unrelated IP address instead of yours; a block keyed on your IP
+   no longer applies. A SOCKS proxy is simply a local relay point a program
+   can send its traffic through instead of connecting directly, which is how
+   an application hands its requests off to Tor. Configured as
+   `socks5h://127.0.0.1:9050` by default (DNS lookups are routed through Tor
+   too, so the site name itself is never leaked outside the tunnel). Requires
+   a Tor daemon (the background process that runs the relay chain) running
+   locally; see the per-OS install commands under
+   [Installation](#installation). Override the proxy URL with
    `YOUTUBE_HELPER_TOR_PROXY`.
 
 If all three fail, the original error from the last attempt is raised.
@@ -172,7 +179,14 @@ YouTube Helper is a thin wrapper around `yt-dlp` and `ffmpeg`. You are responsib
 ## Multi-surface exposure
 
 `youtube-helper` is not just a library: the same functions are exposed
-as two CLIs, a FastAPI HTTP surface, MCP tools, and a browser GUI:
+as two command-line interfaces (CLIs, programs you drive by typing commands
+rather than writing Python), a FastAPI HTTP surface (the same functions
+reachable over the network as a small web service), MCP tools (the Model
+Context Protocol, a standard that lets an AI agent call a program's
+functions directly, the same way a human would call them from the command
+line), and a browser GUI (a point-and-click page). Four doors onto the same
+underlying code, so a script, a web service, an AI agent, and a human at a
+browser can all reach the exact same download logic:
 
 ```bash
 # Python library (default)

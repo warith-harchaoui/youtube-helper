@@ -16,8 +16,8 @@
 
 [![logo](https://raw.githubusercontent.com/warith-harchaoui/youtube-helper/main/assets/logo.png)](https://harchaoui.org/warith/ai-helpers)
 
-YouTube Helper est une bibliothèque Python de fonctions utilitaires pour télécharger vidéos, audio et vignettes depuis des plateformes comme YouTube, Vimeo et DailyMotion, via `yt-dlp`.
-Elle gère aussi le post-traitement : conversion ou fusion de fichiers média avec `ffmpeg`.
+YouTube Helper est une bibliothèque Python de fonctions utilitaires pour télécharger vidéos, audio et vignettes depuis des plateformes comme YouTube, Vimeo et DailyMotion. Le téléchargement proprement dit passe par `yt-dlp`, un outil libre qui sait déjà parler à des centaines de sites vidéo, chacun avec ses propres particularités ; youtube-helper l'enveloppe dans une interface Python unique, pour qu'on n'ait jamais à apprendre ces particularités soi-même.
+Elle gère aussi le post-traitement : conversion ou fusion de fichiers média avec `ffmpeg`, l'outil en ligne de commande de référence pour lire, convertir et combiner audio et vidéo.
 
 ## Documentation
 
@@ -47,7 +47,7 @@ Fonctions de **téléchargement (sur disque)**, dans `youtube_helper.main` :
 - `video_subtitles(url, output_dir, langs=("fr","en"))` : téléchargement automatique de sous-titres.
 - `video_comments(url, max_count, cookies_from_browser="firefox"|"chrome"|...)` : échantillon de commentaires.
 - `is_short(meta)` / `ensure_recent_ytdlp(min_version)` : fonctions utilitaires.
-- Bâti uniquement sur les métadonnées publiques de yt-dlp : **pas d'API Google Data, pas d'API Vimeo, pas d'OAuth, pas de quota.**
+- Bâti uniquement sur les métadonnées publiques de yt-dlp : **pas d'API Google Data, pas d'API Vimeo, pas d'OAuth, pas de quota.** En clair, les API officielles des plateformes demandent d'enregistrer une application, d'obtenir des identifiants par OAuth (la poignée de main qui prouve à la plateforme que l'application a le droit d'agir au nom d'un utilisateur), puis de rester sous un quota (un plafond strict du nombre de requêtes autorisées par jour). Lire la même page publique qu'un navigateur affiche n'exige rien de tout cela : ni compte à créer, ni clé à demander, ni plafond quotidien à redouter.
 
 ## Installation
 
@@ -152,11 +152,21 @@ vidéo) réessaie automatiquement quand l'approche normale se fait bloquer
 2. **User-Agent navigateur** : nouvelle tentative avec un User-Agent Chrome
    de bureau complet et à jour, ainsi que les en-têtes correspondants.
    Surchargeable via la variable d'environnement `YOUTUBE_HELPER_USER_AGENT`.
-3. **Tor** : nouvelle tentative via un proxy SOCKS Tor local
-   (`socks5h://127.0.0.1:9050` par défaut, la résolution DNS passant aussi
-   par Tor). Nécessite un démon Tor lancé localement — voir les commandes
-   d'installation par OS dans la section [Installation](#installation).
-   Surchargeable via `YOUTUBE_HELPER_TOR_PROXY`.
+3. **Tor** : nouvelle tentative via un proxy SOCKS Tor local. Tor fait
+   passer la requête par une chaîne de relais avant qu'elle n'atteigne le
+   site visé, si bien que le site voit une adresse IP différente, sans
+   rapport avec la vôtre ; un blocage fondé sur votre IP ne s'applique
+   alors plus. Un proxy SOCKS est simplement un point de relais local
+   auquel un programme peut confier son trafic plutôt que de se connecter
+   directement, c'est ainsi qu'une application transmet ses requêtes à
+   Tor. Configuré par défaut en `socks5h://127.0.0.1:9050` (la résolution
+   DNS, c'est-à-dire la traduction d'un nom de site en adresse IP, passe
+   elle aussi par Tor, pour que le nom du site lui-même ne fuite jamais
+   hors du tunnel). Nécessite un démon Tor (le processus en arrière-plan
+   qui fait tourner la chaîne de relais) lancé localement : voir les
+   commandes d'installation par OS dans la section
+   [Installation](#installation). Surchargeable via
+   `YOUTUBE_HELPER_TOR_PROXY`.
 
 Si les trois échouent, l'erreur d'origine de la dernière tentative est levée.
 
@@ -167,8 +177,17 @@ YouTube Helper est un wrapper léger autour de `yt-dlp` et `ffmpeg`. Vous êtes 
 ## Exposition multi-surface
 
 `youtube-helper` n'est pas seulement une bibliothèque : les mêmes
-fonctions sont exposées comme deux CLI, une surface HTTP FastAPI,
-des outils MCP et une interface graphique dans le navigateur.
+fonctions sont exposées via deux interfaces en ligne de commande (CLI,
+des programmes qu'on pilote en tapant des commandes plutôt qu'en écrivant
+du Python), une surface HTTP FastAPI (ces mêmes fonctions accessibles par
+le réseau comme un petit service web), des outils MCP (le Model Context
+Protocol, une norme qui permet à un agent d'intelligence artificielle
+d'appeler directement les fonctions d'un programme, de la même façon
+qu'un humain les appellerait en ligne de commande), et une interface
+graphique dans le navigateur (une page à cliquer). Quatre portes
+d'entrée vers le même code sous-jacent, pour qu'un script, un service
+web, un agent d'IA et un humain devant son navigateur accèdent tous à
+la même logique de téléchargement.
 
 ```bash
 # Bibliothèque Python (par défaut)
