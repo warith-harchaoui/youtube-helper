@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.2.1] - 2026-08-17
 
 ### Fixed
 
@@ -30,6 +30,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   per-URL loop no longer share one `YoutubeDL` instance across the whole
   loop — each item gets its own independent fallback chain, since a block
   can hit mid-walk, not only on the very first request.
+
+### Documentation
+
+- **README.md/LISEZMOI.md**: glossed recurring jargon at first mention
+  (`yt-dlp`, `ffmpeg`, OAuth/quota, Tor's SOCKS-proxy mechanism, MCP) so a
+  reader unfamiliar with these terms can follow why no API keys are
+  needed and how the Tor fallback actually defeats an IP block, without
+  losing any technical precision for readers who already know them.
 
 ## [2.2.0] - 2026-08-15
 
