@@ -46,8 +46,10 @@ def test_option_variants_order_and_shape():
     base = m.default_ytdlp_options()
     variants = m._ytdlp_option_variants(base)
 
+    # No YOUTUBE_HELPER_COOKIES_FROM_BROWSER set in the test environment -> the
+    # cookies-from-browser tier is skipped, same 3-variant chain as before.
     assert len(variants) == 3
-    normal, browser_ua, tor = variants
+    (_, normal), (_, browser_ua), (_, tor) = variants
 
     assert normal is base
     assert "proxy" not in normal
@@ -57,6 +59,25 @@ def test_option_variants_order_and_shape():
 
     assert tor["http_headers"]["User-Agent"] == m._BROWSER_USER_AGENT
     assert tor["proxy"] == m._TOR_PROXY
+
+
+def test_option_variants_include_cookies_tier_when_configured(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setattr(m, "_COOKIES_FROM_BROWSER", "chrome")
+    base = m.default_ytdlp_options()
+    variants = m._ytdlp_option_variants(base)
+
+    assert len(variants) == 4
+    labels = [label for label, _ in variants]
+    assert labels == ["default options", "a browser User-Agent", "cookies from chrome", "Tor"]
+
+    _, cookies_opts = variants[2]
+    assert cookies_opts["cookiesfrombrowser"] == ("chrome",)
+    assert "proxy" not in cookies_opts
+
+    _, tor_opts = variants[3]
+    assert tor_opts["proxy"] == m._TOR_PROXY
 
 
 def test_run_ytdlp_succeeds_on_first_attempt(monkeypatch: pytest.MonkeyPatch):
@@ -163,6 +184,32 @@ def test_download_audio_purges_a_stale_partial_file_before_the_retry_succeeds(
 
     assert result == output_path
     assert calls["n"] == 2
+
+
+def test_video_url_meta_data_handles_missing_description(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    # Regression test: some extractors (live streams, certain Vimeo /
+    # DailyMotion pages, ...) omit "description" entirely, so yt-dlp's info
+    # dict carries it as None rather than "". video_url_meta_data used to
+    # call `description.split("\n")` unconditionally, which raised
+    # AttributeError on any such video -- and since download_thumbnail /
+    # download_audio / download_video all call this function to build their
+    # default output filename, a missing description broke every one of
+    # them whenever the caller omitted output_path.
+    import os_helper as osh
+
+    monkeypatch.setattr(osh, "is_working_url", lambda url: True)
+    monkeypatch.setattr(
+        m,
+        "_aux_ytdlp_meta_data",
+        lambda url: {"title": "Live stream with no description", "description": None},
+    )
+
+    meta = m.video_url_meta_data("https://example.com/watch?v=live")
+
+    assert meta["title"] == "Live stream with no description"
+    assert meta["description"] == ""
 
 
 class _FixedTempDir:

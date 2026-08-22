@@ -52,7 +52,19 @@ _BROWSER_HEADERS = {
     "Sec-Fetch-Mode": "navigate",
 }
 
-# Fallback #2: route through a local Tor SOCKS proxy (socks5h resolves DNS
+# Fallback #2: pull a real session's cookies straight from a local browser profile
+# (yt-dlp's --cookies-from-browser mechanism). This is what actually clears YouTube's
+# "Sign in to confirm you're not a bot" challenge in practice — a bare browser User-Agent
+# does not, and neither does routing through Tor (exit nodes are themselves commonly
+# flagged). Empty by default (opt-in: reading another app's cookie store is invasive
+# enough that it should not happen silently); set YOUTUBE_HELPER_COOKIES_FROM_BROWSER to
+# a yt-dlp-recognized browser name (chrome, firefox, edge, brave, opera, vivaldi, safari,
+# whale, chromium) to enable it. Safari's cookie store additionally needs Full Disk Access
+# granted to the calling process/terminal on macOS, or extraction raises "Operation not
+# permitted" — Chrome/Firefox need no such grant.
+_COOKIES_FROM_BROWSER = os.environ.get("YOUTUBE_HELPER_COOKIES_FROM_BROWSER", "").strip()
+
+# Fallback #3 (last resort): route through a local Tor SOCKS proxy (socks5h resolves DNS
 # through Tor too, avoiding leaks). Requires a Tor daemon running locally
 # (e.g. `brew install tor && brew services start tor`). Overridable via
 # YOUTUBE_HELPER_TOR_PROXY.
@@ -144,24 +156,36 @@ def default_ytdlp_options(
     return options
 
 
-def _ytdlp_option_variants(options: dict) -> list[dict]:
+def _ytdlp_option_variants(options: dict) -> list[tuple[str, dict]]:
     """
     Build the ordered list of yt-dlp option variants to try in turn.
 
     1. the caller's options as-is
     2. the same options with a fully-populated browser User-Agent
-    3. the same again, routed through a local Tor SOCKS proxy
+    3. the same again, with cookies pulled from a local browser profile
+       (only when :data:`_COOKIES_FROM_BROWSER` is set — see its docstring)
+    4. the same again, routed through a local Tor SOCKS proxy
 
-    These are the two default fallback mechanisms used whenever the normal
-    approach gets blocked (rate-limiting, bot checks, IP bans, ...).
+    These are the default fallback mechanisms used whenever the normal approach gets
+    blocked (rate-limiting, bot checks, IP bans, ...). In practice #3 is the one that
+    actually clears YouTube's "Sign in to confirm you're not a bot" challenge; #4 is
+    kept as the last resort for environments with no logged-in browser to borrow
+    cookies from (Tor exit nodes are themselves commonly flagged by YouTube, so it is
+    not a reliable primary fix for that particular challenge).
     """
     browser_headers = dict(options.get("http_headers", {}))
     browser_headers.update(_BROWSER_HEADERS)
     with_browser_ua = {**options, "http_headers": browser_headers}
 
-    with_tor = {**with_browser_ua, "proxy": _TOR_PROXY}
+    variants = [("default options", options), ("a browser User-Agent", with_browser_ua)]
 
-    return [options, with_browser_ua, with_tor]
+    if _COOKIES_FROM_BROWSER:
+        with_cookies = {**with_browser_ua, "cookiesfrombrowser": (_COOKIES_FROM_BROWSER,)}
+        variants.append((f"cookies from {_COOKIES_FROM_BROWSER}", with_cookies))
+
+    variants.append(("Tor", {**with_browser_ua, "proxy": _TOR_PROXY}))
+
+    return variants
 
 
 def _run_ytdlp(
@@ -200,7 +224,8 @@ def _run_ytdlp(
         The last error encountered, if every fallback also fails.
     """
     last_error: Exception | None = None
-    for attempt, opts in enumerate(_ytdlp_option_variants(options)):
+    variants = _ytdlp_option_variants(options)
+    for attempt, (label, opts) in enumerate(variants):
         if on_attempt_start is not None:
             on_attempt_start()
         try:
@@ -208,10 +233,9 @@ def _run_ytdlp(
                 return action(ydl)
         except Exception as e:
             last_error = e
-            if attempt == 0:
-                osh.info("yt-dlp failed with default options; retrying with a browser User-Agent")
-            elif attempt == 1:
-                osh.info("yt-dlp failed with a browser User-Agent; retrying over Tor")
+            if attempt + 1 < len(variants):
+                next_label = variants[attempt + 1][0]
+                osh.info(f"yt-dlp failed with {label}; retrying with {next_label}")
     raise last_error
 
 
@@ -271,7 +295,12 @@ def video_url_meta_data(url: str) -> dict:
     res.update(meta)
     title = meta.get("title")
     res["title"] = title
-    description = meta.get("description")
+    # Some extractors (live streams, certain Vimeo/DailyMotion pages, ...)
+    # omit the description entirely, so yt-dlp hands back None here. Coalesce
+    # to "" before splitting — without this, videos with no description
+    # crash every caller that relies on this function for the default output
+    # filename (download_thumbnail / download_audio / download_video).
+    description = meta.get("description") or ""
     res["description"] = description
 
     t = description.split("\n")
