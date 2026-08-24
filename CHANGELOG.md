@@ -5,6 +5,60 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2026-08-24
+
+### Added
+
+- **Cookies-from-browser fallback tier** in the yt-dlp retry chain: YouTube's
+  "Sign in to confirm you're not a bot" challenge survived the existing
+  default → browser-UA → Tor chain untouched (Tor exit nodes are themselves
+  commonly flagged). Verified live: `--cookies-from-browser chrome` clears
+  it immediately where Tor did not. The new tier sits between browser-UA and
+  Tor, opt-in via `YOUTUBE_HELPER_COOKIES_FROM_BROWSER` (empty by default —
+  reading another app's cookie store should never happen silently).
+
+### Fixed
+
+- **`streaming.py`'s `resolve_direct_url`/`list_video_streams`/
+  `pick_video_stream` (and transitively `extract_frames_stream`) completely
+  bypassed the browser-UA / cookies-from-browser / Tor retry chain**,
+  calling `YoutubeDL(...).extract_info(...)` directly with zero fallback —
+  unlike every function in `main.py` and `branding.py`'s `channel_videos`/
+  `video_engagement`, which already routed through `main._run_ytdlp`. The
+  README's "Download resilience" section documents this resilience as
+  applying to "every yt-dlp call in `youtube_helper.main`", which was true,
+  but silently left `streaming.py`'s three functions with none of it. Found
+  via a live bot-block in the field (YouTube's "Sign in to confirm you're
+  not a bot") that `main.py`'s functions recovered from automatically but
+  `streaming.py`'s did not. Both extraction call sites now go through
+  `_run_ytdlp`, same as the rest of the package.
+- **`video_url_meta_data` crashed on videos with no description.** Some
+  extractors (live streams, certain Vimeo / DailyMotion pages, …) omit the
+  `description` field entirely, so yt-dlp's info dict carries it as `None`
+  rather than `""`. The function called `description.split("\n")`
+  unconditionally, raising `AttributeError` on any such video — and since
+  `download_thumbnail` / `download_audio` / `download_video` all call this
+  function to build their default output filename when `output_path` is
+  omitted, a missing description broke every one of them too. Coalesces to
+  `""` before splitting; added a regression test
+  (`test_video_url_meta_data_handles_missing_description`).
+- **README.md/LISEZMOI.md's "Download resilience" section never documented
+  the new cookies-from-browser tier**, and still numbered Tor as fallback
+  #3 (now #4) — the exact same repo, same doc drift class as the missing-
+  description fix above, just in the "what does this env var do" surface
+  instead of code. Added the missing tier description (mirrors the code
+  comment: which browsers are supported, the Safari Full Disk Access
+  caveat) and fixed Tor's numbering in both the resilience section and the
+  Installation section's cross-reference.
+
+### Documentation
+
+- **README.md/LISEZMOI.md**: added an honest "battle-tested" /
+  "éprouvé en production" paragraph — on PyPI, CI-gated, semantic-versioned,
+  depends on `os-helper` / `audio-helper` / `video-helper`, and
+  is itself a dependency of `podcast-helper` — matching the framing already
+  used across the suite (see `audio-helper`'s README).
+
 ## [2.2.1] - 2026-08-17
 
 ### Fixed

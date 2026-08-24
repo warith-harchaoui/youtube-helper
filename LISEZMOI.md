@@ -19,6 +19,8 @@
 YouTube Helper est une bibliothèque Python de fonctions utilitaires pour télécharger vidéos, audio et vignettes depuis des plateformes comme YouTube, Vimeo et DailyMotion. Le téléchargement proprement dit passe par `yt-dlp`, un outil libre qui sait déjà parler à des centaines de sites vidéo, chacun avec ses propres particularités ; youtube-helper l'enveloppe dans une interface Python unique, pour qu'on n'ait jamais à apprendre ces particularités soi-même.
 Elle gère aussi le post-traitement : conversion ou fusion de fichiers média avec `ffmpeg`, l'outil en ligne de commande de référence pour lire, convertir et combiner audio et vidéo.
 
+YouTube Helper est éprouvé en production. Chaque changement passe par des tests automatisés et une intégration continue avant d'atteindre PyPI ; les versions suivent le [versionnage sémantique](https://semver.org/lang/fr/) (actuellement `v2.3.0`). [`podcast-helper`](https://github.com/warith-harchaoui/podcast-helper), un autre paquet publié de la suite, s'appuie directement dessus en production. YouTube Helper repose lui-même sur [`os-helper`](https://github.com/warith-harchaoui/os-helper) (le socle commun que chaque bibliothèque de la suite utilise pour la journalisation et la gestion des fichiers), sur [`audio-helper`](https://github.com/warith-harchaoui/audio-helper) et sur [`video-helper`](https://github.com/warith-harchaoui/video-helper) pour l'étape de conversion qui suit la récupération du média brut par `yt-dlp`. C'est ce que « éprouvé en production » veut dire ici : pas une promesse, mais un graphe de dépendances sur lequel repose déjà du code publié, dans les deux sens autour de ce paquet.
+
 ## Documentation
 
 [💻 Documentation](https://harchaoui.org/warith/ai-helpers/docs/youtube-helper-doc/)
@@ -57,7 +59,7 @@ Fonctions de **téléchargement (sur disque)**, dans `youtube_helper.main` :
 - 🐧 **Ubuntu/Debian** : `sudo apt update && sudo apt install -y python3 python3-pip git yt-dlp ffmpeg`
 - 🪟 **Windows** (PowerShell) : `winget install Python.Python.3.12 Git.Git yt-dlp.yt-dlp Gyan.FFmpeg`
 
-**Optionnel — Tor** (uniquement nécessaire pour le repli n°3 de la [résilience du téléchargement](#résilience-du-téléchargement)) :
+**Optionnel — Tor** (uniquement nécessaire pour le repli n°4 de la [résilience du téléchargement](#résilience-du-téléchargement)) :
 
 - 🍎 **macOS** ([Homebrew](https://brew.sh)) : `brew install tor && brew services start tor`
 - 🐧 **Ubuntu/Debian** : `sudo apt update && sudo apt install -y tor` (le service systemd du paquet démarre automatiquement ; sinon `sudo systemctl enable --now tor`)
@@ -152,7 +154,23 @@ vidéo) réessaie automatiquement quand l'approche normale se fait bloquer
 2. **User-Agent navigateur** : nouvelle tentative avec un User-Agent Chrome
    de bureau complet et à jour, ainsi que les en-têtes correspondants.
    Surchargeable via la variable d'environnement `YOUTUBE_HELPER_USER_AGENT`.
-3. **Tor** : nouvelle tentative via un proxy SOCKS Tor local. Tor fait
+3. **Cookies du navigateur** (opt-in, ignoré par défaut) : nouvelle
+   tentative avec les cookies de session récupérés directement dans le
+   profil d'un navigateur local (mécanisme `--cookies-from-browser` de
+   yt-dlp). En pratique, c'est ce palier qui fait vraiment sauter le
+   contrôle « Confirmez que vous n'êtes pas un robot » de YouTube — un
+   User-Agent navigateur seul n'y suffit pas, ni Tor (les nœuds de sortie
+   Tor sont eux-mêmes souvent signalés). Lire le trousseau de cookies
+   d'une autre application est suffisamment intrusif pour que cela ne se
+   produise jamais silencieusement : définissez
+   `YOUTUBE_HELPER_COOKIES_FROM_BROWSER` avec un nom de navigateur reconnu
+   par yt-dlp (`chrome`, `firefox`, `edge`, `brave`, `opera`, `vivaldi`,
+   `safari`, `whale`, `chromium`) pour l'activer. Le trousseau de cookies
+   de Safari nécessite en plus l'accès complet au disque (Full Disk
+   Access) accordé au processus/terminal appelant sur macOS, sans quoi
+   l'extraction lève « Operation not permitted » ; Chrome/Firefox n'ont
+   besoin d'aucune autorisation particulière.
+4. **Tor** : nouvelle tentative via un proxy SOCKS Tor local. Tor fait
    passer la requête par une chaîne de relais avant qu'elle n'atteigne le
    site visé, si bien que le site voit une adresse IP différente, sans
    rapport avec la vôtre ; un blocage fondé sur votre IP ne s'applique
@@ -166,9 +184,14 @@ vidéo) réessaie automatiquement quand l'approche normale se fait bloquer
    qui fait tourner la chaîne de relais) lancé localement : voir les
    commandes d'installation par OS dans la section
    [Installation](#installation). Surchargeable via
-   `YOUTUBE_HELPER_TOR_PROXY`.
+   `YOUTUBE_HELPER_TOR_PROXY`. Conservé en dernier recours pour les
+   environnements sans navigateur connecté auprès duquel emprunter des
+   cookies — les nœuds de sortie Tor étant eux-mêmes souvent signalés, ce
+   n'est pas un correctif fiable en premier lieu pour ce contrôle
+   anti-robot.
 
-Si les trois échouent, l'erreur d'origine de la dernière tentative est levée.
+Si tous les paliers échouent, l'erreur d'origine de la dernière tentative
+est levée.
 
 ## Usage légal et éthique
 

@@ -36,9 +36,13 @@ from typing import Any, Literal, TypedDict
 # used here instead of stdlib logging so verbosity stays centrally managed.
 import os_helper as osh
 
-# yt-dlp is already a dep of youtube-helper; we use its Python API rather
-# than shelling out so we keep the info dict (URL + headers + is_live).
-from yt_dlp import YoutubeDL
+# _run_ytdlp is main.py's browser-UA / cookies-from-browser / Tor retry
+# chain (see its docstring and the "Download resilience" README section).
+# Reused here rather than re-implemented so resolve_direct_url /
+# list_video_streams / pick_video_stream get the exact same resilience as
+# video_url_meta_data / download_video / download_audio / download_thumbnail
+# instead of a bare single-shot YoutubeDL call with no fallback at all.
+from .main import _run_ytdlp
 
 
 class DirectMediaURL(TypedDict):
@@ -102,6 +106,13 @@ def resolve_direct_url(
     RuntimeError
         If ``yt-dlp`` could not extract a usable URL (private video,
         geo-blocked without bypass, removed, …).
+
+    Notes
+    -----
+    Goes through the same browser-UA / cookies-from-browser /
+    Tor retry chain as :func:`youtube_helper.main.video_url_meta_data`
+    (see the README's "Download resilience" section) — a bot-check or
+    rate-limit on the first attempt is not the end of the story.
     """
     # We pick the format based on ``prefer``. ``bestaudio*`` matches any
     # audio-only stream; ``best`` matches the best combined stream. The
@@ -119,8 +130,7 @@ def resolve_direct_url(
         "hls_prefer_native": False,
     }
 
-    with YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=False)
+    info = _run_ytdlp(ydl_opts, lambda ydl: ydl.extract_info(url, download=False))
 
     if info is None:
         raise RuntimeError(f"yt-dlp could not extract info for URL: {url!r}")
@@ -303,8 +313,7 @@ def _extract_info_for_catalog(
     }
     if cookies_from_browser:
         ydl_opts["cookiesfrombrowser"] = (cookies_from_browser,)
-    with YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=False)
+    info = _run_ytdlp(ydl_opts, lambda ydl: ydl.extract_info(url, download=False))
     if info is None:
         raise RuntimeError(f"yt-dlp could not extract info for URL: {url!r}")
     if "entries" in info and info["entries"]:
@@ -339,7 +348,8 @@ def list_video_streams(
     cookies_from_browser : str, optional
         Pass through to yt-dlp's ``--cookies-from-browser`` (e.g.
         ``"firefox"`` / ``"chrome"`` / ``"safari"``) for age-gated or
-        login-required content.
+        login-required content. Tried on every retry tier below, ahead of
+        whichever browser ``YOUTUBE_HELPER_COOKIES_FROM_BROWSER`` names.
     verbose : bool, optional
         Echo yt-dlp's output to stderr (off by default).
 
@@ -348,6 +358,13 @@ def list_video_streams(
     list[VideoStreamInfo]
         Possibly empty if the URL has no video (audio-only podcast,
         for example).
+
+    Notes
+    -----
+    Goes through the same browser-UA / cookies-from-browser / Tor retry
+    chain as :func:`youtube_helper.main.video_url_meta_data` (see the
+    README's "Download resilience" section) — a bot-check or rate-limit on
+    the first attempt is not the end of the story.
 
     Raises
     ------

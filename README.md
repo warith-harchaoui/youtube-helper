@@ -19,6 +19,8 @@
 YouTube Helper is a Python library that provides utility functions for downloading videos, audio, and thumbnails from platforms like YouTube, Vimeo, and DailyMotion. It does the actual fetching through `yt-dlp`, an open-source tool that already knows how to talk to hundreds of video sites, each with its own quirks; youtube-helper wraps it in one consistent Python interface so you never have to learn those quirks yourself.
 It also supports post-processing tasks such as converting or merging media files with `ffmpeg`, the standard command-line tool for reading, converting, and combining audio and video.
 
+YouTube Helper is battle-tested: every change ships through automated tests and continuous integration before it reaches PyPI, versions follow [Semantic Versioning](https://semver.org/) (currently `v2.3.0`), and [`podcast-helper`](https://github.com/warith-harchaoui/podcast-helper), a separate published package in the suite, builds directly on top of it in production. YouTube Helper itself depends on [`os-helper`](https://github.com/warith-harchaoui/os-helper) (the shared foundation package every library in the suite uses for logging and file management), [`audio-helper`](https://github.com/warith-harchaoui/audio-helper), and [`video-helper`](https://github.com/warith-harchaoui/video-helper) for the conversion step after `yt-dlp` fetches the raw media. That is what "battle-tested" means here: not a claim, but a dependency graph other shipped code actually stands on, on both sides of this package.
+
 ## Documentation
 
 [💻 Documentation](https://harchaoui.org/warith/ai-helpers/docs/youtube-helper-doc/)
@@ -57,7 +59,7 @@ It also supports post-processing tasks such as converting or merging media files
 - 🐧 **Ubuntu/Debian**: `sudo apt update && sudo apt install -y python3 python3-pip git yt-dlp ffmpeg`
 - 🪟 **Windows** (PowerShell): `winget install Python.Python.3.12 Git.Git yt-dlp.yt-dlp Gyan.FFmpeg`
 
-**Optional — Tor** (only needed for the [download resilience](#download-resilience) fallback #3):
+**Optional — Tor** (only needed for the [download resilience](#download-resilience) fallback #4):
 
 - 🍎 **macOS** ([Homebrew](https://brew.sh)): `brew install tor && brew services start tor`
 - 🐧 **Ubuntu/Debian**: `sudo apt update && sudo apt install -y tor` (the package's systemd service starts automatically; if not, `sudo systemctl enable --now tor`)
@@ -157,7 +159,20 @@ bot checks, IP bans):
 2. **Browser User-Agent**: retried with a fully-populated, up-to-date desktop
    Chrome User-Agent and matching headers. Override with the
    `YOUTUBE_HELPER_USER_AGENT` environment variable.
-3. **Tor**: retried again over a local Tor SOCKS proxy. Tor routes the request
+3. **Cookies from browser** (opt-in, skipped by default): retried with
+   session cookies pulled straight from a local browser profile (yt-dlp's
+   `--cookies-from-browser` mechanism). In practice this is the tier that
+   actually clears YouTube's "Sign in to confirm you're not a bot"
+   challenge — a browser User-Agent alone does not, and neither does Tor
+   (exit nodes are themselves commonly flagged). Reading another app's
+   cookie store is invasive enough that it never happens silently: set
+   `YOUTUBE_HELPER_COOKIES_FROM_BROWSER` to a yt-dlp-recognized browser name
+   (`chrome`, `firefox`, `edge`, `brave`, `opera`, `vivaldi`, `safari`,
+   `whale`, `chromium`) to enable it. Safari's cookie store additionally
+   needs Full Disk Access granted to the calling process/terminal on macOS,
+   or extraction raises "Operation not permitted"; Chrome/Firefox need no
+   such grant.
+4. **Tor**: retried again over a local Tor SOCKS proxy. Tor routes the request
    through a chain of relays before it reaches the site, so the site sees a
    different, unrelated IP address instead of yours; a block keyed on your IP
    no longer applies. A SOCKS proxy is simply a local relay point a program
@@ -168,9 +183,12 @@ bot checks, IP bans):
    a Tor daemon (the background process that runs the relay chain) running
    locally; see the per-OS install commands under
    [Installation](#installation). Override the proxy URL with
-   `YOUTUBE_HELPER_TOR_PROXY`.
+   `YOUTUBE_HELPER_TOR_PROXY`. Kept as the last resort for environments with
+   no logged-in browser to borrow cookies from — Tor exit nodes are
+   themselves commonly flagged, so it is not a reliable primary fix for the
+   bot challenge.
 
-If all three fail, the original error from the last attempt is raised.
+If every tier fails, the original error from the last attempt is raised.
 
 ## Legal and Ethical Use
 
