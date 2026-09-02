@@ -261,6 +261,18 @@ docker run --rm -p 8000:8000 youtube-helper
 Un plan de GUI plus riche (bibliothèque vidéo, comparateur de chaînes,
 downloader batch) est dans [GUI.md](https://github.com/warith-harchaoui/youtube-helper/blob/main/GUI.md).
 
+## Version Rust
+
+Un crate compagnon, [`youtube-helper-rs`](https://github.com/warith-harchaoui/youtube-helper-rs),
+encapsule le même binaire `yt-dlp` depuis Rust plutôt que depuis Python —
+`fetch_metadata` et `download_audio`, rien de plus pour l'instant (pas de
+téléchargement vidéo, de miniatures, de catalogue de flux, de métadonnées
+de chaîne, de sous-titres ni de repli Tor, tous présents ici). L'intérêt :
+un fin wrapper `std::process::Command` avec des résultats typés et une
+énumération d'erreurs `thiserror`, pour qu'un programme Rust qui invoque
+déjà `yt-dlp` obtienne une gestion d'erreurs cohérente et typée, sans le
+moindre runtime Python dans l'image de déploiement.
+
 ## Auteur
  - [Warith HARCHAOUI](https://linkedin.com/in/warith-harchaoui)
 

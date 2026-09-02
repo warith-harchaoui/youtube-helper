@@ -254,6 +254,17 @@ docker run --rm -p 8000:8000 youtube-helper
 A richer GUI plan (video library board, channel comparator, batch downloader)
 lives in [GUI.md](https://github.com/warith-harchaoui/youtube-helper/blob/main/GUI.md).
 
+## Rust rewrite
+
+A companion crate, [`youtube-helper-rs`](https://github.com/warith-harchaoui/youtube-helper-rs),
+wraps the same `yt-dlp` binary from Rust instead of Python —
+`fetch_metadata` and `download_audio`, nothing more yet (no video download,
+thumbnails, stream catalog, channel metadata, subtitles, or Tor fallback,
+all present here). The interest: it's a thin `std::process::Command`
+wrapper with typed results and a `thiserror` error enum, so a Rust program
+that already shells out to `yt-dlp` gets consistent, typed error handling
+with no Python runtime in the deployment image at all.
+
 ## Author
  - [Warith HARCHAOUI](https://linkedin.com/in/warith-harchaoui)
 
