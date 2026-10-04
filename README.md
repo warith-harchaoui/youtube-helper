@@ -12,9 +12,9 @@
 
 *(youtube-helper does reach the internet: it downloads media from the source site you point it at. The promise is about no exfiltration and no telemetry, nothing about you or your requests is ever sent anywhere except the site hosting the media you asked for.)*
 
-[🌍 AI Helpers](https://harchaoui.org/warith/ai-helpers)
+[🌍 AI Helpers](https://deraison.ai/ai-helpers)
 
-[![logo](https://raw.githubusercontent.com/warith-harchaoui/youtube-helper/main/assets/logo.png)](https://harchaoui.org/warith/ai-helpers)
+[![logo](https://raw.githubusercontent.com/warith-harchaoui/youtube-helper/main/assets/logo.png)](https://deraison.ai/ai-helpers)
 
 YouTube Helper is a Python library that provides utility functions for downloading videos, audio, and thumbnails from platforms like YouTube, Vimeo, and DailyMotion. It does the actual fetching through `yt-dlp`, an open-source tool that already knows how to talk to hundreds of video sites, each with its own quirks; youtube-helper wraps it in one consistent Python interface so you never have to learn those quirks yourself.
 It also supports post-processing tasks such as converting or merging media files with `ffmpeg`, the standard command-line tool for reading, converting, and combining audio and video.
@@ -23,7 +23,7 @@ YouTube Helper is battle-tested: every change ships through automated tests and 
 
 ## Documentation
 
-[💻 Documentation](https://harchaoui.org/warith/ai-helpers/docs/youtube-helper-doc/)
+[💻 Documentation](https://deraison.ai/ai-helpers/docs/youtube-helper-doc/)
 
 [🗺️ Landscape](https://github.com/warith-harchaoui/youtube-helper/blob/main/LANDSCAPE.md)
 
@@ -65,7 +65,7 @@ YouTube Helper is battle-tested: every change ships through automated tests and 
 - 🐧 **Ubuntu/Debian**: `sudo apt update && sudo apt install -y tor` (the package's systemd service starts automatically; if not, `sudo systemctl enable --now tor`)
 - 🪟 **Windows**: `choco install tor` ([Chocolatey](https://chocolatey.org)), then run `tor` in a terminal — or install the [Tor Browser](https://www.torproject.org/download/) and set `YOUTUBE_HELPER_TOR_PROXY=socks5h://127.0.0.1:9150` (its bundled proxy listens on 9150, not the standalone daemon's default 9050)
 
-We recommend using Python environments. Check this link if you're unfamiliar with setting one up: [🥸 Tech tips](https://harchaoui.org/warith/4ml/#install).
+We recommend using Python environments. Check this link if you're unfamiliar with setting one up: [🥸 Tech tips](https://deraison.ai/4ml/#install).
 
 ### From PyPI (recommended)
 

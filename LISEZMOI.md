@@ -12,9 +12,9 @@
 
 *(youtube-helper accède bien à Internet : il télécharge les médias depuis le site source que vous lui indiquez. La promesse porte sur l'absence d'exfiltration et de télémétrie, rien vous concernant, ni vos requêtes, n'est envoyé ailleurs que vers le site qui héberge le média demandé.)*
 
-[🌍 AI Helpers](https://harchaoui.org/warith/ai-helpers)
+[🌍 AI Helpers](https://deraison.ai/ai-helpers)
 
-[![logo](https://raw.githubusercontent.com/warith-harchaoui/youtube-helper/main/assets/logo.png)](https://harchaoui.org/warith/ai-helpers)
+[![logo](https://raw.githubusercontent.com/warith-harchaoui/youtube-helper/main/assets/logo.png)](https://deraison.ai/ai-helpers)
 
 YouTube Helper est une bibliothèque Python de fonctions utilitaires pour télécharger vidéos, audio et vignettes depuis des plateformes comme YouTube, Vimeo et DailyMotion. Le téléchargement proprement dit passe par `yt-dlp`, un outil libre qui sait déjà parler à des centaines de sites vidéo, chacun avec ses propres particularités ; youtube-helper l'enveloppe dans une interface Python unique, pour qu'on n'ait jamais à apprendre ces particularités soi-même.
 Elle gère aussi le post-traitement : conversion ou fusion de fichiers média avec `ffmpeg`, l'outil en ligne de commande de référence pour lire, convertir et combiner audio et vidéo.
@@ -23,7 +23,7 @@ YouTube Helper est éprouvé en production. Chaque changement passe par des test
 
 ## Documentation
 
-[💻 Documentation](https://harchaoui.org/warith/ai-helpers/docs/youtube-helper-doc/)
+[💻 Documentation](https://deraison.ai/ai-helpers/docs/youtube-helper-doc/)
 
 [🗺️ Paysage](https://github.com/warith-harchaoui/youtube-helper/blob/main/PAYSAGE.md)
 
@@ -65,7 +65,7 @@ Fonctions de **téléchargement (sur disque)**, dans `youtube_helper.main` :
 - 🐧 **Ubuntu/Debian** : `sudo apt update && sudo apt install -y tor` (le service systemd du paquet démarre automatiquement ; sinon `sudo systemctl enable --now tor`)
 - 🪟 **Windows** : `choco install tor` ([Chocolatey](https://chocolatey.org)), puis lancez `tor` dans un terminal — ou installez le [Tor Browser](https://www.torproject.org/download/) et définissez `YOUTUBE_HELPER_TOR_PROXY=socks5h://127.0.0.1:9150` (son proxy embarqué écoute sur le port 9150, pas le 9050 par défaut du démon autonome)
 
-On recommande de travailler dans un environnement Python. Si vous ne savez pas en créer un, voir [🥸 Conseils techniques](https://harchaoui.org/warith/4ml/#install).
+On recommande de travailler dans un environnement Python. Si vous ne savez pas en créer un, voir [🥸 Conseils techniques](https://deraison.ai/4ml/#install).
 
 ### Depuis PyPI (recommandé)
 
