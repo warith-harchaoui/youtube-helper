@@ -261,6 +261,17 @@ docker run --rm -p 8000:8000 youtube-helper
 Un plan de GUI plus riche (bibliothèque vidéo, comparateur de chaînes,
 downloader batch) est dans [GUI.md](https://github.com/warith-harchaoui/youtube-helper/blob/main/GUI.md).
 
+### En tant que skill d'agent
+
+`skills/youtube-helper/` empaquette youtube-helper comme **skill Claude** *et* skill
+**OpenCode**, pour qu'un agent puisse s'en saisir à votre place. Voir
+[`skills/README.md`](https://github.com/warith-harchaoui/youtube-helper/blob/main/skills/README.md) pour l'installer (liens
+symboliques vers `~/.claude/skills/` et `~/.opencode/skills/`) et
+[`TRIGGERS.md`](https://github.com/warith-harchaoui/youtube-helper/blob/main/TRIGGERS.md) pour le catalogue exhaustif des
+déclencheurs — `scripts/check_triggers.py` maintient la description du skill
+alignée dessus ; la suite de tests échoue si une capacité cesse d'être
+nommée.
+
 ## Version Rust
 
 Un crate compagnon, [`youtube-helper-rs`](https://github.com/warith-harchaoui/youtube-helper-rs),
