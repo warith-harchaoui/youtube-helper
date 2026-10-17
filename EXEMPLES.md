@@ -7,7 +7,7 @@ extrait suppose :
 import youtube_helper as yth
 import os_helper as osh
 
-osh.verbosity(2)   # so osh.info(...) calls surface on stdout
+osh.verbosity(2)  # so osh.info(...) calls surface on stdout
 ```
 
 et que `yt-dlp` et `ffmpeg` sont installés (`brew install yt-dlp ffmpeg`
@@ -65,8 +65,10 @@ peut alors la lire sans repasser par yt-dlp.
 # Énumère tous les formats vidéo que yt-dlp trouve.
 streams = yth.list_video_streams("https://www.youtube.com/watch?v=YE7VzlLtp-4")
 for s in streams[:5]:
-    print(f"{s['format_id']:6} {s['width']}x{s['height']} {s['fps']}fps "
-          f"{s['vcodec']:14} {s['ext']:6} ~{s['vbr_kbps']:.0f} kbps")
+    print(
+        f"{s['format_id']:6} {s['width']}x{s['height']} {s['fps']}fps "
+        f"{s['vcodec']:14} {s['ext']:6} ~{s['vbr_kbps']:.0f} kbps"
+    )
 # 160     256x144   30.0 avc1.42c00c   mp4    ~  110 kbps
 # 278     256x144   30.0 vp09.00.11... webm   ~  102 kbps
 # ...
@@ -74,7 +76,7 @@ for s in streams[:5]:
 # Choisit celui qui correspond à vos contraintes : le meilleur candidat yt-dlp parmi les correspondances.
 pick = yth.pick_video_stream(
     "https://www.youtube.com/watch?v=YE7VzlLtp-4",
-    prefer_codec="h264",   # also matches "avc1.xxx"
+    prefer_codec="h264",  # also matches "avc1.xxx"
     prefer_format="mp4",
     max_fps=30,
 )
@@ -96,7 +98,7 @@ pour ffmpeg :
 ```python
 out = yth.resolve_direct_url(
     "https://www.youtube.com/watch?v=YE7VzlLtp-4",
-    prefer="video",   # or "audio" for the cheapest audio-only path
+    prefer="video",  # or "audio" for the cheapest audio-only path
 )
 # {"url": "https://...", "container": "mp4", "is_live": False,
 #  "headers": {"User-Agent": "...", ...}}
@@ -116,15 +118,20 @@ retélécharger la page.
 ```python
 import video_helper as vh
 
-pick = yth.pick_video_stream("https://www.youtube.com/watch?v=YE7VzlLtp-4",
-                             prefer_codec="h264", max_fps=30)
+pick = yth.pick_video_stream(
+    "https://www.youtube.com/watch?v=YE7VzlLtp-4", prefer_codec="h264", max_fps=30
+)
 
 for frame in vh.extract_frames(
     pick["url"],
     http_headers=pick["headers"],
-    start_instant=10.0, end_instant=20.0,
+    start_instant=10.0,
+    end_instant=20.0,
     frame_interval=1.0,
-    destination="torch", device="mps", batch_size=10, layout="image",
+    destination="torch",
+    device="mps",
+    batch_size=10,
+    layout="image",
 ):
     # frame.shape == (10, 3, H, W), RGB uint8, on MPS
     embeddings = model(frame)
@@ -141,10 +148,17 @@ exécute `pick_video_stream` en interne, insère automatiquement les
 for frame in yth.extract_frames_stream(
     "https://www.youtube.com/watch?v=YE7VzlLtp-4",
     # contraintes du sélecteur
-    prefer_codec="h264", prefer_format="mp4", max_fps=30,
+    prefer_codec="h264",
+    prefer_format="mp4",
+    max_fps=30,
     # transmis tel quel à extract_frames
-    start_instant=10.0, end_instant=20.0, frame_interval=1.0,
-    destination="torch", device="mps", batch_size=10, layout="image",
+    start_instant=10.0,
+    end_instant=20.0,
+    frame_interval=1.0,
+    destination="torch",
+    device="mps",
+    batch_size=10,
+    layout="image",
 ):
     embeddings = model(frame)
 ```
@@ -169,13 +183,12 @@ Google Data, aucune API Vimeo, aucun OAuth, aucun quota.
 meta = yth.video_engagement("https://www.youtube.com/watch?v=YE7VzlLtp-4")
 print(meta["view_count"], meta["like_count"], meta["comment_count"])
 # 412309876 1893422 156003
-print(meta["kind"])   # "short" / "long" / "live"
+print(meta["kind"])  # "short" / "long" / "live"
 # long
 
 # Instantané de chaîne : abonnés, vues totales, nombre de vidéos
 ch = yth.channel_info("https://www.youtube.com/@Blender")
-print(f"{ch['title']}: {ch['follower_count']:,} subscribers, "
-      f"{ch['video_count']:,} videos")
+print(f"{ch['title']}: {ch['follower_count']:,} subscribers, {ch['video_count']:,} videos")
 # Blender: 1,920,000 subscribers, 487 videos
 
 # Liste des vidéos de la chaîne avec engagement par vidéo (paginé, lent car un appel par vidéo)
@@ -229,7 +242,7 @@ subs = yth.video_subtitles(
 comments = yth.video_comments(
     "https://www.youtube.com/watch?v=YE7VzlLtp-4",
     max_count=50,
-    cookies_from_browser="firefox",   # ou "chrome" / "safari" : lit votre session active
+    cookies_from_browser="firefox",  # ou "chrome" / "safari" : lit votre session active
 )
 for c in comments[:3]:
     print(f"@{c['author']} ({c['like_count']} ♥): {c['text'][:80]}")
@@ -238,7 +251,7 @@ for c in comments[:3]:
     # @kid_pixels (308 ♥): My 6yo watches this on loop. Eternal classic.
 
 # Heuristique : s'agit-il d'un Short ou d'un extrait vertical ?
-yth.is_short(yth.video_engagement(url))   # True / False
+yth.is_short(yth.video_engagement(url))  # True / False
 ```
 
 ## Pièges à connaître
