@@ -1,0 +1,53 @@
+# youtube-helper — Compose entry point for the container image next to this file.
+#
+#   docker compose up --build      # HTTP surface on http://localhost:8000
+#   docker compose run --rm youtube-helper youtube-helper --help
+#
+# The image installs the [api] extra, so the FastAPI app is what it serves.
+# Per the suite's rule, MCP is never a second implementation: when the [mcp]
+# extra is present, fastapi-mcp mounts /mcp onto this very app and each tool
+# *is* one of these routes.
+#
+# On bot checks from inside a container
+# ------------------------------------
+# The yt-dlp retry chain is default options -> browser User-Agent ->
+# cookies-from-browser -> Tor. The third tier is the one that actually clears
+# YouTube's "Sign in to confirm you're not a bot" challenge, and it is the one
+# a container cannot use: YOUTUBE_HELPER_COOKIES_FROM_BROWSER reads a local
+# browser profile, and there is no browser in here. Setting it would only make
+# that tier fail and fall through to Tor.
+#
+# So a containerised youtube-helper has the weaker half of the chain. If you
+# hit bot checks, run it on the host where a logged-in browser exists, or point
+# the service at a Tor daemon you control via YOUTUBE_HELPER_TOR_PROXY.
+
+services:
+  youtube-helper:
+    build: .
+    image: youtube-helper:local
+    ports:
+      - "${YOUTUBE_HELPER_PORT:-8000}:8000"
+    environment:
+      PYTHONUNBUFFERED: "1"
+      YOUTUBE_HELPER_HOST: 0.0.0.0
+      YOUTUBE_HELPER_PORT: "8000"
+      # Last-resort tier of the retry chain. Needs a Tor daemon reachable from
+      # the container — host.docker.internal on Docker Desktop / Colima.
+      # YOUTUBE_HELPER_TOR_PROXY: socks5h://host.docker.internal:9050
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+    healthcheck:
+      # python, not curl: the slim image ships no HTTP client, and adding one
+      # just for a probe would grow the image for nothing.
+      test:
+        - CMD
+        - python
+        - -c
+        - |
+          import sys, urllib.request
+          sys.exit(0 if urllib.request.urlopen("http://localhost:8000/health", timeout=3).status == 200 else 1)
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
