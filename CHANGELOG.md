@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Retry as a different YouTube client before touching anyone's cookies.** When YouTube
+  answers "Sign in to confirm you're not a bot", the fix that costs nothing and reads
+  nobody's private data is to ask as another client: YouTube does not apply the same checks
+  to its web, mobile, TV and embedded players. The retry ladder now tries `web_embedded`,
+  `tv`, `android_vr` then `mweb` *before* the cookies-from-browser rung and long before Tor,
+  because those two are invasive and slow respectively. Needs no configuration; override the
+  list with `YOUTUBE_HELPER_PLAYER_CLIENTS`, or pin one explicitly with
+  `default_ytdlp_options(player_clients=[...])`, in which case the ladder leaves your choice
+  alone.
+
+- **`max_height` on `download_video`, with a non-HLS preference** (`--max-height` on both
+  CLIs, `max_height` in the `/video` body, `YOUTUBE_HELPER_MAX_HEIGHT` for a whole
+  deployment). Two problems, one knob. Size: left to itself yt-dlp picks the best stream
+  going, which on one episode meant a 4.3 GB file heading for a FAT32 volume that refuses
+  anything over 4 GiB, failing mid-write. Speed: that stream was fragmented HLS, which
+  YouTube throttles hard — measured at 75-300 KiB/s across 1507 fragments, against ~2 MiB/s
+  for the same video's direct https format, which was also eight times smaller. The capped
+  selector (`height_capped_format`, now exported) puts `protocol^=http` formats first and
+  only falls back to HLS, then to best-available, so a video with no small format still
+  downloads instead of failing "Requested format is not available".
+
+  Opt-in: with no cap set, callers keep the previous best-available behaviour exactly.
+
+### Changed
+
+- The yt-dlp fallback tests now assert the ladder by invariant (caller's options first,
+  Tor last, cookies only when configured) instead of by a fixed length. A hard-coded count
+  made every new rung look like a regression.
+
 ### Fixed
 
 - **`channel_videos` returned an empty list for any bare channel URL.** Under

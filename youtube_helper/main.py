@@ -28,7 +28,7 @@ from __future__ import annotations
 
 import glob
 import os
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from typing import Any
 
 import audio_helper as ah
@@ -70,12 +70,80 @@ _COOKIES_FROM_BROWSER = os.environ.get("YOUTUBE_HELPER_COOKIES_FROM_BROWSER", ""
 # YOUTUBE_HELPER_TOR_PROXY.
 _TOR_PROXY = os.environ.get("YOUTUBE_HELPER_TOR_PROXY", "socks5h://127.0.0.1:9050")
 
+# Fallback #2bis, tried BEFORE cookies and Tor because it costs nothing and touches nobody's
+# private data: ask YouTube as a different client. YouTube serves several apps (web, mobile,
+# TV, embedded player) and does not apply the same checks to all of them, so a video refused
+# for one client often loads for another. This is the account-free lever the yt-dlp project
+# itself recommends for "Sign in to confirm you're not a bot".
+#
+# The order below is measured, not guessed (RZ79EY6genM, a 1h42 episode, yt-dlp 2026.08.19):
+#
+#   client        formats  https-only  HLS  best <=720p non-HLS
+#   web_embedded       35          31    0  itag 136, 720p, 0.32 GiB   <- cleanest
+#   tv                  -           -    -  "page needs to be reloaded" that day
+#   android_vr          5           1    0  itag 18, 360p only
+#   visionos (default) 50          28   18  itag 136 exists, but HLS is mixed in
+#   web / web_safari / ios          refused outright (they need a PO token)
+#
+# Two things fall out of that table. First, web_embedded answers when the defaults are
+# refused. Second, it exposes NO HLS at all, which matters for speed: YouTube throttles
+# fragmented HLS hard (measured at 75-300 KiB/s over 1507 fragments, versus ~2 MiB/s on a
+# direct https format), so a client without HLS is also the fast one.
+#
+# web_embedded only works for videos the uploader allows to be embedded, hence the chain.
+# Override with YOUTUBE_HELPER_PLAYER_CLIENTS (comma-separated, empty disables the rung).
+_PLAYER_CLIENT_FALLBACKS = tuple(
+    c.strip() for c in os.environ.get(
+        "YOUTUBE_HELPER_PLAYER_CLIENTS", "web_embedded,tv,android_vr,mweb"
+    ).split(",") if c.strip()
+)
+
+# Default ceiling on video height, as a string ("720") or empty for "whatever yt-dlp picks".
+# Empty by default so existing callers keep getting best-available quality; set
+# YOUTUBE_HELPER_MAX_HEIGHT, or pass max_height=, when the destination cannot take an
+# arbitrarily large file. A real case: a FAT32 volume refuses anything over 4 GiB, and
+# yt-dlp left to itself chose a premium stream that blew past it mid-write.
+_MAX_HEIGHT = os.environ.get("YOUTUBE_HELPER_MAX_HEIGHT", "").strip()
+
+
+def height_capped_format(max_height: int) -> str:
+    """yt-dlp format selector for "no taller than *max_height*, and avoid HLS if possible".
+
+    Non-HLS first on purpose. YouTube throttles fragmented HLS far more aggressively than a
+    direct https format: on one measured episode, 75-300 KiB/s across 1507 fragments against
+    ~2 MiB/s for the equivalent https stream. ``protocol^=http`` keeps ``https`` and
+    ``http_dash_segments`` while excluding ``m3u8_native``.
+
+    Every rung degrades gracefully: height-capped non-HLS, then height-capped anything, then
+    best available, so a video that simply has no small format still downloads instead of
+    failing with "Requested format is not available".
+
+    Parameters
+    ----------
+    max_height : int
+        Maximum video height in pixels, e.g. ``720``.
+
+    Returns
+    -------
+    str
+        A yt-dlp ``format`` string.
+    """
+    h = int(max_height)
+    return (
+        f"bv*[height<={h}][protocol^=http]+ba[protocol^=http]/"
+        f"b[height<={h}][protocol^=http]/"
+        f"bv*[height<={h}]+ba/b[height<={h}]/"
+        "bv*+ba/b"
+    )
+
 
 def default_ytdlp_options(
     overwrites: bool = True,
     audio: bool = False,
     video: bool = False,
     cookie_dir: str | None = None,
+    max_height: int | str | None = None,
+    player_clients: Sequence[str] | None = None,
 ) -> dict:
     """
     Generate default yt-dlp options based on provided parameters.
@@ -93,6 +161,16 @@ def default_ytdlp_options(
         helpers pass their ``temporary_folder`` here so the jar disappears when
         the ``with`` block exits; when omitted it falls back to the system temp
         directory. It is *never* written to the current working directory.
+    max_height : int or str or None, optional
+        Cap the video height, e.g. ``720``. ``None`` falls back to the
+        ``YOUTUBE_HELPER_MAX_HEIGHT`` environment variable, and if that is empty too,
+        yt-dlp picks best-available as before. See :func:`height_capped_format` for why
+        the generated selector also prefers non-HLS.
+    player_clients : sequence of str or None, optional
+        Ask YouTube as these clients instead of yt-dlp's defaults (``web_embedded``,
+        ``tv``, ``android_vr``, ``mweb``, …). Mostly useful for pinning one explicitly;
+        callers normally leave this alone and let the retry ladder try the clients in
+        :data:`_PLAYER_CLIENT_FALLBACKS` on failure.
 
     Returns
     -------
@@ -106,6 +184,8 @@ def default_ytdlp_options(
     to True, it overrides the audio flag and downloads video+audio.
     """
     verbosity = 0
+    if max_height is None and _MAX_HEIGHT:
+        max_height = _MAX_HEIGHT
     options = {
         "quiet": verbosity == 0,
         "no_warnings": verbosity < 2,
@@ -153,6 +233,19 @@ def default_ytdlp_options(
     if video:
         options["format"] = "bestvideo+bestaudio/best"
 
+    # Height cap and client choice, applied last so they override the generic audio/video
+    # defaults just set above. Both are plain yt-dlp options and they live here so that every
+    # surface (library, CLI, API, MCP) inherits them from one place, instead of each one
+    # hand-rolling its own format string.
+    if max_height and not audio:
+        options["format"] = height_capped_format(int(max_height))
+    if player_clients:
+        extractor_args = dict(options.get("extractor_args") or {})
+        youtube_args = dict(extractor_args.get("youtube") or {})
+        youtube_args["player_client"] = list(player_clients)
+        extractor_args["youtube"] = youtube_args
+        options["extractor_args"] = extractor_args
+
     return options
 
 
@@ -178,6 +271,21 @@ def _ytdlp_option_variants(options: dict) -> list[tuple[str, dict]]:
     with_browser_ua = {**options, "http_headers": browser_headers}
 
     variants = [("default options", options), ("a browser User-Agent", with_browser_ua)]
+
+    # Client rungs come before cookies and Tor deliberately. Asking YouTube as a different
+    # client needs no account, reads nobody's browser profile, and routes through no third
+    # party, so it is the cheapest thing to try and the one that works most often. Only if
+    # every client is refused do we escalate to borrowing cookies, then to Tor.
+    # Skipped entirely when the caller already pinned a client explicitly.
+    already_pinned = bool((options.get("extractor_args") or {}).get("youtube", {}).get("player_client"))
+    if not already_pinned:
+        for client in _PLAYER_CLIENT_FALLBACKS:
+            variants.append((
+                f"player_client={client}",
+                {**with_browser_ua,
+                 "extractor_args": {**(with_browser_ua.get("extractor_args") or {}),
+                                    "youtube": {"player_client": [client]}}},
+            ))
 
     if _COOKIES_FROM_BROWSER:
         with_cookies = {**with_browser_ua, "cookiesfrombrowser": (_COOKIES_FROM_BROWSER,)}
@@ -505,7 +613,7 @@ def download_audio(url: str, output_path: str = None, target_sample_rate: int = 
     return output_path
 
 
-def download_video(url: str, output_path: str = None) -> str:
+def download_video(url: str, output_path: str = None, max_height: int | str | None = None) -> str:
     """
     Download video from a given URL and save it to the specified output path.
 
@@ -515,6 +623,13 @@ def download_video(url: str, output_path: str = None) -> str:
         The URL of the video to be downloaded.
     output_path : str, optional
         The path where the downloaded video should be saved.
+    max_height : int or str or None, optional
+        Cap the video height, e.g. ``720``. ``None`` falls back to
+        ``YOUTUBE_HELPER_MAX_HEIGHT``, and if that is empty too, yt-dlp picks
+        best-available as it always has. Worth setting when the destination has a
+        size limit, or when speed matters more than resolution: the capped selector
+        also prefers direct https formats over fragmented HLS, which YouTube
+        throttles heavily (see :func:`height_capped_format`).
 
     Returns
     -------
@@ -551,7 +666,7 @@ def download_video(url: str, output_path: str = None) -> str:
         o = osh.join([temp_directory, basename])
 
         # Set yt-dlp options to download the best quality video
-        opts = default_ytdlp_options(video=True, cookie_dir=temp_directory)
+        opts = default_ytdlp_options(video=True, cookie_dir=temp_directory, max_height=max_height)
         opts["outtmpl"] = f"{o}.%(ext)s"
 
         # Download the best quality video using yt-dlp. Purge any partial output

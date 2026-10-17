@@ -52,6 +52,41 @@ same flags) and the download bench GUI at `GET /gui` (audio/video downloads).
 YouTube, Vimeo, DailyMotion, Twitch VOD, SoundCloud, and any other site
 `yt-dlp` supports. Do not assume YouTube-only.
 
+## When a download is refused, or crawls
+
+Two failures look alike from outside and are not the same thing. Read the message.
+
+**"Sign in to confirm you're not a bot".** YouTube scores the request, not you. The fix that
+costs nothing and reads nobody's data is to ask as a different client: YouTube does not apply
+the same checks to its web, mobile, TV and embedded players. `youtube-helper` now does this
+automatically, trying `web_embedded`, `tv`, `android_vr` then `mweb` before it ever considers
+borrowing cookies or routing through Tor. Override the list with
+`YOUTUBE_HELPER_PLAYER_CLIENTS` (comma-separated; empty disables the rung).
+
+**"The uploader has not made this video available in your country".** That is a geo-block, not
+a bot check, and no client, cookie or User-Agent will clear it. `YOUTUBE_HELPER_TOR_PROXY` is
+the rung that can, when an exit node happens to sit in the right country.
+
+**The download crawls at a few hundred KiB/s.** That is almost always fragmented HLS, which
+YouTube throttles hard. Measured on one 1h42 episode: 75-300 KiB/s across 1507 fragments,
+against ~2 MiB/s for the same video's direct https format, which was also eight times smaller.
+Pass `--max-height 720` (or `max_height=720`, or set `YOUTUBE_HELPER_MAX_HEIGHT`): the capped
+selector prefers direct https formats and only falls back to HLS if nothing else exists. The
+same flag is what you want when the destination has a size limit, e.g. a FAT32 volume, which
+refuses any file over 4 GiB.
+
+| Knob | Env | CLI | Library |
+|---|---|---|---|
+| Cap height, prefer non-HLS | `YOUTUBE_HELPER_MAX_HEIGHT` | `--max-height 720` | `download_video(..., max_height=720)` |
+| Which clients to retry as | `YOUTUBE_HELPER_PLAYER_CLIENTS` | n. a. | `default_ytdlp_options(..., player_clients=[...])` |
+| Borrow browser cookies | `YOUTUBE_HELPER_COOKIES_FROM_BROWSER` | n. a. | n. a. |
+| Cookie file (Netscape) | `YOUTUBE_HELPER_COOKIES` | n. a. | n. a. |
+| Tor proxy | `YOUTUBE_HELPER_TOR_PROXY` | n. a. | n. a. |
+
+Nothing here depends on one person's machine: every knob is an environment variable or an
+argument, all default to the previous behaviour, and the automatic client fallback needs no
+configuration at all.
+
 ## When NOT to use youtube-helper (SKIP)
 
 - Transforming a LOCAL media file (convert / chunk / concat / stems / room-tone /

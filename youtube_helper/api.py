@@ -180,6 +180,14 @@ class DownloadBody(BaseModel):
     # Sample rate lives here rather than on a dedicated /audio-body because
     # the same schema drives both audio and thumbnail (unused for the latter).
     sample_rate: int = Field(44100, description="Target sample rate (audio only).")
+    max_height: int | None = Field(
+        None,
+        description=(
+            "Cap the video height, e.g. 720 (video only). None means best available, or "
+            "whatever YOUTUBE_HELPER_MAX_HEIGHT says. A cap also makes the selector prefer "
+            "direct https formats over fragmented HLS, which YouTube throttles heavily."
+        ),
+    )
 
 
 class ResolveBody(BaseModel):
@@ -417,7 +425,7 @@ def video_endpoint(body: DownloadBody, background: BackgroundTasks) -> FileRespo
     tmp = _new_tmpdir()
     dst = tmp / "video.mp4"
     try:
-        download_video(url=body.url, output_path=str(dst))
+        download_video(url=body.url, output_path=str(dst), max_height=body.max_height)
     except Exception as exc:
         _cleanup(tmp)
         raise HTTPException(status_code=502, detail=str(exc)) from exc

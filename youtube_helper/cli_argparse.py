@@ -141,7 +141,7 @@ def _handle_video(ns: argparse.Namespace) -> int:
         Process exit code (0 on success).
     """
     # Download the video track (yt-dlp bestvideo+bestaudio, muxed).
-    out = download_video(url=ns.url, output_path=ns.output)
+    out = download_video(url=ns.url, output_path=ns.output, max_height=ns.max_height)
     print(out)
     return 0
 
@@ -465,6 +465,12 @@ def _add_video(sub: argparse._SubParsersAction) -> None:
         The parser is mutated in place.
     """
     p = sub.add_parser("video", help="Download the video (best video + audio) to disk.")
+    p.add_argument(
+        "--max-height", type=int, default=None,
+        help="Cap the video height, e.g. 720. Omit for best available (or set "
+             "YOUTUBE_HELPER_MAX_HEIGHT). A cap also prefers direct https formats over the "
+             "HLS ones YouTube throttles, so it is usually faster as well as smaller.",
+    )
     p.add_argument("--url", required=True, help="Video URL.")
     p.add_argument("--output", default=None, help="Output path (auto-named from title if omitted).")
     p.set_defaults(func=_handle_video)

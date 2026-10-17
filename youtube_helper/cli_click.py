@@ -119,9 +119,10 @@ def valid(url: str) -> None:
 @cli.command()
 @click.option("--url", required=True, help="Video URL.")
 @click.option("--output", type=click.Path(), default=None, help="Output path (auto if omitted).")
-def video(url: str, output: str | None) -> None:
+@click.option("--max-height", type=int, default=None, help="Cap the video height, e.g. 720. Omit for best available (or set YOUTUBE_HELPER_MAX_HEIGHT). A cap also prefers direct https formats over the HLS ones YouTube throttles, so it is usually faster.")
+def video(url: str, output: str | None, max_height: int | None) -> None:
     """Download the video (best video + audio) to disk."""
-    click.echo(download_video(url=url, output_path=output))
+    click.echo(download_video(url=url, output_path=output, max_height=max_height))
 
 
 # ---------------------------------------------------------------------------

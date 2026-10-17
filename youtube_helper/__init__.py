@@ -52,6 +52,7 @@ __email__ = "warithmetics@deraison.ai"
 __all__ = [
     # main — download helpers
     "default_ytdlp_options",
+    "height_capped_format",
     "video_url_meta_data",
     "is_valid_video_url",
     "download_thumbnail",
@@ -91,6 +92,7 @@ from .main import (
     download_audio,
     download_thumbnail,
     download_video,
+    height_capped_format,
     is_valid_video_url,
     video_url_meta_data,
 )

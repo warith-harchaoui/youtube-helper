@@ -5,6 +5,10 @@ These tests never touch the network: ``yt_dlp.YoutubeDL`` is replaced with a
 fake that records the options it was built with and raises/succeeds on
 command, so the retry ordering (normal -> browser User-Agent -> Tor) can be
 verified in isolation.
+
+The chain is asserted by INVARIANT (what comes first, what comes last, which rung
+appears when configured) rather than by a fixed length: rungs get added over time, and a
+hard-coded count makes every such addition look like a regression.
 """
 
 from __future__ import annotations
@@ -47,19 +51,62 @@ def test_option_variants_order_and_shape():
     base = m.default_ytdlp_options()
     variants = m._ytdlp_option_variants(base)
 
-    # No YOUTUBE_HELPER_COOKIES_FROM_BROWSER set in the test environment -> the
-    # cookies-from-browser tier is skipped, same 3-variant chain as before.
-    assert len(variants) == 3
-    (_, normal), (_, browser_ua), (_, tor) = variants
+    labels = [label for label, _ in variants]
+    (_, normal), (_, browser_ua), (_, tor) = variants[0], variants[1], variants[-1]
 
+    # The caller's own options are tried untouched first.
+    assert labels[0] == "default options"
     assert normal is base
     assert "proxy" not in normal
 
+    # Then the same options with a real browser User-Agent.
+    assert labels[1] == "a browser User-Agent"
     assert browser_ua["http_headers"]["User-Agent"] == m._BROWSER_USER_AGENT
     assert "proxy" not in browser_ua
 
+    # Tor stays LAST: it is the slowest rung and its exit nodes are themselves often
+    # flagged, so nothing should ever be tried after it.
+    assert labels[-1] == "Tor"
     assert tor["http_headers"]["User-Agent"] == m._BROWSER_USER_AGENT
     assert tor["proxy"] == m._TOR_PROXY
+
+    # No YOUTUBE_HELPER_COOKIES_FROM_BROWSER in the test environment -> no cookies rung.
+    assert not any(label.startswith("cookies from") for label in labels)
+
+
+def test_option_variants_try_other_player_clients_before_cookies_and_tor():
+    """Asking YouTube as another client is free and reads nobody's data, so it comes first.
+
+    This is the account-free lever for "Sign in to confirm you're not a bot": YouTube does
+    not apply the same checks to every client, so a video refused for the default client
+    often loads for web_embedded or tv. Borrowing browser cookies works too but reads
+    another app's private store, and Tor is slow and frequently flagged, so both must stay
+    behind the client rungs.
+    """
+    variants = m._ytdlp_option_variants(m.default_ytdlp_options())
+    labels = [label for label, _ in variants]
+
+    client_rungs = [i for i, label in enumerate(labels) if label.startswith("player_client=")]
+    assert client_rungs, "the client fallbacks should be tried"
+    assert [labels[i] for i in client_rungs] == [
+        f"player_client={c}" for c in m._PLAYER_CLIENT_FALLBACKS
+    ]
+    assert max(client_rungs) < labels.index("Tor")
+
+    _, first_client = variants[client_rungs[0]]
+    assert first_client["extractor_args"]["youtube"]["player_client"] == [
+        m._PLAYER_CLIENT_FALLBACKS[0]
+    ]
+    # A client rung keeps the browser User-Agent won at the previous rung, and adds no proxy.
+    assert first_client["http_headers"]["User-Agent"] == m._BROWSER_USER_AGENT
+    assert "proxy" not in first_client
+
+
+def test_option_variants_respect_a_client_the_caller_pinned():
+    """A caller who named a client meant it; the ladder must not silently try others."""
+    base = m.default_ytdlp_options(player_clients=["tv"])
+    labels = [label for label, _ in m._ytdlp_option_variants(base)]
+    assert not any(label.startswith("player_client=") for label in labels)
 
 
 def test_option_variants_include_cookies_tier_when_configured(
@@ -69,15 +116,19 @@ def test_option_variants_include_cookies_tier_when_configured(
     base = m.default_ytdlp_options()
     variants = m._ytdlp_option_variants(base)
 
-    assert len(variants) == 4
     labels = [label for label, _ in variants]
-    assert labels == ["default options", "a browser User-Agent", "cookies from chrome", "Tor"]
+    assert "cookies from chrome" in labels
+    # Cookies sit after the free client rungs and before the slow Tor one.
+    assert labels.index("cookies from chrome") > max(
+        i for i, label in enumerate(labels) if label.startswith("player_client=")
+    )
+    assert labels.index("cookies from chrome") < labels.index("Tor")
 
-    _, cookies_opts = variants[2]
+    _, cookies_opts = variants[labels.index("cookies from chrome")]
     assert cookies_opts["cookiesfrombrowser"] == ("chrome",)
     assert "proxy" not in cookies_opts
 
-    _, tor_opts = variants[3]
+    _, tor_opts = variants[-1]
     assert tor_opts["proxy"] == m._TOR_PROXY
 
 
@@ -104,26 +155,29 @@ def test_run_ytdlp_falls_back_to_browser_user_agent(monkeypatch: pytest.MonkeyPa
     assert "proxy" not in seen_opts[1]
 
 
-def test_run_ytdlp_falls_back_to_tor(monkeypatch: pytest.MonkeyPatch):
+def test_run_ytdlp_falls_back_all_the_way_to_tor(monkeypatch: pytest.MonkeyPatch):
+    """Every rung but the last fails -> the last attempt is Tor, and it is reached."""
+    rungs = len(m._ytdlp_option_variants(m.default_ytdlp_options()))
     seen_opts: list = []
-    monkeypatch.setattr(m.yt_dlp, "YoutubeDL", _fake_ydl_class(seen_opts, 2))
+    monkeypatch.setattr(m.yt_dlp, "YoutubeDL", _fake_ydl_class(seen_opts, rungs - 1))
 
-    result = m._run_ytdlp(m.default_ytdlp_options(), _counting_action(fail_count=2))
+    result = m._run_ytdlp(m.default_ytdlp_options(), _counting_action(fail_count=rungs - 1))
 
     assert result == "success"
-    assert len(seen_opts) == 3
-    assert seen_opts[2]["proxy"] == m._TOR_PROXY
-    assert seen_opts[2]["http_headers"]["User-Agent"] == m._BROWSER_USER_AGENT
+    assert len(seen_opts) == rungs
+    assert seen_opts[-1]["proxy"] == m._TOR_PROXY
+    assert seen_opts[-1]["http_headers"]["User-Agent"] == m._BROWSER_USER_AGENT
 
 
 def test_run_ytdlp_raises_last_error_when_all_fail(monkeypatch: pytest.MonkeyPatch):
+    rungs = len(m._ytdlp_option_variants(m.default_ytdlp_options()))
     seen_opts: list = []
-    monkeypatch.setattr(m.yt_dlp, "YoutubeDL", _fake_ydl_class(seen_opts, 3))
+    monkeypatch.setattr(m.yt_dlp, "YoutubeDL", _fake_ydl_class(seen_opts, rungs))
 
-    with pytest.raises(RuntimeError, match="boom 3"):
-        m._run_ytdlp(m.default_ytdlp_options(), _counting_action(fail_count=3))
+    with pytest.raises(RuntimeError, match=f"boom {rungs}"):
+        m._run_ytdlp(m.default_ytdlp_options(), _counting_action(fail_count=rungs))
 
-    assert len(seen_opts) == 3
+    assert len(seen_opts) == rungs
 
 
 def test_run_ytdlp_calls_on_attempt_start_before_every_attempt(
