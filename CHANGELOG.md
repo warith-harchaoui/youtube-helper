@@ -5,6 +5,45 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **`channel_videos` returned an empty list for any bare channel URL.** Under
+  `extract_flat`, a channel root (`/@handle`, `/channel/UC…`, `/c/…`,
+  `/user/…`) no longer answers with videos: it answers with the channel's own
+  tabs, as playlist entries that all carry the channel id and no `url` at all.
+  The per-video pass skipped every one of them for lack of a URL, so the
+  function returned `[]` — and returned it *silently*, without raising, which
+  is why the browser-UA / cookies-from-browser / Tor retry chain never fired:
+  it only reacts to exceptions. A channel root is now expanded to the tabs
+  that actually list videos (`/videos`, plus `/shorts` and `/streams` when
+  `include_shorts` / `include_lives` ask for them), each walked tolerantly
+  since not every channel has every tab. Explicit tabs, playlists and the
+  Vimeo / DailyMotion creator pages this module also serves are untouched.
+- **`resolve_direct_url(prefer="video")` failed outright on most YouTube
+  videos** with "Requested format is not available". The selector was `best`,
+  which in yt-dlp means "best *single file* already carrying both tracks" —
+  the progressive streams YouTube has retired on all but a few videos. It is
+  now `best/bestvideo*`: the progressive stream when one exists, the best
+  video-only stream otherwise, so a single direct URL always comes back.
+  Merging (`bestvideo*+bestaudio`) is deliberately not used — a merged
+  selection has no single URL to hand to ffmpeg, which is this function's
+  whole contract.
+
+### Added
+
+- **`has_audio` on `DirectMediaURL`.** With video-only streams now the normal
+  answer for `prefer="video"`, callers need to know whether the URL they got
+  carries sound, rather than finding out inside ffmpeg. `prefer="audio"`
+  always reports `True`; when `prefer="video"` reports `False`, resolve a
+  second URL with `prefer="audio"` and give ffmpeg one input from each.
+
+### Changed
+
+- The `@Blender` channel used as a test fixture no longer has a videos tab;
+  the suite now points at `@BlenderOfficial`.
+
 ## [2.3.0] - 2026-08-24
 
 ### Added

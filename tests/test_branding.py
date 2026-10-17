@@ -21,7 +21,7 @@ pytestmark = pytest.mark.integration
 
 
 SAMPLE_VIDEO = "https://www.youtube.com/watch?v=YE7VzlLtp-4"  # Big Buck Bunny
-SAMPLE_CHANNEL = "https://www.youtube.com/@Blender"  # the channel that uploaded it
+SAMPLE_CHANNEL = "https://www.youtube.com/@BlenderOfficial"  # the channel that uploaded it
 
 
 # ---------------------------------------------------------------------------

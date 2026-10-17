@@ -65,12 +65,19 @@ class DirectMediaURL(TypedDict):
         HTTP headers the player must send with the request. YouTube
         often requires a specific ``User-Agent`` and ``Referer`` to
         avoid 403s; pass them to ffmpeg via ``-headers``.
+    has_audio : bool
+        Whether this single URL already carries sound. ``prefer="audio"``
+        always yields True; ``prefer="video"`` yields False whenever the
+        site only offers video-only streams, which is now YouTube's normal
+        answer. Callers needing both tracks resolve a second URL with
+        ``prefer="audio"`` and let ffmpeg take one input from each.
     """
 
     url: str
     container: str
     is_live: bool
     headers: dict[str, str]
+    has_audio: bool
 
 
 def resolve_direct_url(
@@ -88,9 +95,14 @@ def resolve_direct_url(
         Twitch / …).
     prefer : ``"audio"`` | ``"video"``
         Format preference. ``"audio"`` selects ``bestaudio`` —
-        cheapest path for ASR + diarization. ``"video"`` selects
-        ``best`` (video + audio muxed), useful for the ``/video`` view
-        (Phase 7) that needs the visual track too.
+        cheapest path for ASR + diarization. ``"video"`` selects the
+        best stream carrying pictures, for the ``/video`` view (Phase 7)
+        that needs the visual track too. A progressive stream (video and
+        audio in one file) is preferred, but YouTube no longer publishes
+        one for most videos, so the usual answer is a video-only stream:
+        check ``has_audio`` on the result if you need sound in the same
+        URL, and resolve the audio separately with ``prefer="audio"``
+        when it is False.
     live : ``"auto"`` | ``"force_live"`` | ``"force_vod"``
         ``"auto"`` propagates whatever the info dict says (the usual
         case). The other two override — handy for testing or when the
@@ -115,9 +127,18 @@ def resolve_direct_url(
     rate-limit on the first attempt is not the end of the story.
     """
     # We pick the format based on ``prefer``. ``bestaudio*`` matches any
-    # audio-only stream; ``best`` matches the best combined stream. The
-    # ``*`` allows yt-dlp to fall back across audio-only candidates.
-    fmt = "bestaudio*" if prefer == "audio" else "best"
+    # audio-only stream; the ``*`` lets yt-dlp fall back across audio-only
+    # candidates.
+    #
+    # For video, ``best`` alone means "best single file that already carries
+    # both tracks", and YouTube has retired those progressive streams on most
+    # videos — the selector simply fails with "Requested format is not
+    # available". ``best/bestvideo*`` keeps that stream when it exists and
+    # otherwise takes the best video-only one, so a single direct URL always
+    # comes back. Merging ``bestvideo*+bestaudio`` is deliberately *not* used
+    # here: a merged selection has no single URL to hand to ffmpeg, which is
+    # this function's whole contract.
+    fmt = "bestaudio*" if prefer == "audio" else "best/bestvideo*"
 
     ydl_opts: dict[str, Any] = {
         "format": fmt,
@@ -152,8 +173,10 @@ def resolve_direct_url(
         chosen = formats[-1]
         direct_url = chosen["url"]
         ext = chosen.get("ext", "mp4")
+        acodec = chosen.get("acodec")
     else:
         ext = info.get("ext", "mp4")
+        acodec = info.get("acodec")
 
     # Live detection: ``is_live`` is the primary signal; ``live_status``
     # ("is_live" / "was_live" / "not_live" / ...) is the newer one.
@@ -178,11 +201,17 @@ def resolve_direct_url(
     # default one.
     headers = dict(info.get("http_headers") or {})
 
+    # yt-dlp spells "no audio track" as the literal string ``"none"``; a key
+    # that is absent altogether means the extractor never said, in which case
+    # assuming sound matches the historical behaviour of this function.
+    has_audio = acodec != "none"
+
     return {
         "url": direct_url,
         "container": container,
         "is_live": is_live,
         "headers": headers,
+        "has_audio": has_audio,
     }
 
 

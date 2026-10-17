@@ -38,12 +38,18 @@ def test_resolve_direct_url_video():
     assert isinstance(out["headers"], dict)
     assert isinstance(out["is_live"], bool)
     assert out["container"] in {"mp4", "webm", "hls", "dash", "mov", "m4a"}
+    # One URL, so one answer about sound: YouTube has retired the progressive
+    # streams that carried both tracks, and the caller has to be told which
+    # kind it got rather than discover it inside ffmpeg.
+    assert isinstance(out["has_audio"], bool)
 
 
 def test_resolve_direct_url_audio():
     """Resolving with ``prefer="audio"`` yields an HTTP(S) direct URL."""
     out = resolve_direct_url(SAMPLE_URL, prefer="audio")
     assert out["url"].startswith("http")
+    # An audio-only selector has no reason to come back silent.
+    assert out["has_audio"] is True
 
 
 # ---------------------------------------------------------------------------

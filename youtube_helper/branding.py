@@ -160,6 +160,45 @@ def _normalise_video_meta(meta: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+# A bare YouTube channel URL — ``/@handle``, ``/channel/UC…``, and the two
+# legacy spellings. Anything with a path beyond that (a tab, a playlist) is
+# already specific enough to walk directly.
+_YT_CHANNEL_ROOT = re.compile(
+    r"^(https?://(?:www\.)?youtube\.com/"
+    r"(?:@[^/?#]+|channel/[^/?#]+|c/[^/?#]+|user/[^/?#]+))/?$",
+    re.IGNORECASE,
+)
+
+
+def _channel_listing_urls(url: str, include_shorts: bool, include_lives: bool) -> list[str]:
+    """Expand a bare YouTube channel URL into the tabs that actually list videos.
+
+    Under ``extract_flat`` a channel *root* no longer yields videos: it yields
+    its own tabs, as playlist entries that all carry the channel id and no
+    ``url`` at all. Walking it therefore produced an empty list rather than an
+    error — silent, and invisible to the retry chain, which only reacts to
+    exceptions. The tabs themselves list real videos, so the root is expanded
+    into the ones the caller asked for.
+
+    Tabs come back in listing order — long-form, then Shorts, then past live
+    streams — and the caller's ``max_videos`` cap applies to the concatenation.
+
+    Any other URL is returned untouched: an explicit tab, a playlist, and the
+    Vimeo / DailyMotion user pages this module also serves are all walkable
+    as they stand.
+    """
+    match = _YT_CHANNEL_ROOT.match(url.strip())
+    if not match:
+        return [url]
+    base = match.group(1)
+    urls = [f"{base}/videos"]
+    if include_shorts:
+        urls.append(f"{base}/shorts")
+    if include_lives:
+        urls.append(f"{base}/streams")
+    return urls
+
+
 # ─── Public — channel-level ──────────────────────────────────────────────────
 
 
@@ -201,19 +240,31 @@ def channel_videos(
     schema (``id``, ``url``, ``title``, ``duration_seconds``, ``view_count``,
     ``like_count``, ``comment_count``, ``upload_date``, ``kind``, …).
 
-    Two-pass strategy: a fast flat listing first (1 call), then per-video
-    metadata fetch (1 call per video). The second pass is what makes
-    ``view_count`` / ``like_count`` reliable — ``extract_flat`` returns
-    IDs and sometimes ``view_count``, but rarely likes / comments.
+    Two-pass strategy: a fast flat listing first (one call per channel tab
+    walked — see :func:`_channel_listing_urls`), then per-video metadata fetch
+    (1 call per video). The second pass is what makes ``view_count`` /
+    ``like_count`` reliable — ``extract_flat`` returns IDs and sometimes
+    ``view_count``, but rarely likes / comments.
     """
-    # Pass 1: flat listing of IDs.
+    # Pass 1: flat listing of IDs, one call per tab that actually holds videos.
     flat_options = _minimal_options(
         verbose=verbose,
         extract_flat=True,
         playlistend=max_videos,
     )
-    page = _run_ytdlp(flat_options, lambda ydl: ydl.extract_info(url, download=False))
-    entries = page.get("entries") or []
+    entries: list[dict[str, Any]] = []
+    for listing_url in _channel_listing_urls(url, include_shorts, include_lives):
+        try:
+            page = _run_ytdlp(
+                flat_options,
+                lambda ydl, listing_url=listing_url: ydl.extract_info(listing_url, download=False),
+            )
+        except yt_dlp.utils.DownloadError as e:  # noqa: BLE001
+            # Not every channel has every tab — "This channel does not have a
+            # videos tab" is the normal answer for a Shorts-only creator.
+            osh.debug("youtube-helper: no listing at %s (%s)", listing_url, e)
+            continue
+        entries.extend(entry for entry in (page.get("entries") or []) if entry)
 
     # Pass 2: per-video metadata fetch (limited to the cap). Each video gets
     # its own fallback chain (a block/rate-limit can hit mid-walk, not just on

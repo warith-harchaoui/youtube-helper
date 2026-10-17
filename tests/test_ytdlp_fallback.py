@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import pytest
 
+import youtube_helper.branding as b
 import youtube_helper.main as m
 
 
@@ -225,3 +226,63 @@ class _FixedTempDir:
 
     def __exit__(self, *exc_info):
         return False
+
+
+# ---------------------------------------------------------------------------
+# Channel-tab expansion — pure URL work, no network
+#
+# A channel root used to be walked directly. Under ``extract_flat`` YouTube
+# answers it with the channel's own tabs: playlist entries carrying the
+# channel id and no ``url``, which the per-video pass then skipped one by one,
+# so ``channel_videos`` returned ``[]`` without ever raising. Silence is what
+# made it dangerous — the retry chain above only reacts to exceptions.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "root",
+    [
+        "https://www.youtube.com/@BlenderOfficial",
+        "https://www.youtube.com/@BlenderOfficial/",
+        "http://youtube.com/@BlenderOfficial",
+        "https://www.youtube.com/channel/UCSMOQeBJ2RAnuFungnQOxLg",
+        "https://www.youtube.com/c/Blender",
+        "https://www.youtube.com/user/BlenderFoundation",
+    ],
+)
+def test_a_channel_root_is_expanded_to_its_videos_tab(root):
+    """Every spelling of a bare channel URL resolves to the long-form tab."""
+    urls = b._channel_listing_urls(root, include_shorts=False, include_lives=False)
+    assert len(urls) == 1
+    assert urls[0].endswith("/videos")
+    assert urls[0].startswith("http")
+
+
+def test_the_requested_tabs_are_the_ones_walked():
+    """Shorts and past live streams are only fetched when asked for."""
+    root = "https://www.youtube.com/@BlenderOfficial"
+    assert b._channel_listing_urls(root, False, False) == [f"{root}/videos"]
+    assert b._channel_listing_urls(root, True, False) == [
+        f"{root}/videos",
+        f"{root}/shorts",
+    ]
+    assert b._channel_listing_urls(root, True, True) == [
+        f"{root}/videos",
+        f"{root}/shorts",
+        f"{root}/streams",
+    ]
+
+
+@pytest.mark.parametrize(
+    "already_specific",
+    [
+        "https://www.youtube.com/@BlenderOfficial/videos",
+        "https://www.youtube.com/@BlenderOfficial/shorts",
+        "https://www.youtube.com/playlist?list=PL6B3937A5D230E335",
+        "https://vimeo.com/blender",
+        "https://www.dailymotion.com/blender",
+    ],
+)
+def test_anything_already_specific_is_left_alone(already_specific):
+    """Tabs, playlists and non-YouTube creator pages are walkable as they are."""
+    assert b._channel_listing_urls(already_specific, True, True) == [already_specific]
