@@ -80,3 +80,29 @@ def test_video_merges_straight_into_mp4():
 
 def test_audio_does_not_ask_for_an_mp4_merge():
     assert "merge_output_format" not in m.default_ytdlp_options(audio=True)
+
+
+# --- silent truncation ------------------------------------------------------------------
+# Regression cover for the 2026 corpus incident: seven episodes transcribed and reported on
+# partial video, one at 12 % of its runtime, with no warning anywhere.
+
+def test_lossy_fragmented_downloads_fail_instead_of_shortening_the_file():
+    """yt-dlp defaults to skipping fragments it cannot fetch; that is how the loss hid.
+
+    After fragment_retries attempts it drops the fragment, carries on, and finalises the
+    container normally. The result is a valid, playable mp4 whose moov honestly reports the
+    short duration, so every downstream check passes and nothing raises.
+    """
+    assert m.default_ytdlp_options(video=True)["skip_unavailable_fragments"] is False
+    assert m.default_ytdlp_options(audio=True)["skip_unavailable_fragments"] is False
+
+
+def test_fragment_retries_are_more_patient_than_the_yt_dlp_default():
+    """The observed failures were throttling, not missing data: the fragment was there."""
+    assert m.default_ytdlp_options(video=True)["fragment_retries"] > 10
+
+
+def test_lossy_fragments_can_be_re_enabled(monkeypatch: pytest.MonkeyPatch):
+    """An escape hatch for callers who would rather have a partial file than nothing."""
+    monkeypatch.setattr(m, "_ALLOW_LOSSY_FRAGMENTS", True)
+    assert m.default_ytdlp_options(video=True)["skip_unavailable_fragments"] is True

@@ -43,6 +43,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **A fragmented download that loses fragments now fails, instead of quietly returning a
+  shorter file.** `skip_unavailable_fragments` defaults to `True` in yt-dlp: after
+  `fragment_retries` attempts it drops the fragment, carries on, and finalises the container
+  normally. What lands on disk is a valid, playable mp4 whose moov atom honestly reports the
+  short duration, so every downstream check passes, `is_valid_video_file` included, and
+  nothing raises.
+
+  That is how seven episodes of a corpus were transcribed and reported on partial video, one
+  of them covering 12 % of its runtime, with no warning anywhere. They were served as HLS in
+  724-1507 fragments over a path YouTube throttles to a few hundred KiB/s, while several
+  downloads and builds ran at once; fragments timed out, got skipped, and the loss became
+  invisible. Re-downloading them later worked, so the source had never been the problem.
+
+  Failing loudly is the right default for a download helper: the caller can retry, and this
+  library's own ladder does, including with clients that serve no HLS at all. `fragment_retries`
+  also goes from 10 to 25, since the failures were transient throttling rather than missing
+  data. `YOUTUBE_HELPER_ALLOW_LOSSY_FRAGMENTS=1` restores the old behaviour, and
+  `YOUTUBE_HELPER_FRAGMENT_RETRIES` tunes the patience.
+
 - The yt-dlp fallback tests now assert the ladder by invariant (caller's options first,
   Tor last, cookies only when configured) instead of by a fixed length. A hard-coded count
   made every new rung look like a regression.

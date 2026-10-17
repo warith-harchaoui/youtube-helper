@@ -466,10 +466,12 @@ def _add_video(sub: argparse._SubParsersAction) -> None:
     """
     p = sub.add_parser("video", help="Download the video (best video + audio) to disk.")
     p.add_argument(
-        "--max-height", type=int, default=None,
+        "--max-height",
+        type=int,
+        default=None,
         help="Cap the video height, e.g. 720. Omit for best available (or set "
-             "YOUTUBE_HELPER_MAX_HEIGHT). A cap also prefers direct https formats over the "
-             "HLS ones YouTube throttles, so it is usually faster as well as smaller.",
+        "YOUTUBE_HELPER_MAX_HEIGHT). A cap also prefers direct https formats over the "
+        "HLS ones YouTube throttles, so it is usually faster as well as smaller.",
     )
     p.add_argument("--url", required=True, help="Video URL.")
     p.add_argument("--output", default=None, help="Output path (auto-named from title if omitted).")

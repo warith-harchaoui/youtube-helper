@@ -93,9 +93,11 @@ _TOR_PROXY = os.environ.get("YOUTUBE_HELPER_TOR_PROXY", "socks5h://127.0.0.1:905
 # web_embedded only works for videos the uploader allows to be embedded, hence the chain.
 # Override with YOUTUBE_HELPER_PLAYER_CLIENTS (comma-separated, empty disables the rung).
 _PLAYER_CLIENT_FALLBACKS = tuple(
-    c.strip() for c in os.environ.get(
+    c.strip()
+    for c in os.environ.get(
         "YOUTUBE_HELPER_PLAYER_CLIENTS", "web_embedded,tv,android_vr,mweb"
-    ).split(",") if c.strip()
+    ).split(",")
+    if c.strip()
 )
 
 # Default ceiling on video height, as a string ("720") or empty for "whatever yt-dlp picks".
@@ -104,6 +106,37 @@ _PLAYER_CLIENT_FALLBACKS = tuple(
 # arbitrarily large file. A real case: a FAT32 volume refuses anything over 4 GiB, and
 # yt-dlp left to itself chose a premium stream that blew past it mid-write.
 _MAX_HEIGHT = os.environ.get("YOUTUBE_HELPER_MAX_HEIGHT", "").strip()
+
+# A fragmented download (HLS, DASH, ISM) that loses fragments must FAIL, not quietly hand
+# back a shorter file.
+#
+# yt-dlp's own default is the opposite: `skip_unavailable_fragments` defaults to True, so
+# after `fragment_retries` (10) attempts it drops the fragment and carries on, then
+# finalises the container normally. What lands on disk is a perfectly valid, perfectly
+# playable mp4 whose moov atom honestly reports the short duration — so every downstream
+# check passes, `is_valid_video_file` included, and nothing anywhere raises.
+#
+# That is how seven episodes of a corpus were transcribed and reported on partial video in
+# 2026, one of them covering 12 % of its runtime, without a single warning. The videos were
+# 0.28-1.73 GiB, far under any filesystem limit, and re-downloading them later worked fine:
+# the source was never the problem. They were served as HLS in 724-1507 fragments, over a
+# path YouTube throttles to a few hundred KiB/s, while several downloads and builds ran at
+# once. Fragments timed out, got skipped, and the loss became invisible.
+#
+# Failing loudly is the right default for a download helper: a caller can retry, and this
+# library's own retry ladder will, including with clients that serve no HLS at all. Set
+# YOUTUBE_HELPER_ALLOW_LOSSY_FRAGMENTS=1 to restore yt-dlp's skip-and-continue behaviour.
+_ALLOW_LOSSY_FRAGMENTS = os.environ.get("YOUTUBE_HELPER_ALLOW_LOSSY_FRAGMENTS", "").strip() in (
+    "1",
+    "true",
+    "yes",
+    "on",
+)
+
+# Retries per fragment before giving up. Raised above yt-dlp's 10 because the failures seen
+# here are transient throttling, not missing data: the fragment is there, it just answered
+# slowly. More patience costs a little time; too little costs a silently shortened file.
+_FRAGMENT_RETRIES = int(os.environ.get("YOUTUBE_HELPER_FRAGMENT_RETRIES", "25"))
 
 
 def height_capped_format(max_height: int) -> str:
@@ -195,6 +228,10 @@ def default_ytdlp_options(
         "include_ads": False,
         "forceurl": verbosity < 2,
         "overwrites": overwrites,
+        # See _ALLOW_LOSSY_FRAGMENTS: a fragmented download that loses fragments must raise,
+        # not silently return a shorter file.
+        "skip_unavailable_fragments": _ALLOW_LOSSY_FRAGMENTS,
+        "fragment_retries": _FRAGMENT_RETRIES,
     }
 
     options.update(
@@ -286,15 +323,23 @@ def _ytdlp_option_variants(options: dict) -> list[tuple[str, dict]]:
     # party, so it is the cheapest thing to try and the one that works most often. Only if
     # every client is refused do we escalate to borrowing cookies, then to Tor.
     # Skipped entirely when the caller already pinned a client explicitly.
-    already_pinned = bool((options.get("extractor_args") or {}).get("youtube", {}).get("player_client"))
+    already_pinned = bool(
+        (options.get("extractor_args") or {}).get("youtube", {}).get("player_client")
+    )
     if not already_pinned:
         for client in _PLAYER_CLIENT_FALLBACKS:
-            variants.append((
-                f"player_client={client}",
-                {**with_browser_ua,
-                 "extractor_args": {**(with_browser_ua.get("extractor_args") or {}),
-                                    "youtube": {"player_client": [client]}}},
-            ))
+            variants.append(
+                (
+                    f"player_client={client}",
+                    {
+                        **with_browser_ua,
+                        "extractor_args": {
+                            **(with_browser_ua.get("extractor_args") or {}),
+                            "youtube": {"player_client": [client]},
+                        },
+                    },
+                )
+            )
 
     if _COOKIES_FROM_BROWSER:
         with_cookies = {**with_browser_ua, "cookiesfrombrowser": (_COOKIES_FROM_BROWSER,)}
