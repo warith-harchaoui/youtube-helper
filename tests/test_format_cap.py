@@ -66,3 +66,17 @@ def test_an_explicit_cap_beats_the_environment(monkeypatch: pytest.MonkeyPatch):
 def test_player_clients_reach_the_youtube_extractor_args():
     opts = m.default_ytdlp_options(video=True, player_clients=["web_embedded", "tv"])
     assert opts["extractor_args"]["youtube"]["player_client"] == ["web_embedded", "tv"]
+
+
+def test_video_merges_straight_into_mp4():
+    """Avoids the re-encode: merging to mp4 is a remux, converting afterwards is not.
+
+    Without this, a video+audio pair merges into webm/mkv and download_video falls through
+    to video_helper.video_converter, which re-encodes (measured at 290 % CPU on libx264 for
+    tens of minutes once VideoToolbox declined).
+    """
+    assert m.default_ytdlp_options(video=True)["merge_output_format"] == "mp4"
+
+
+def test_audio_does_not_ask_for_an_mp4_merge():
+    assert "merge_output_format" not in m.default_ytdlp_options(audio=True)

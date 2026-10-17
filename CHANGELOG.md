@@ -32,6 +32,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   Opt-in: with no cap set, callers keep the previous best-available behaviour exactly.
 
+- **Video downloads merge straight into mp4, instead of being re-encoded into one.**
+  A separate video+audio pair used to merge into whatever container yt-dlp preferred, often
+  webm or mkv, and `download_video` then handed the result to `video_helper.video_converter`
+  to reach the `.mp4` the caller asked for. That re-encodes: measured at 290 % CPU on
+  libx264, for tens of minutes per episode, after VideoToolbox declined the job. mp4 accepts
+  AV1, H.264, VP9 and opus, so `merge_output_format="mp4"` makes ffmpeg remux in seconds.
+  When codecs genuinely cannot live in mp4, yt-dlp keeps its container and the existing
+  conversion path still catches it, so this only ever removes work.
+
 ### Changed
 
 - The yt-dlp fallback tests now assert the ladder by invariant (caller's options first,

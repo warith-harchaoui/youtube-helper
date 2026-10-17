@@ -232,6 +232,15 @@ def default_ytdlp_options(
 
     if video:
         options["format"] = "bestvideo+bestaudio/best"
+        # Merge straight into mp4. Without this, a separate video+audio pair merges into
+        # whatever container yt-dlp prefers (often webm or mkv), and download_video then
+        # hands the result to video_helper.video_converter to reach the .mp4 the caller
+        # asked for -- which RE-ENCODES: measured at 290 % CPU on libx264, for tens of
+        # minutes, after VideoToolbox declined. mp4 accepts AV1, H.264, VP9 and opus, so
+        # asking for it here makes ffmpeg remux in seconds instead. When the codecs genuinely
+        # cannot live in mp4, yt-dlp keeps its own container and the existing conversion
+        # path still catches it, so this only ever removes work.
+        options["merge_output_format"] = "mp4"
 
     # Height cap and client choice, applied last so they override the generic audio/video
     # defaults just set above. Both are plain yt-dlp options and they live here so that every
