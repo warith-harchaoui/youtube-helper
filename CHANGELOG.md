@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.4.0] — 2026-10-18
 
 ### Added
 
@@ -67,6 +67,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   made every new rung look like a regression.
 
 ### Fixed
+
+- **A stalled yt-dlp read could hang the caller forever.** yt-dlp inherits Python's default
+  socket timeout, which is no timeout at all, so a connection the remote had half-closed was
+  simply waited on. Seen twice while auditing the suite: a caption fetch sat at 0 % CPU for
+  nine minutes with its sockets in `CLOSE_WAIT`, and only a kill ended it.
+
+  The second-order damage was larger than the wait. Every recovery path in this module --
+  the browser User-Agent fallback, the Tor fallback, the player-client ladder added above --
+  only runs after an attempt *returns*. An attempt that never returns disables all of them,
+  which is why the failure presented as a hang instead of a retry. Both the download options
+  and the metadata options now set `socket_timeout` (30 s, override with
+  `YOUTUBE_HELPER_SOCKET_TIMEOUT`), so a dead connection fails fast enough for that
+  machinery to do its job.
 
 - **`channel_videos` returned an empty list for any bare channel URL.** Under
   `extract_flat`, a channel root (`/@handle`, `/channel/UC…`, `/c/…`,

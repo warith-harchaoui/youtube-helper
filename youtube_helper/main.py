@@ -138,6 +138,22 @@ _ALLOW_LOSSY_FRAGMENTS = os.environ.get("YOUTUBE_HELPER_ALLOW_LOSSY_FRAGMENTS", 
 # slowly. More patience costs a little time; too little costs a silently shortened file.
 _FRAGMENT_RETRIES = int(os.environ.get("YOUTUBE_HELPER_FRAGMENT_RETRIES", "25"))
 
+# Seconds a single socket read may stall before yt-dlp gives up on it.
+#
+# Without this yt-dlp inherits Python's default, which is no timeout at all: a connection
+# the remote has half-closed is simply waited on, forever. Observed twice while auditing
+# the suite -- a caption fetch sat at 0 % CPU for nine minutes with its sockets in
+# CLOSE_WAIT, and would still be sitting there. The process cannot be reasoned out of it;
+# only a kill ends it.
+#
+# The damage is wider than one slow call. Every retry path in this module -- the browser
+# User-Agent fallback, the Tor fallback, the player-client ladder -- only runs after an
+# attempt *returns*. An attempt that never returns disables all of them, so the library
+# looks hung rather than degraded. A bounded read is what makes that machinery reachable.
+#
+# 30 s is well past any healthy response while still failing fast enough to retry.
+_SOCKET_TIMEOUT = float(os.environ.get("YOUTUBE_HELPER_SOCKET_TIMEOUT", "30"))
+
 
 def height_capped_format(max_height: int) -> str:
     """yt-dlp format selector for "no taller than *max_height*, and avoid HLS if possible".
@@ -232,6 +248,9 @@ def default_ytdlp_options(
         # not silently return a shorter file.
         "skip_unavailable_fragments": _ALLOW_LOSSY_FRAGMENTS,
         "fragment_retries": _FRAGMENT_RETRIES,
+        # See _SOCKET_TIMEOUT: without it a half-closed connection hangs the caller
+        # forever and the retry ladder below never gets a turn.
+        "socket_timeout": _SOCKET_TIMEOUT,
     }
 
     options.update(

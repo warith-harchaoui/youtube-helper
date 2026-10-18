@@ -43,7 +43,7 @@ import yt_dlp
 # Same normal -> browser-UA -> Tor fallback chain main.py's downloads use, for
 # the same reason: a blocked/rate-limited request is just as likely on a
 # metadata-only call as on a download.
-from .main import _run_ytdlp
+from .main import _SOCKET_TIMEOUT, _run_ytdlp
 
 # ─── Internal helpers ────────────────────────────────────────────────────────
 
@@ -61,6 +61,10 @@ def _minimal_options(verbose: bool = False, **extra: Any) -> dict[str, Any]:
         "no_warnings": not verbose,
         "skip_download": True,
         "extract_flat": False,
+        # Metadata calls need a bounded read just as much as downloads do: this is the
+        # path that hung for nine minutes on a half-closed socket. See
+        # :data:`youtube_helper.main._SOCKET_TIMEOUT`.
+        "socket_timeout": _SOCKET_TIMEOUT,
         "http_headers": {
             "User-Agent": (
                 "Mozilla/5.0 (Macintosh; Intel Mac OS X 13_0) "

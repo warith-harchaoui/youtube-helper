@@ -106,3 +106,38 @@ def test_lossy_fragments_can_be_re_enabled(monkeypatch: pytest.MonkeyPatch):
     """An escape hatch for callers who would rather have a partial file than nothing."""
     monkeypatch.setattr(m, "_ALLOW_LOSSY_FRAGMENTS", True)
     assert m.default_ytdlp_options(video=True)["skip_unavailable_fragments"] is True
+
+
+# --- indefinite hangs -------------------------------------------------------------------
+# Regression cover for the suite audit: a caption fetch sat at 0 % CPU for nine minutes with
+# its sockets in CLOSE_WAIT, twice, and had to be killed. yt-dlp inherits Python's default
+# socket timeout, which is no timeout at all.
+
+def test_downloads_cannot_block_forever_on_a_half_closed_socket():
+    """Every yt-dlp read must be bounded, or the remote decides how long we wait."""
+    assert m.default_ytdlp_options(video=True)["socket_timeout"] > 0
+    assert m.default_ytdlp_options(audio=True)["socket_timeout"] > 0
+
+
+def test_metadata_calls_are_bounded_too():
+    """The call that actually hung was metadata-only, not a download."""
+    from youtube_helper import branding
+
+    assert branding._minimal_options()["socket_timeout"] > 0
+
+
+def test_socket_timeout_is_overridable(monkeypatch: pytest.MonkeyPatch):
+    """A slow link may legitimately need longer than the default."""
+    monkeypatch.setattr(m, "_SOCKET_TIMEOUT", 120.0)
+    assert m.default_ytdlp_options(video=True)["socket_timeout"] == 120.0
+
+
+def test_the_retry_ladder_is_reachable_at_all():
+    """The browser-UA, Tor and player-client fallbacks only run once an attempt returns.
+
+    An unbounded read is therefore not merely slow: it disables every recovery path this
+    module provides, which is why the failure presented as a hang rather than an error.
+    """
+    opts = m.default_ytdlp_options(video=True)
+    assert opts["socket_timeout"] > 0
+    assert opts["fragment_retries"] > 10
