@@ -405,6 +405,20 @@ def _run_ytdlp(
         The last error encountered, if every fallback also fails.
     """
     last_error: Exception | None = None
+    # Bound the read here, not only in the option builders.
+    #
+    # default_ytdlp_options and branding._minimal_options both set
+    # socket_timeout, but streaming.py hand-builds its own option dicts for
+    # resolve_direct_url / list_video_streams / pick_video_stream and passes
+    # them straight here -- so those three stayed unbounded when the timeout
+    # was added to the builders alone. Every yt-dlp call in this package funnels
+    # through _run_ytdlp, which makes it the one place where no future caller
+    # can forget. (The Rust twin puts it in ytdlp::run for the same reason.)
+    #
+    # setdefault, so a caller who deliberately chose a value keeps it.
+    options = {**options}
+    options.setdefault("socket_timeout", _SOCKET_TIMEOUT)
+
     variants = _ytdlp_option_variants(options)
     for attempt, (label, opts) in enumerate(variants):
         if on_attempt_start is not None:

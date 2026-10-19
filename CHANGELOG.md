@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.1] — 2026-10-19
+
+### Fixed
+
+- **2.4.0's `socket_timeout` did not reach three of this package's call
+  sites.** The bound was added to the two option *builders*
+  (`default_ytdlp_options`, `branding._minimal_options`), but `streaming.py`
+  hand-builds its option dicts literally and calls `_run_ytdlp` with them. So
+  `resolve_direct_url`, `list_video_streams` and `pick_video_stream` — and
+  transitively `extract_frames_stream` — stayed exactly as unbounded as before
+  the release.
+
+  The bound now lives in `_run_ytdlp`, the chokepoint every yt-dlp call in the
+  package funnels through, applied with `setdefault` so a caller who chose a
+  value deliberately keeps it. That is where it should have gone in 2.4.0: the
+  Rust twin put it in `ytdlp::run` for exactly this reason.
+
+  A structural note worth keeping, since this is the second time it has bitten:
+  `streaming.py` does not use the shared option builders, so anything added to
+  those builders does not apply to it. The 2.3.x series had the same blind spot
+  with the retry ladder.
+
 ## [2.4.0] — 2026-10-18
 
 ### Added

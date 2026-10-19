@@ -141,3 +141,33 @@ def test_the_retry_ladder_is_reachable_at_all():
     opts = m.default_ytdlp_options(video=True)
     assert opts["socket_timeout"] > 0
     assert opts["fragment_retries"] > 10
+
+
+def test_the_bound_reaches_hand_built_option_dicts():
+    """streaming.py builds its own ydl_opts and does not call either builder.
+
+    resolve_direct_url, list_video_streams and pick_video_stream construct their
+    options literally and hand them to _run_ytdlp, so a socket_timeout set only
+    in default_ytdlp_options / _minimal_options left all three unbounded. The
+    bound belongs at the chokepoint every call passes through.
+    """
+    seen = {}
+
+    def action(ydl):
+        seen.update(ydl.params)
+        return {"ok": True}
+
+    m._run_ytdlp({"skip_download": True, "quiet": True}, action)
+    assert seen["socket_timeout"] > 0
+
+
+def test_an_explicit_socket_timeout_is_not_overridden():
+    """A caller who chose a value deliberately keeps it."""
+    seen = {}
+
+    def action(ydl):
+        seen.update(ydl.params)
+        return {"ok": True}
+
+    m._run_ytdlp({"socket_timeout": 7}, action)
+    assert seen["socket_timeout"] == 7
