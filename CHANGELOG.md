@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.2] — 2026-10-20
+
+### Fixed
+
+- **`branding`'s module docstring lost its feature list on the documentation
+  site.** The five bullets naming what the module does — channel snapshot,
+  video list, engagement signals, subtitles, comments sample — follow the line
+  that announces them with no blank line between, so docutils reads the indent
+  as a stray block rather than a list and Sphinx drops it. The summary of the
+  module was absent from the rendered page while sitting in plain sight in the
+  source.
+
 ## [2.4.1] — 2026-10-19
 
 ### Fixed
