@@ -82,6 +82,10 @@ logs/
 *.json
 *.yaml
 !environment.yaml
+# Package data, not a stray config: the GUI's every string lives here, and a
+# blanket *.yaml would keep it out of git and therefore out of the wheel —
+# which is how a sibling package came to publish an unreadable locale file.
+!youtube_helper/locales/*.yaml
 # *.yml
 
 # Distribution / packaging

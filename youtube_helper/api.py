@@ -273,7 +273,7 @@ def root() -> RedirectResponse:
 
 
 @app.get("/gui", response_class=HTMLResponse, tags=["meta"])
-def gui() -> HTMLResponse:
+def gui(lang: str = "") -> HTMLResponse:
     """Serve the self-contained single-page 'download bench' GUI.
 
     The page (defined in :mod:`youtube_helper.gui`) is a build-step-free
@@ -281,16 +281,24 @@ def gui() -> HTMLResponse:
     ``/audio`` / ``/video`` endpoints defined below. It adds no server-side
     logic — it is purely a friendlier front door to the API.
 
+    Parameters
+    ----------
+    lang : str
+        Language to render, from ``locales/i18n.yaml``. Anything the file does
+        not carry — including the empty default — falls back to the declared
+        default locale, so a mistyped ``?lang=`` returns a page rather than a
+        500.
+
     Returns
     -------
     HTMLResponse
         The complete HTML document (status 200, ``text/html``).
     """
-    # Import here so the (large) HTML string is only loaded when the route is
-    # actually hit, and so importing the API module stays cheap.
-    from .gui import GUI_HTML
+    # Import here so the page is only built when the route is actually hit,
+    # and so importing the API module stays cheap.
+    from .gui import render_gui
 
-    return HTMLResponse(content=GUI_HTML)
+    return HTMLResponse(content=render_gui(lang))
 
 
 # ---------------------------------------------------------------------------

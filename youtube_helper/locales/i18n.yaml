@@ -1,0 +1,118 @@
+# Human-language source of truth for youtube-helper.
+#
+# `gui:` holds every string the single-page GUI shows. Code refers to these
+# keys; this file owns the wording. Read by `os_helper.Locales`, the loader
+# shared across the suite (CODING.md 21.3).
+#
+# There is no `prompts:` section: this package talks to yt-dlp and ffmpeg, not
+# to a model.
+
+meta:
+  default_locale: fr
+  supported_locales:
+  - fr
+  - en
+
+gui:
+  # --- head / header -------------------------------------------------------
+  page_title:
+    fr: YouTube Helper — Banc de téléchargement
+    en: YouTube Helper — Download Bench
+  hero_title:
+    fr: YouTube Helper — Banc de téléchargement
+    en: YouTube Helper — Download Bench
+  hero_subtitle:
+    fr: >-
+      Collez une URL YouTube (ou de n'importe quel site pris en charge par
+      yt-dlp), choisissez audio ou vidéo, lancez sur l'API locale, puis
+      écoutez le résultat et téléchargez-le.
+    en: >-
+      Paste a YouTube (or any yt-dlp-supported) URL, pick audio or video,
+      run it on the local API, then play the result and download it.
+  local_first_badge:
+    fr: Tout en local
+    en: Local-first
+  local_first_tail:
+    fr: — rien n'est envoyé à un tiers.
+    en: — nothing is uploaded to a third party.
+
+  # --- URL field -----------------------------------------------------------
+  url_label:
+    fr: URL du média
+    en: Media URL
+  # Not translated: an example URL is the same in every language.
+  url_placeholder: https://www.youtube.com/watch?v=YE7VzlLtp-4
+  url_hint:
+    fr: >-
+      Fonctionne avec YouTube, Vimeo, DailyMotion, les VOD Twitch, SoundCloud
+      et tout autre site pris en charge par yt-dlp.
+    en: >-
+      Works with YouTube, Vimeo, DailyMotion, Twitch VOD, SoundCloud, and any
+      other site yt-dlp supports.
+
+  # --- kind selector -------------------------------------------------------
+  kind_label:
+    fr: Que télécharger
+    en: What to download
+  kind_audio:
+    fr: audio — meilleure piste audio, réencodée en mp3
+    en: audio — best audio track, re-encoded to mp3
+  kind_video:
+    fr: vidéo — meilleure vidéo + audio, muxées en mp4
+    en: video — best video + audio, muxed to mp4
+
+  # --- sample rate ---------------------------------------------------------
+  sample_rate_label:
+    fr: fréquence d'échantillonnage (Hz)
+    en: sample rate (Hz)
+  sample_rate_16000:
+    fr: 16000 — parole / reconnaissance vocale
+    en: 16000 — speech / STT
+  sample_rate_44100:
+    fr: 44100 — qualité CD (par défaut)
+    en: 44100 — CD quality (default)
+  sample_rate_48000:
+    fr: 48000 — qualité vidéo
+    en: 48000 — video-grade
+
+  # --- action + result -----------------------------------------------------
+  run_button:
+    fr: Télécharger
+    en: Download
+  result_heading:
+    fr: Résultat
+    en: Result
+  result_empty:
+    fr: Rien de téléchargé pour l'instant.
+    en: Nothing downloaded yet.
+  download_link:
+    fr: Télécharger le résultat
+    en: Download result
+
+  # --- language toggle -----------------------------------------------------
+  lang_toggle_href:
+    fr: /gui?lang=en
+    en: /gui?lang=fr
+  lang_toggle_flag:
+    fr: 🇬🇧
+    en: 🇫🇷
+  lang_toggle_aria:
+    fr: English version
+    en: Version française
+
+  # --- status line, written by the page's script ---------------------------
+  js_need_url:
+    fr: Collez d'abord une URL de média.
+    en: Paste a media URL first.
+  js_downloading:
+    fr: Téléchargement… cela peut être long sur une vidéo étendue.
+    en: Downloading… this can take a while for long videos.
+  js_error_prefix:
+    fr: 'Erreur '
+    en: 'Error '
+  js_done:
+    fr: Terminé.
+    en: Done.
+  js_request_failed:
+    fr: 'Échec de la requête : '
+    en: 'Request failed: '

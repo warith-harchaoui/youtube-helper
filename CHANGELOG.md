@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.0] — 2026-10-20
+
+### Added
+
+- **The GUI speaks French and English.** Every string it shows now comes from
+  `youtube_helper/locales/i18n.yaml` through `os_helper.Locales`, the loader
+  shared across the suite (CODING.md 21.3), instead of being written into the
+  markup. `GET /gui?lang=fr|en` picks the language; anything the file does not
+  carry — including a mistyped code and the empty default — falls back to the
+  declared default locale, so a bad `?lang=` returns a page rather than a 500.
+  A flag in the header toggles between the two.
+
+  The template is tokenised (`{{TOKEN}}` in HTML, a `T` object for the
+  script), so one piece of markup serves both languages and a translator
+  never opens a Python file. The script's strings are injected as JSON rather
+  than substituted as text: it is the encoding an apostrophe cannot break out
+  of, and French copy is full of them.
+
+  `GUI_HTML` still resolves, via a module-level `__getattr__` that renders on
+  access — importers that predate this keep working, and the locale file is
+  not read by packages that never serve the GUI.
+
+### Fixed
+
+- **Two tests asserted the default language rather than the page's identity.**
+  They looked for the literal `"download bench"`, which is no longer what a
+  French default renders. They now ask the locale file what the page is
+  called, so the copy can change without touching them.
+
+### Notes
+
+- The locale file lives **inside** the package, with a `package-data` pattern
+  that reaches it, and two tests hold that. The sibling package
+  best-engine-ai-helper shipped the opposite arrangement — data beside the
+  package, patterns that silently matched nothing — and its published wheels
+  carried no data at all until 1.6.1.
+
 ## [2.4.2] — 2026-10-20
 
 ### Fixed
