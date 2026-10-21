@@ -1,0 +1,78 @@
+# fr catalogue for youtube-helper.
+#
+# msgid is the English source string as it appears in the code, so a
+# reworded source needs its entry reworded too — os_helper.Catalog.problems
+# reports the mismatch rather than letting the page half-revert to English.
+msgid ""
+msgstr ""
+"Project-Id-Version: youtube-helper\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "16000 — speech / STT"
+msgstr "16000 — parole / reconnaissance vocale"
+
+msgid "44100 — CD quality (default)"
+msgstr "44100 — qualité CD (par défaut)"
+
+msgid "48000 — video-grade"
+msgstr "48000 — qualité vidéo"
+
+msgid "Done."
+msgstr "Terminé."
+
+msgid "Download"
+msgstr "Télécharger"
+
+msgid "Download result"
+msgstr "Télécharger le résultat"
+
+msgid "Downloading… this can take a while for long videos."
+msgstr "Téléchargement… cela peut être long sur une vidéo étendue."
+
+msgid "Error "
+msgstr "Erreur "
+
+msgid "Local-first"
+msgstr "Tout en local"
+
+msgid "Media URL"
+msgstr "URL du média"
+
+msgid "Nothing downloaded yet."
+msgstr "Rien de téléchargé pour l'instant."
+
+msgid "Paste a YouTube (or any yt-dlp-supported) URL, pick audio or video, run it on the local API, then play the result and download it."
+msgstr "Collez une URL YouTube (ou de n'importe quel site pris en charge par yt-dlp), choisissez audio ou vidéo, lancez sur l'API locale, puis écoutez le résultat et téléchargez-le."
+
+msgid "Paste a media URL first."
+msgstr "Collez d'abord une URL de média."
+
+msgid "Request failed: "
+msgstr "Échec de la requête : "
+
+msgid "Result"
+msgstr "Résultat"
+
+msgid "What to download"
+msgstr "Que télécharger"
+
+msgid "Works with YouTube, Vimeo, DailyMotion, Twitch VOD, SoundCloud, and any other site yt-dlp supports."
+msgstr "Fonctionne avec YouTube, Vimeo, DailyMotion, les VOD Twitch, SoundCloud et tout autre site pris en charge par yt-dlp."
+
+msgid "YouTube Helper — Download Bench"
+msgstr "YouTube Helper — Banc de téléchargement"
+
+msgid "audio — best audio track, re-encoded to mp3"
+msgstr "audio — meilleure piste audio, réencodée en mp3"
+
+msgid "sample rate (Hz)"
+msgstr "fréquence d'échantillonnage (Hz)"
+
+msgid "video — best video + audio, muxed to mp4"
+msgstr "vidéo — meilleure vidéo + audio, muxées en mp4"
+
+msgid "— nothing is uploaded to a third party."
+msgstr "— rien n'est envoyé à un tiers."

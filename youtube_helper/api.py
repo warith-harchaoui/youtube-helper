@@ -284,10 +284,10 @@ def gui(lang: str = "") -> HTMLResponse:
     Parameters
     ----------
     lang : str
-        Language to render, from ``locales/i18n.yaml``. Anything the file does
-        not carry — including the empty default — falls back to the declared
-        default locale, so a mistyped ``?lang=`` returns a page rather than a
-        500.
+        Language to render, from the compiled ``gettext`` catalogues under
+        ``locales/``. Anything without a catalogue — including the empty
+        default — falls back to the declared default language, so a mistyped
+        ``?lang=`` returns a page rather than a 500.
 
     Returns
     -------

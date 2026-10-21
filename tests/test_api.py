@@ -18,6 +18,8 @@ Warith Harchaoui, Ph.D. — https://linkedin.com/in/warith-harchaoui/
 
 from __future__ import annotations
 
+import re
+
 import pytest
 
 # FastAPI is in the ``[api]`` optional extra — skip cleanly otherwise.
@@ -95,10 +97,11 @@ def test_gui_returns_200_html(client):
     # read from the locale file rather than written here: the page is bilingual
     # since 2.5.0, and a hard-coded English phrase would assert the default
     # locale rather than the page's identity.
-    from youtube_helper.gui import _locales, default_language
+    from youtube_helper.gui import render_gui
 
-    title = _locales().text("gui", "hero_title", default_language())
-    assert title.lower() in body
+    title = re.search(r"<title>([^<]*)</title>", render_gui())
+    assert title, "the default page has no <title>"
+    assert title.group(1).lower() in body
     assert 'value="audio"' in r.text and 'value="video"' in r.text
 
 
@@ -108,9 +111,11 @@ def test_root_redirects_to_gui(client):
     r = client.get("/")
     assert r.status_code == 200
     # Same reason as above: ask the locale file what the page is called.
-    from youtube_helper.gui import _locales, default_language
+    from youtube_helper.gui import render_gui
 
-    assert _locales().text("gui", "hero_title", default_language()).lower() in r.text.lower()
+    title = re.search(r"<title>([^<]*)</title>", render_gui())
+    assert title, "the default page has no <title>"
+    assert title.group(1).lower() in r.text.lower()
 
 
 def test_gui_posts_to_guarded_download_endpoint(client):

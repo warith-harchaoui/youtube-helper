@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "youtube-helper"
-version = "2.5.0"
+version = "2.6.0"
 description = "YouTube Helper — yt-dlp wrapper for downloading videos / audio / thumbnails, resolving direct media URLs, browsing video stream catalogs, and pulling no-API engagement metadata (channel / video / comments / subtitles) on YouTube, Vimeo, DailyMotion, Twitch VOD, SoundCloud, and any yt-dlp-supported source."
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
@@ -28,7 +28,7 @@ classifiers = [
     "Topic :: Internet :: WWW/HTTP",
 ]
 dependencies = [
-    "os-helper>=2.4.0,<3",
+    "os-helper>=2.6.0,<3",
     "audio-helper>=2.0.0,<3",
     "video-helper>=2.0.0,<3",
     "yt-dlp>=2024.12.23",
@@ -97,7 +97,7 @@ include = ["youtube_helper*"]
 # The locale file is data, not code: without this it is absent from the
 # wheel and every GUI string raises FileNotFoundError on an installed copy.
 [tool.setuptools.package-data]
-youtube_helper = ["locales/*.yaml"]
+youtube_helper = ["locales/*/LC_MESSAGES/*.po", "locales/*/LC_MESSAGES/*.mo"]
 exclude = ["tests*", "assets*"]
 
 [tool.ruff]
