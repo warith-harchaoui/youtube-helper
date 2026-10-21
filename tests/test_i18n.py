@@ -147,14 +147,36 @@ def test_the_build_declares_the_locale_file_as_package_data() -> None:
     """Living inside the package is necessary and not sufficient.
 
     setuptools ships `.py` files on its own; anything else needs declaring.
-    """
-    import tomllib
 
+    Read with a regex rather than ``tomllib``: this package supports Python
+    3.10, where ``tomllib`` is not in the standard library, and a test that
+    errors on the floor of the supported range is not a test.
+    """
     root = Path(__file__).resolve().parent.parent
-    config = tomllib.loads((root / "pyproject.toml").read_text(encoding="utf-8"))
-    patterns = config["tool"]["setuptools"]["package-data"]["youtube_helper"]
-    assert any("locales" in p and p.endswith(".yaml") for p in patterns), (
-        f"package-data does not cover the locale file: {patterns}"
+    text = (root / "pyproject.toml").read_text(encoding="utf-8")
+    section = re.search(r"^\[tool\.setuptools\.package-data\](.*?)(?=^\[)", text, re.S | re.M)
+    assert section, "pyproject.toml declares no [tool.setuptools.package-data]"
+    assert "locales" in section.group(1) and "yaml" in section.group(1), (
+        f"package-data does not cover the locale file:\n{section.group(1)}"
+    )
+
+
+def test_the_declared_os_helper_floor_carries_the_loader() -> None:
+    """`osh.Locales` landed in os-helper 2.4.0; a lower floor is a lie.
+
+    The GUI resolves every string through the shared loader, so a user who
+    installs this package against an older os-helper gets an AttributeError
+    out of the `/gui` route. Neither CI nor a developer machine catches it:
+    pip resolves the NEWEST os-helper, never the floor, so the declaration can
+    be wrong for months without a single red build.
+    """
+    root = Path(__file__).resolve().parent.parent
+    text = (root / "pyproject.toml").read_text(encoding="utf-8")
+    bound = re.search(r'"os-helper>=(\d+)\.(\d+)(?:\.(\d+))?', text)
+    assert bound, "pyproject.toml declares no os-helper lower bound"
+    floor = tuple(int(part or 0) for part in bound.groups())
+    assert floor >= (2, 4, 0), (
+        f"declared floor {bound.group(0)!r} predates os_helper.Locales (2.4.0)"
     )
 
 
