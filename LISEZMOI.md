@@ -206,7 +206,7 @@ du Python), une surface HTTP FastAPI (ces mêmes fonctions accessibles par
 le réseau comme un petit service web), des outils MCP (le Model Context
 Protocol, une norme qui permet à un agent d'intelligence artificielle
 d'appeler directement les fonctions d'un programme, de la même façon
-qu'un humain les appellerait en ligne de commande), et une interface
+qu'un humain les appellerait en ligne de commande) et une interface
 graphique dans le navigateur (une page à cliquer). Quatre portes
 d'entrée vers le même code sous-jacent, pour qu'un script, un service
 web, un agent d'IA et un humain devant son navigateur accèdent tous à
