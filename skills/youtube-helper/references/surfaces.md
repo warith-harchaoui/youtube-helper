@@ -26,9 +26,9 @@ rather than hand-building one, so logging and output templates stay consistent.
 
 Logging and file management route through `os_helper` — the suite convention.
 
-## 2. CLIs — argparse (core) and click (`[cli]`)
+## 2. Command line — click, shipped with the core package
 
-`youtube-helper` and `youtube-helper-click`. See `cli-reference.md`.
+`youtube-helper <subcommand>`. See `cli-reference.md`.
 
 ## 3. HTTP API — FastAPI (`[api]`)
 

@@ -64,9 +64,9 @@ ajoute :
   justement parce qu'il est canonique, mais il ne renvoie aucun fichier
   média et coûte l'OAuth et le quota.
 - **Surfaces multiples** : les mêmes opérations sont disponibles comme
-  bibliothèque Python, CLI argparse, CLI click et surface HTTP FastAPI.
-  `yt-dlp` vous donne les deux premières ; les deux dernières sont
-  propres à ce wrapper.
+  bibliothèque Python, ligne de commande et surface HTTP FastAPI avec
+  des outils MCP montés dessus. `yt-dlp` vous donne les deux premières ;
+  la dernière est propre à ce wrapper.
 - **Prêt pour Docker** : un seul `docker run` suffit pour un serveur
   HTTP local sur n'importe quelle URL prise en charge par yt-dlp.
 

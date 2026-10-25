@@ -1,20 +1,21 @@
 """
-YouTube Helper — click-based command-line interface.
+YouTube Helper — the command line.
 
-Twin of :mod:`youtube_helper.cli_argparse`: same public surface (identical
-subcommand names, identical flag semantics), but implemented with
-:mod:`click` so users who already have a click-native shell setup
-(bash / zsh completion via ``click.shell_completion``, colored `--help`,
-nested command groups) can plug it in without friction. Installed as
-the ``youtube-helper-click`` entry point in ``pyproject.toml``.
+``youtube-helper <subcommand>``: download a video, its audio track or its
+thumbnail, resolve a page URL to a direct ffmpeg-ready media URL, browse or
+pick among the stream formats yt-dlp reports, and pull public engagement
+metadata (channel, video, comments, subtitles) without any platform API key.
+Works on YouTube, Vimeo, DailyMotion, Twitch VOD, SoundCloud, and every other
+site yt-dlp supports.
 
 Design notes
 ------------
-- Subcommands mirror ``youtube-helper`` (the argparse twin) so both CLIs
-  can be introspected identically by higher layers (FastAPI).
-- Flags reuse the argparse names (``--url`` / ``--output`` / …) rather
-  than the more idiomatic click positional style — consistency across
-  the two CLIs beats micro-idiomaticity here.
+- One command line, built with :mod:`click`. There is no second parser:
+  the subcommand names and flag names here are the contract, and the
+  FastAPI surface (:mod:`youtube_helper.api`) mirrors them one-to-one.
+- Flags are named (``--url`` / ``--output`` / …) rather than positional,
+  so a long download command stays readable and the HTTP surface can
+  reuse the same parameter names.
 - A library exception is caught by the ``main()`` entry point (not
   click's own error handling, which only special-cases
   ``ClickException``/``Abort``) and printed as a clean ``Error: ...``
@@ -22,10 +23,10 @@ Design notes
 
 Usage Example
 -------------
->>> #   youtube-helper-click metadata     --url https://www.youtube.com/watch?v=YE7VzlLtp-4
->>> #   youtube-helper-click audio        --url https://www.youtube.com/watch?v=YE7VzlLtp-4 --output out.mp3
->>> #   youtube-helper-click resolve      --url https://www.youtube.com/watch?v=YE7VzlLtp-4 --prefer audio
->>> #   youtube-helper-click channel-info --url https://www.youtube.com/@blender
+>>> #   youtube-helper metadata     --url https://www.youtube.com/watch?v=YE7VzlLtp-4
+>>> #   youtube-helper audio        --url https://www.youtube.com/watch?v=YE7VzlLtp-4 --output out.mp3
+>>> #   youtube-helper resolve      --url https://www.youtube.com/watch?v=YE7VzlLtp-4 --prefer audio
+>>> #   youtube-helper channel-info --url https://www.youtube.com/@blender
 
 Author
 ------
@@ -37,14 +38,10 @@ from __future__ import annotations
 import json
 import sys
 
-try:
-    import click
-except ImportError as exc:  # pragma: no cover
-    raise ImportError(
-        "The click CLI requires the [cli] extra. Install with: pip install 'youtube-helper[cli]'"
-    ) from exc
+import click
 
-# Same underlying functions as the argparse twin — one source of truth.
+# The same functions the library exposes — the CLI is a thin shell over them,
+# never a second implementation.
 from . import (
     channel_info,
     channel_videos,
@@ -77,9 +74,18 @@ def _dumps(obj: object) -> str:
 @click.group(
     context_settings={"help_option_names": ["-h", "--help"], "max_content_width": 100},
 )
-@click.version_option(package_name="youtube-helper", prog_name="youtube-helper-click")
+# ``-v`` is already ``--verbose`` on most subcommands, hence the capital ``-V``.
+# The version comes from the installed distribution metadata: the package
+# defines no ``__version__``, so pyproject.toml stays the single source.
+@click.version_option(None, "-V", "--version", package_name="youtube-helper")
 def cli() -> None:
-    """YouTube Helper — click twin of the argparse CLI. Same subcommands."""
+    """YouTube Helper — download and inspect media from yt-dlp-supported sites.
+
+    Downloads video, audio or thumbnails, resolves a page URL to a direct
+    ffmpeg-ready media URL, browses the stream catalog, and pulls no-API
+    engagement metadata on YouTube, Vimeo, DailyMotion, Twitch VOD,
+    SoundCloud and anything else yt-dlp handles.
+    """
     # Nothing to do at the group level — every subcommand carries its
     # own arguments and side effects.
 
@@ -415,7 +421,7 @@ def ytdlp_version(min_version: str | None) -> None:
 
 
 def main() -> None:
-    """Console entry point (``youtube-helper-click``).
+    """Console entry point (``youtube-helper``).
 
     click's own ``main()`` only special-cases ``ClickException``/``Abort``
     (and a broken pipe); a plain library exception (e.g. ``AssertionError``

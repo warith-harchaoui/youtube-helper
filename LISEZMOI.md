@@ -73,7 +73,6 @@ On recommande de travailler dans un environnement Python. Si vous ne savez pas e
 pip install youtube-helper
 
 # Surfaces optionnelles
-pip install "youtube-helper[cli]"       # jumeau CLI click
 pip install "youtube-helper[api]"       # surface HTTP FastAPI
 ```
 
@@ -85,7 +84,6 @@ cd youtube-helper
 pip install -e .
 
 # Surfaces optionnelles
-pip install -e ".[cli]"
 pip install -e ".[api]"
 ```
 
@@ -200,8 +198,8 @@ YouTube Helper est un wrapper léger autour de `yt-dlp` et `ffmpeg`. Vous êtes 
 ## Exposition multi-surface
 
 `youtube-helper` n'est pas seulement une bibliothèque : les mêmes
-fonctions sont exposées via deux interfaces en ligne de commande (CLI,
-des programmes qu'on pilote en tapant des commandes plutôt qu'en écrivant
+fonctions sont exposées via une interface en ligne de commande (CLI,
+un programme qu'on pilote en tapant des commandes plutôt qu'en écrivant
 du Python), une surface HTTP FastAPI (ces mêmes fonctions accessibles par
 le réseau comme un petit service web), des outils MCP (le Model Context
 Protocol, une norme qui permet à un agent d'intelligence artificielle
@@ -216,15 +214,11 @@ la même logique de téléchargement.
 # Bibliothèque Python (par défaut)
 import youtube_helper as yth
 
-# CLI argparse (installée automatiquement)
+# Ligne de commande (installée automatiquement)
 youtube-helper metadata     --url https://www.youtube.com/watch?v=YE7VzlLtp-4
 youtube-helper audio        --url https://www.youtube.com/watch?v=YE7VzlLtp-4 --output out.mp3
 youtube-helper resolve      --url https://www.youtube.com/watch?v=YE7VzlLtp-4 --prefer audio
 youtube-helper channel-info --url https://www.youtube.com/@blender
-
-# Jumeau CLI click (nécessite l'extra [cli])
-pip install "youtube-helper[cli]"
-youtube-helper-click metadata --url https://www.youtube.com/watch?v=YE7VzlLtp-4
 
 # Surface HTTP FastAPI (nécessite l'extra [api])
 pip install "youtube-helper[api]"

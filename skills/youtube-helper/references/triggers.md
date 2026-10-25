@@ -32,8 +32,8 @@ files, transcribe, synthesize, or upload.
 | Top comments | `youtube-helper comments` | `video_comments` | `POST /comments` |
 | yt-dlp freshness check | `youtube-helper ytdlp-version` | `ensure_recent_ytdlp` | `POST /ytdlp-version` |
 
-Every operation is also reachable through the click CLI (`youtube-helper-click …`,
-same flags) and the download bench GUI at `GET /gui` (audio/video downloads).
+Every download is also reachable through the download bench GUI at `GET /gui`
+(audio and video).
 
 ## Natural-language phrasings that should fire
 

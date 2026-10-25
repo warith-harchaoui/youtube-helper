@@ -45,8 +45,7 @@ ffmpeg -version                      # needed for merged / converted output
 Install:
 
 ```bash
-pip install youtube-helper                 # core: library + argparse CLI
-pip install 'youtube-helper[cli]'          # + the click twin
+pip install youtube-helper                 # core: library + command line
 pip install 'youtube-helper[api]'          # + FastAPI HTTP surface and GUI
 pip install 'youtube-helper[mcp]'          # + MCP tools over the same app
 ```
@@ -55,35 +54,35 @@ pip install 'youtube-helper[mcp]'          # + MCP tools over the same app
 
 | Intent | CLI | Library |
 |---|---|---|
-| Is this a usable video URL | `youtube-helper valid URL` | `is_valid_video_url` |
-| Title, duration, uploader, … | `youtube-helper metadata URL` | `video_url_meta_data` |
-| Direct media URL, no download | `youtube-helper resolve URL` | `resolve_direct_url` |
-| What streams exist | `youtube-helper list-streams URL` | `list_video_streams` |
-| Choose a stream by constraints | `youtube-helper pick-stream URL` | `pick_video_stream` |
-| Download the video | `youtube-helper video URL` | `download_video` |
-| Download the audio only | `youtube-helper audio URL` | `download_audio` |
-| Download the thumbnail | `youtube-helper thumbnail URL` | `download_thumbnail` |
-| Download the subtitles | `youtube-helper subtitles URL` | `video_subtitles` |
-| Channel info / video list | `youtube-helper channel-info`, `channel-videos` | `channel_info`, `channel_videos` |
-| Views, likes, comment count | `youtube-helper engagement URL` | `video_engagement` |
-| The same for many URLs | `youtube-helper engagement-batch` | `engagement_batch` |
-| Fetch the comments | `youtube-helper comments URL` | `video_comments` |
+| Is this a usable video URL | `youtube-helper valid --url URL` | `is_valid_video_url` |
+| Title, duration, uploader, … | `youtube-helper metadata --url URL` | `video_url_meta_data` |
+| Direct media URL, no download | `youtube-helper resolve --url URL` | `resolve_direct_url` |
+| What streams exist | `youtube-helper list-streams --url URL` | `list_video_streams` |
+| Choose a stream by constraints | `youtube-helper pick-stream --url URL` | `pick_video_stream` |
+| Download the video | `youtube-helper video --url URL` | `download_video` |
+| Download the audio only | `youtube-helper audio --url URL` | `download_audio` |
+| Download the thumbnail | `youtube-helper thumbnail --url URL` | `download_thumbnail` |
+| Download the subtitles | `youtube-helper subtitles --url URL --output-dir DIR` | `video_subtitles` |
+| Channel info / video list | `youtube-helper channel-info --url URL`, `channel-videos --url URL` | `channel_info`, `channel_videos` |
+| Views, likes, comment count | `youtube-helper engagement --url URL` | `video_engagement` |
+| The same for many URLs | `youtube-helper engagement-batch --urls URL --urls URL` | `engagement_batch` |
+| Fetch the comments | `youtube-helper comments --url URL` | `video_comments` |
 | Which yt-dlp is in play | `youtube-helper ytdlp-version` | `ensure_recent_ytdlp` |
 
 Quick examples:
 
 ```bash
-youtube-helper metadata "https://youtu.be/YE7VzlLtp-4"
-youtube-helper audio "https://youtu.be/YE7VzlLtp-4" -o talk.m4a
-youtube-helper video "https://youtu.be/YE7VzlLtp-4" --height 720
-youtube-helper subtitles "https://youtu.be/YE7VzlLtp-4" --lang en
+youtube-helper metadata  --url "https://youtu.be/YE7VzlLtp-4"
+youtube-helper audio     --url "https://youtu.be/YE7VzlLtp-4" --output talk.mp3
+youtube-helper video     --url "https://youtu.be/YE7VzlLtp-4" --max-height 720
+youtube-helper subtitles --url "https://youtu.be/YE7VzlLtp-4" --output-dir ./subs --langs en
 ```
 
 ```python
 import youtube_helper as yh
 
 meta = yh.video_url_meta_data(url)  # title, duration, uploader, …
-path = yh.download_audio(url, output_folder="./dl")
+path = yh.download_audio(url, output_path="./dl/talk.mp3")
 for frame in yh.extract_frames_stream(url):  # frames without a full download
     ...
 ```

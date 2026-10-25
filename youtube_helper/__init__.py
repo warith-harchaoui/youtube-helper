@@ -23,11 +23,9 @@ Multi-surface exposure
 ----------------------
 The same functions are also available as:
 
-- ``youtube_helper.cli_argparse`` — argparse-based CLI, entry point
+- ``youtube_helper.cli`` — the command line (click), entry point
   ``youtube-helper``. No extra dependency.
-- ``youtube_helper.cli_click``    — click-based twin CLI, entry point
-  ``youtube-helper-click``. Requires the ``[cli]`` extra.
-- ``youtube_helper.api``          — FastAPI HTTP surface. Requires the
+- ``youtube_helper.api`` — FastAPI HTTP surface. Requires the
   ``[api]`` extra.
 
 Dependencies

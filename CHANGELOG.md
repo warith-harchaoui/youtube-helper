@@ -5,6 +5,76 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.7.0] - 2026-10-25
+
+### Changed
+
+- **One command line, built with click.** `youtube_helper/cli_click.py` became
+  `youtube_helper/cli.py`; `youtube_helper/cli_argparse.py` (908 lines) is
+  deleted, and with it the `youtube-helper-click` console script. A flag naming
+  the parsing library describes the implementation, not the interface, so there
+  is nothing left to choose between. `youtube-helper-mcp` is untouched: it
+  starts another surface, it is not a second command line.
+
+  Parity was measured before deleting anything, not assumed: both parsers were
+  built in the same interpreter and compared programmatically — subcommand sets
+  (15 on each side, identical), the `--…` option set per subcommand, and every
+  option's default and required-ness. The only differences were cosmetic: the
+  dest name behind `--max` (`max` vs `max_count`), `list`-vs-`tuple` defaults,
+  and click's habit of exposing both halves of a boolean pair
+  (`--include-shorts` alongside `--no-shorts`) where argparse declared only
+  the one that flips the default. Nothing was lost in the move.
+
+- **`click` moved out of the `[cli]` extra into the core dependencies**, and
+  the extra is gone. The CLI is no longer optional, so its dependency cannot be
+  either. `[dev]` no longer lists `click` for the same reason, and
+  `requirements.txt` lists it under the core runtime.
+
+- The `os-helper` cap widened from `<3` to `<4`: os-helper 3.0.0 drops its own
+  CLI, which is not a break for anything this package calls.
+
+### Fixed
+
+- **The CLI's own help described an architecture that no longer existed.**
+  `youtube-helper --help` opened with "click twin of the argparse CLI. Same
+  subcommands." — meaningless to a user and, after this release, false. It now
+  says what the tool does. The module docstring and the dead
+  `try: import click / except ImportError` guard pointing at the `[cli]` extra
+  went the same way.
+
+- **`-V` did not exist.** Only the long `--version` was wired, so the habitual
+  short form failed as an unknown option. Added as the capital `-V` because
+  `-v` is `--verbose` on most subcommands. `-h` was already present.
+
+- **The agent skill documented a command line that was never real.**
+  `skills/youtube-helper/references/cli-reference.md` and `SKILL.md` showed the
+  URL as a positional argument (`youtube-helper metadata URL`) and invented
+  flags that no subcommand has ever accepted — `--json`, `-o`, `--height`,
+  `--format`, `--lang`, `--auto`, `--limit`, `--urls-file`. Every documented
+  invocation would have failed on the first argument. Both files were rewritten
+  against the real parser: `--url` everywhere, plus `--output`, `--max-height`,
+  `--sample-rate`, `--output-dir`, `--langs`, `--manual`, `--max`,
+  `--max-videos`, `--urls`. The reference also claimed `valid` "exits 0 either
+  way" where it exits 1 on `false`, and that the click CLI covered only six of
+  the fifteen commands. The library example passed `output_folder=` to
+  `download_audio`, whose parameter is `output_path=`.
+
+- `tests/test_cli.py` ran every scenario twice, once per parser. Collapsed onto
+  the one CLI, keeping the stronger half of each pair: the argparse test
+  asserted the clean error line carries the *cause* (`Invalid URL`) where the
+  click one only looked for `Error:`. The `pytest.importorskip("click")` guard
+  is gone — click is a core dependency — and `-h` and `-V` are now covered.
+
+### Migration
+
+- `youtube-helper-click <cmd>` → `youtube-helper <cmd>`. Identical subcommands
+  and flags; nothing to relearn.
+- `pip install "youtube-helper[cli]"` now fails on an unknown extra. Drop the
+  extra: `pip install youtube-helper` ships the CLI.
+- `youtube_helper.cli_argparse` and `youtube_helper.cli_click` no longer
+  import. The module is `youtube_helper.cli`, exposing `cli` (the click group)
+  and `main`.
+
 ## [2.6.0] - 2026-10-21
 
 ### Changed

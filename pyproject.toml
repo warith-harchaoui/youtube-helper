@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "youtube-helper"
-version = "2.6.0"
+version = "2.7.0"
 description = "YouTube Helper — yt-dlp wrapper for downloading videos / audio / thumbnails, resolving direct media URLs, browsing video stream catalogs, and pulling no-API engagement metadata (channel / video / comments / subtitles) on YouTube, Vimeo, DailyMotion, Twitch VOD, SoundCloud, and any yt-dlp-supported source."
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
@@ -28,20 +28,19 @@ classifiers = [
     "Topic :: Internet :: WWW/HTTP",
 ]
 dependencies = [
-    "os-helper>=2.6.0,<3",
+    "os-helper>=2.6.0,<4",
     "audio-helper>=2.0.0,<3",
     "video-helper>=2.0.0,<3",
     "yt-dlp>=2024.12.23",
     "ffmpeg-python>=0.2.0,<0.3.0",
     "pillow>=10,<12",
+    # The command line is the only CLI surface now, so click is core, not optional.
+    "click>=8.1,<9",
     # SOCKS proxy support for yt-dlp (needed by the Tor download fallback).
     "PySocks>=1.7,<2",
 ]
 
 [project.optional-dependencies]
-# CLI-only-with-click extra. argparse variant needs no runtime dep and
-# is always available.
-cli = ["click>=8.1,<9"]
 # FastAPI HTTP surface (youtube_helper.api). uvicorn + python-multipart
 # so multipart file uploads work out of the box.
 api = [
@@ -61,12 +60,11 @@ mcp = [
     "mcp>=1.12,<2",
 ]
 # `dev` keeps the bar low for CI — pytest + httpx (for FastAPI TestClient)
-# + click (so the click CLI import always resolves in tests) + the mcp stack
-# so that surface is actually exercised on every push.
+# + the mcp stack so that surface is actually exercised on every push.
+# click is not listed: it is a core dependency now.
 dev = [
     "pytest>=8", "pytest-timeout>=2.3",
     "httpx>=0.27",
-    "click>=8.1,<9",
     "fastapi>=0.111,<1",
     "python-multipart>=0.0.9,<1",
     "fastapi-mcp>=0.3,<1",
@@ -74,10 +72,8 @@ dev = [
 ]
 
 [project.scripts]
-# argparse-based CLI — no runtime dep beyond stdlib + core package.
-youtube-helper = "youtube_helper.cli_argparse:main"
-# click-based twin — install with [cli] extra.
-youtube-helper-click = "youtube_helper.cli_click:main"
+# The command line (click). One CLI, no suffixed twin.
+youtube-helper = "youtube_helper.cli:main"
 # MCP server — install with [mcp] extra.
 youtube-helper-mcp = "youtube_helper.mcp:main"
 

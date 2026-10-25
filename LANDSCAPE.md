@@ -59,9 +59,9 @@ the hood. What it adds:
   because it is canonical, but it returns no media files and costs OAuth
   and quota.
 - **Multi-surface exposure**: the same operations are available as a
-  Python library, an argparse CLI, a click CLI, and a FastAPI HTTP
-  surface. `yt-dlp` gives you the first two; the last two are unique
-  to this wrapper.
+  Python library, a command line, and a FastAPI HTTP surface with MCP
+  tools mounted on it. `yt-dlp` gives you the first two; the last one
+  is unique to this wrapper.
 - **Docker-ready**: one `docker run` and you have a local HTTP
   server for any yt-dlp-supported URL.
 
