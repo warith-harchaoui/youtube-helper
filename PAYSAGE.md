@@ -96,3 +96,45 @@ ajoute :
 - **`youtube-comment-downloader`** : vous n'avez besoin que d'aspirer en
   masse les commentaires d'une vidéo sans toucher à l'API Data, rien
   d'autre.
+
+## Sources et date de relevé
+
+**Relevé le 27/10/2026.** Chaque version et chaque date ci-dessous ont été
+lues ce jour-là dans les métadonnées PyPI du paquet concerné
+(`https://pypi.org/pypi/<nom>/json`) ; les descriptions en une ligne sont le
+résumé PyPI rédigé par chaque projet. Les notes en étoiles, elles, sont
+éditoriales : un jugement d'adéquation à *ce* créneau, pas un banc d'essai, et
+rien ici ne mesure un débit.
+
+| Outil | Dernière version | Publiée le | Ce que dit son propre résumé |
+|---|---|---|---|
+| `youtube-helper` | 2.7.0 | 25/10/2026 | ce paquet |
+| `yt-dlp` | 2026.10.26 | 26/10/2026 | le moteur d'extraction sur lequel repose ce paquet |
+| `youtube-dl` | 2021.12.17 | 16/12/2021 | le prédécesseur ; aucune publication depuis presque cinq ans |
+| `pytube` | 15.0.0 | 07/05/2023 | téléchargeur YouTube en Python pur, sans publication depuis 2023 |
+| `pytubefix` | 11.2.1 | 16/10/2026 | « Python3 library for downloading YouTube Videos » |
+| `streamlink` | 8.6.2 | 07/10/2026 | « extracts streams from various services and pipes them into a video player of choice » |
+| `gallery-dl` | 1.32.18 | 25/10/2026 | « download image galleries and collections from several image hosting sites » |
+| `scrapetube` | 2.6.0 | 16/09/2025 | « Scrape youtube without the official youtube api and without selenium » |
+| `youtube-comment-downloader` | 0.1.84 | 15/10/2026 | « downloading Youtube comments without using the Youtube API » |
+| `google-api-python-client` | 2.201.0 | 30/09/2026 | le client officiel des API Google, API YouTube Data v3 comprise |
+
+Deux affirmations du texte reposent sur ces dates plutôt que sur une opinion.
+La ligne `youtube-dl` est notée bas sur la fraîcheur des extracteurs parce que
+sa dernière publication PyPI précède ce relevé de près de cinq ans, ce qui
+justifie aussi la recommandation de migrer vers `yt-dlp`. `pytubefix` est
+présenté comme le fork maintenu de `pytube` parce qu'il a publié une version
+onze jours avant ce relevé, là où la dernière de `pytube` date de mai 2023.
+
+Le coût en OAuth et en quota imputé à `google-api-python-client` est celui de
+l'API YouTube Data v3, pas de la bibliothèque cliente : Google documente une
+**allocation par défaut de 10 000 unités par jour** et par projet dans le
+[guide de démarrage](https://developers.google.com/youtube/v3/getting-started)
+de l'API. Le coût unitaire par appel varie selon l'endpoint ; il n'est pas
+reproduit ici.
+
+Rien dans ce document ne compare une vitesse, un nombre d'extracteurs ou un
+taux de réussite à ceux d'un concurrent. Là où la comparaison exigerait un tel
+chiffre, le texte argumente par la conception — une forme d'API annoncée, un
+quota documenté, une date de publication — car un banc d'essai qu'on ne peut
+pas rejouer vaut moins que pas de banc d'essai du tout.

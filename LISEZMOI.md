@@ -19,7 +19,7 @@
 YouTube Helper est une bibliothèque Python de fonctions utilitaires pour télécharger vidéos, audio et vignettes depuis des plateformes comme YouTube, Vimeo et DailyMotion. Le téléchargement proprement dit passe par `yt-dlp`, un outil libre qui sait déjà parler à des centaines de sites vidéo, chacun avec ses propres particularités ; youtube-helper l'enveloppe dans une interface Python unique, pour qu'on n'ait jamais à apprendre ces particularités soi-même.
 Elle gère aussi le post-traitement : conversion ou fusion de fichiers média avec `ffmpeg`, l'outil en ligne de commande de référence pour lire, convertir et combiner audio et vidéo.
 
-YouTube Helper est éprouvé en production. Chaque changement passe par des tests automatisés et une intégration continue avant d'atteindre PyPI ; les versions suivent le [versionnage sémantique](https://semver.org/lang/fr/) (actuellement `v2.4.1`). [`podcast-helper`](https://github.com/warith-harchaoui/podcast-helper), un autre paquet publié de la suite, s'appuie directement dessus en production. YouTube Helper repose lui-même sur [`os-helper`](https://github.com/warith-harchaoui/os-helper) (le socle commun que chaque bibliothèque de la suite utilise pour la journalisation et la gestion des fichiers), sur [`audio-helper`](https://github.com/warith-harchaoui/audio-helper) et sur [`video-helper`](https://github.com/warith-harchaoui/video-helper) pour l'étape de conversion qui suit la récupération du média brut par `yt-dlp`. C'est ce que « éprouvé en production » veut dire ici : pas une promesse, mais un graphe de dépendances sur lequel repose déjà du code publié, dans les deux sens autour de ce paquet.
+YouTube Helper est éprouvé en production. Chaque changement passe par des tests automatisés et une intégration continue avant d'atteindre PyPI ; les versions suivent le [versionnage sémantique](https://semver.org/lang/fr/) (actuellement `v2.7.0`). [`podcast-helper`](https://github.com/warith-harchaoui/podcast-helper), un autre paquet publié de la suite, s'appuie directement dessus en production. YouTube Helper repose lui-même sur [`os-helper`](https://github.com/warith-harchaoui/os-helper) (le socle commun que chaque bibliothèque de la suite utilise pour la journalisation et la gestion des fichiers), sur [`audio-helper`](https://github.com/warith-harchaoui/audio-helper) et sur [`video-helper`](https://github.com/warith-harchaoui/video-helper) pour l'étape de conversion qui suit la récupération du média brut par `yt-dlp`. C'est ce que « éprouvé en production » veut dire ici : pas une promesse, mais un graphe de dépendances sur lequel repose déjà du code publié, dans les deux sens autour de ce paquet.
 
 ## Documentation
 
@@ -32,16 +32,16 @@ YouTube Helper est éprouvé en production. Chaque changement passe par des test
 ## Fonctionnalités
 
 Fonctions de **téléchargement (sur disque)**, dans `youtube_helper.main` :
-- `download_video(url, output_path)` / `download_audio(url, output_path)` / `download_thumbnail(url, output_path)`.
+- `download_video(url, output_path, max_height)` / `download_audio(url, output_path, target_sample_rate)` / `download_thumbnail(url, output_path)` : chacune renvoie le chemin qu'elle a écrit.
 - `video_url_meta_data(url)` / `is_valid_video_url(url)` pour interroger les métadonnées sans télécharger.
-- `default_ytdlp_options(verbose, ...)` pour personnaliser les options yt-dlp.
+- `default_ytdlp_options(...)` et `height_capped_format(max_height)` pour personnaliser les options yt-dlp.
 
 **Catalogue de flux et résolution d'URL directe**, dans `youtube_helper.streaming` :
 - `resolve_direct_url(url, prefer="audio"|"video")` → un raccourci "donne-moi une URL directe prête à passer à ffmpeg".
 - `list_video_streams(url)` → énumère chaque format vidéo trouvé par yt-dlp (codec, résolution, fps, bitrate, …).
-- `pick_video_stream(url, prefer_codec=, prefer_format=, max_fps=, language=, cookies_from_browser=)` → picker contraint, retourne un `VideoStreamInfo` prêt à alimenter `video_helper.extract_frames`.
+- `pick_video_stream(url, prefer_codec=, prefer_format=, max_fps=, language=, cookies_from_browser=)` → sélecteur contraint, retourne un `VideoStreamInfo` prêt à alimenter `video_helper.extract_frames`.
 - `extract_frames_stream(url, ..., **extract_frames_kwargs)` → composition en un appel de `pick_video_stream` + `video_helper.extract_frames` ; câble les headers tout seul et transmet n'importe quel kwarg d'`extract_frames` (`destination`, `device`, `batch_size`, `output_width`, `frame_step`, …). Le chemin le plus court d'une URL YouTube / Vimeo / Twitch vers des frames prêtes pour le ML.
-- Le catalogue / picker de flux audio vit volontairement dans **podcast-helper** (propriétaire unique du streaming PCM audio).
+- Le catalogue et le sélecteur de flux audio vivent volontairement dans **podcast-helper** (propriétaire unique du streaming PCM audio).
 
 **Métadonnées d'engagement sans API**, dans `youtube_helper.branding` :
 - `channel_info(url)` / `channel_videos(url, max_videos, include_shorts, include_lives)` : instantané de chaîne et liste paginée de vidéos, avec métriques d'engagement normalisées sur un schéma multiplateforme.
@@ -59,7 +59,7 @@ Fonctions de **téléchargement (sur disque)**, dans `youtube_helper.main` :
 - 🐧 **Ubuntu/Debian** : `sudo apt update && sudo apt install -y python3 python3-pip git yt-dlp ffmpeg`
 - 🪟 **Windows** (PowerShell) : `winget install Python.Python.3.12 Git.Git yt-dlp.yt-dlp Gyan.FFmpeg`
 
-**Optionnel — Tor** (uniquement nécessaire pour le repli n°4 de la [résilience du téléchargement](#résilience-du-téléchargement)) :
+**Optionnel — Tor** (uniquement nécessaire pour le dernier palier de l'échelle de [résilience du téléchargement](#résilience-du-téléchargement)) :
 
 - 🍎 **macOS** ([Homebrew](https://brew.sh)) : `brew install tor && brew services start tor`
 - 🐧 **Ubuntu/Debian** : `sudo apt update && sudo apt install -y tor` (le service systemd du paquet démarre automatiquement ; sinon `sudo systemctl enable --now tor`)
@@ -74,6 +74,7 @@ pip install youtube-helper
 
 # Surfaces optionnelles
 pip install "youtube-helper[api]"       # surface HTTP FastAPI
+pip install "youtube-helper[mcp]"       # la même appli, plus le point d'entrée MCP
 ```
 
 ### Depuis les sources (sans PyPI)
@@ -87,72 +88,86 @@ pip install -e .
 pip install -e ".[api]"
 ```
 
-## Utilisation
+## Prise en main rapide
 
-Pour le catalogue complet d'exemples (téléchargements, catalogue de flux / picker, résolveur d'URL directe, composition avec `video-helper`, métadonnées de branding, sous-titres et commentaires), voir [📋 EXAMPLES.md](https://github.com/warith-harchaoui/youtube-helper/blob/main/EXAMPLES.md).
-
-Démarrage rapide : télécharger une vidéo, extraire les métadonnées et télécharger l'audio.
+Sonder les métadonnées d'une URL sans rien télécharger, récupérer la vidéo,
+puis en extraire la seule piste audio :
 
 ```python
-import youtube_helper as yth
-import video_helper as vh
+import os
+
 import audio_helper as ah
 import os_helper as osh
-import os
+import video_helper as vh
+import youtube_helper as yth
 
 osh.verbosity(0)
 
-# URL YouTube d'exemple
-youtube_url = "https://www.youtube.com/watch?v=YE7VzlLtp-4"
+youtube_url = "https://www.youtube.com/watch?v=YE7VzlLtp-4"  # Big Buck Bunny
 
 folder = "yt_tests"
-os.makedirs(folder, exist_ok=True)
+osh.make_directory(folder)
 
-# Télécharger une vidéo
-video = "big-buck-bunny.mp4"
-video = os.path.join(folder, video)
-yth.download_video(youtube_url, video)
+# Aucun téléchargement ici. Le résultat est l'info dict de yt-dlp lui-même :
+# `title`, `channel`, `duration`, `view_count`, `formats` et le reste y sont
+# tous ; `title` et `description` sont en plus ramenés à des chaînes, car
+# certains extracteurs les omettent et faisaient planter tous les appelants.
+meta = yth.video_url_meta_data(youtube_url)
+print(meta["title"], "—", meta["channel"], f"({meta['duration']}s)")
 
-# Extraire les métadonnées depuis l'URL de la vidéo
-metadata = yth.video_url_meta_data(youtube_url)
-print(metadata["title"])
-# Big Buck Bunny
+# Chaque download_* renvoie le chemin qu'elle a réellement écrit.
+video = yth.download_video(youtube_url, os.path.join(folder, "big-buck-bunny.mp4"))
+audio = yth.download_audio(youtube_url, os.path.join(folder, "big-buck-bunny.mp3"))
 
-print(metadata["duration"])
-# 597
+print(vh.video_dimensions(video))
+# {'width': 1920, 'height': 1080, 'duration': 596.458333, 'frame_rate': 24.0, 'has_sound': True}
 
-print(metadata["description"])
-# Big Buck Bunny tells the story of a giant rabbit with a heart bigger than himself…
-
-print(metadata["channel"])
-# Blender
-
-details = vh.video_dimensions(video)
-print(details)
-# {'width': 1280, 'height': 720, 'duration': 596.458, 'frame_rate': 24.0, 'has_sound': True}
-
-# Télécharger l'audio depuis la vidéo
-audio = "big-buck-bunny.mp3"
-audio = os.path.join(folder, audio)
-yth.download_audio(youtube_url, audio)
-
-audio, sample_rate = ah.load_audio(audio)
-print(sample_rate)
-# 44100
+print(ah.get_audio_duration(audio))
+# 596.474195
 ```
+
+Ces deux dernières sorties sont mesurées sur les fichiers d'essai `yt_tests/`
+de ce dépôt. La durée est celle du film et ne bougera pas ; la résolution,
+elle, n'est pas une constante : `download_video` sans `max_height` prend le
+meilleur format disponible du jour. Passez `max_height=720` — ou définissez
+`YOUTUBE_HELPER_MAX_HEIGHT` — quand il vous faut un plafond prévisible.
+
+`audio_helper.load_audio` est volontairement absente ci-dessus : elle décode
+vers un tenseur torch et réclame donc `audio-helper[demucs]`, que ce paquet
+n'installe pas. `get_audio_duration` fonctionne sur l'installation de base.
+
+Pour le catalogue complet de recettes (téléchargements, catalogue de flux et
+sélecteur, résolveur d'URL directe, composition avec `video-helper`,
+métadonnées de branding, sous-titres, commentaires et ligne de commande), voir
+[📋 EXEMPLES.md](https://github.com/warith-harchaoui/youtube-helper/blob/main/EXEMPLES.md).
 
 ## Résilience du téléchargement
 
-Chaque appel yt-dlp de `youtube_helper.main` (métadonnées, miniature, audio,
-vidéo) réessaie automatiquement quand l'approche normale se fait bloquer
-(limitation de débit, détection de bot, bannissement d'IP) :
+Tous les appels yt-dlp du paquet passent par un même goulot,
+`main._run_ytdlp` : les fonctions de téléchargement, celles de branding ainsi
+que le catalogue et les résolveurs de `streaming`. C'est là que vit l'échelle
+de replis, pour qu'un palier ajouté profite à tout le paquet plutôt qu'à un
+seul module. Quand l'approche normale se fait bloquer (limitation de débit,
+détection de bot, bannissement d'IP), la requête est rejouée sur des paliers
+de plus en plus intrusifs :
 
 1. **Normal** : la requête par défaut, telle que configurée par
    `default_ytdlp_options`.
 2. **User-Agent navigateur** : nouvelle tentative avec un User-Agent Chrome
    de bureau complet et à jour, ainsi que les en-têtes correspondants.
    Surchargeable via la variable d'environnement `YOUTUBE_HELPER_USER_AGENT`.
-3. **Cookies du navigateur** (opt-in, ignoré par défaut) : nouvelle
+3. **Un autre client YouTube** : `web_embedded`, puis `tv`, `android_vr`, puis
+   `mweb` — une tentative chacun. YouTube sert plusieurs applications et ne
+   leur applique pas les mêmes contrôles : une vidéo refusée à un client passe
+   souvent pour un autre. Ce palier précède les deux suivants parce qu'il ne
+   coûte rien, ne lit les données privées de personne et ne passe par aucun
+   tiers ; `web_embedded` n'expose en plus aucun flux HLS, ce qui compte car
+   YouTube bride le HLS fragmenté bien plus durement qu'un format https
+   direct. Surchargez la chaîne via `YOUTUBE_HELPER_PLAYER_CLIENTS`
+   (séparée par des virgules, vide désactive le palier) ou épinglez un client
+   avec `default_ytdlp_options(player_clients=[...])` : dans ce cas l'échelle
+   respecte votre choix.
+4. **Cookies du navigateur** (opt-in, ignoré par défaut) : nouvelle
    tentative avec les cookies de session récupérés directement dans le
    profil d'un navigateur local (mécanisme `--cookies-from-browser` de
    yt-dlp). En pratique, c'est ce palier qui fait vraiment sauter le
@@ -168,7 +183,7 @@ vidéo) réessaie automatiquement quand l'approche normale se fait bloquer
    Access) accordé au processus/terminal appelant sur macOS, sans quoi
    l'extraction lève « Operation not permitted » ; Chrome/Firefox n'ont
    besoin d'aucune autorisation particulière.
-4. **Tor** : nouvelle tentative via un proxy SOCKS Tor local. Tor fait
+5. **Tor** : nouvelle tentative via un proxy SOCKS Tor local. Tor fait
    passer la requête par une chaîne de relais avant qu'elle n'atteigne le
    site visé, si bien que le site voit une adresse IP différente, sans
    rapport avec la vôtre ; un blocage fondé sur votre IP ne s'applique
@@ -190,6 +205,28 @@ vidéo) réessaie automatiquement quand l'approche normale se fait bloquer
 
 Si tous les paliers échouent, l'erreur d'origine de la dernière tentative
 est levée.
+
+**Toute lecture est bornée.** Le même goulot fixe le `socket_timeout` de
+yt-dlp à 30 secondes, surchargeable via `YOUTUBE_HELPER_SOCKET_TIMEOUT`.
+Laissé à lui-même, yt-dlp hérite du défaut de Python, à savoir aucun délai du
+tout : une connexion à demi fermée par le serveur distant est alors attendue
+indéfiniment — une récupération de sous-titres a été observée à 0 % de CPU
+pendant neuf minutes, ses sockets en `CLOSE_WAIT` ; seul un `kill` y a mis
+fin. Le dégât va plus loin qu'un appel lent : tous les paliers ci-dessus ne
+s'exécutent qu'une fois la tentative *revenue*. Une lecture non bornée
+neutralise donc l'échelle entière ; la bibliothèque paraît figée au lieu de
+dégradée. C'est la borne qui rend les replis atteignables.
+
+**Un fragment perdu échoue bruyamment.** Le défaut de yt-dlp est d'abandonner
+un fragment HLS/DASH indisponible une fois ses tentatives épuisées, puis de
+finaliser le conteneur quand même : ce qui atterrit sur le disque est un
+fichier valide et lisible, qui annonce honnêtement sa durée raccourcie, si
+bien qu'aucune vérification en aval ne s'en plaint. Ce paquet passe plutôt
+`skip_unavailable_fragments=False` et porte `fragment_retries` à 25, les
+échecs constatés sur le terrain relevant du bridage passager plutôt que de la
+donnée manquante. Définissez `YOUTUBE_HELPER_ALLOW_LOSSY_FRAGMENTS=1` pour
+restaurer le comportement d'origine de yt-dlp, `YOUTUBE_HELPER_FRAGMENT_RETRIES`
+pour régler la patience.
 
 ## Usage légal et éthique
 
@@ -234,6 +271,12 @@ uvicorn youtube_helper.api:app --port 8000
 pip install "youtube-helper[mcp]"
 youtube-helper-mcp
 ```
+
+Il n'y a qu'une seule ligne de commande, bâtie avec `click` :
+`youtube-helper` porte quinze sous-commandes et la surface HTTP les reflète
+une à une, si bien qu'un nom d'option appris au terminal est le nom du champ
+dans le corps JSON. La liste complète est dans les
+[📋 exemples](https://github.com/warith-harchaoui/youtube-helper/blob/main/EXEMPLES.md).
 
 **Banc de téléchargement (GUI)** (`GET /gui`) : une page unique autonome
 (Tailwind via CDN + JS vanilla, sans étape de build). Collez une URL YouTube (ou

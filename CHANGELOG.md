@@ -5,6 +5,46 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Documentation
+
+- **The six reader-facing documents now sit on the suite's shared spine**
+  (CODING.md rules 16-18). `## Usage` became `## Quick start` /
+  `## Prise en main rapide` in README/LISEZMOI, so Installation is followed by
+  the quick start and the file still ends on Author → Acknowledgements →
+  License; `## Documentation` stays early, where sixteen of the seventeen
+  members put it. LANDSCAPE/PAYSAGE gained the
+  missing `## Sources and as-of date` / `## Sources et date de relevé`, where
+  every competitor version and date is read from that project's own PyPI
+  metadata on a named day rather than asserted. EXAMPLES/EXEMPLES gained
+  `## Command line` / `## Ligne de commande`, their examples are now
+  `## 1.`-numbered scenarios, and `## Caveats` became `## Troubleshooting` /
+  `## Dépannage`.
+
+- **Three stale or wrong claims removed from the documents.** The README
+  advertised `v2.4.1` at version 2.7.0. The "Download resilience" ladder listed
+  four tiers and omitted the player-client rung added in 2.4.0, so it described
+  a chain the code stopped using, and it scoped itself to
+  `youtube_helper.main` when `streaming` and `branding` have routed through
+  `_run_ytdlp` since 2.3.0/2.4.1. The examples offered
+  `is_short(video_engagement(url))`, which cannot work: `is_short` reads raw
+  yt-dlp keys, and the normalised dict spells the duration `duration_seconds`,
+  so the ≤ 60 s test silently never fires. The documents now point at
+  `video_engagement(url)["kind"]` instead.
+
+- **The quick start ran into a dependency the package does not declare.** It
+  ended on `audio_helper.load_audio`, which decodes to a torch tensor and so
+  raises `ImportError` asking for `audio-helper[demucs]` on a plain install.
+  Replaced with `get_audio_duration`, and the two output lines it prints are
+  measured on this repo's own `yt_tests/` fixtures rather than recalled.
+
+- **`socket_timeout` is documented at last.** The 30 s bound and
+  `YOUTUBE_HELPER_SOCKET_TIMEOUT` have existed since 2.4.1 without a word in
+  the README, along with the fragment-loss policy and
+  `YOUTUBE_HELPER_PLAYER_CLIENTS`. All three are now described where a reader
+  debugging a hang will look.
+
 ## [2.7.0] - 2026-10-25
 
 ### Changed
