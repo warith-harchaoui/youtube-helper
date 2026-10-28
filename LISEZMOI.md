@@ -51,6 +51,10 @@ Fonctions de **téléchargement (sur disque)**, dans `youtube_helper.main` :
 - `is_short(meta)` / `ensure_recent_ytdlp(min_version)` : fonctions utilitaires.
 - Bâti uniquement sur les métadonnées publiques de yt-dlp : **pas d'API Google Data, pas d'API Vimeo, pas d'OAuth, pas de quota.** En clair, les API officielles des plateformes demandent d'enregistrer une application, d'obtenir des identifiants par OAuth (la poignée de main qui prouve à la plateforme que l'application a le droit d'agir au nom d'un utilisateur), puis de rester sous un quota (un plafond strict du nombre de requêtes autorisées par jour). Lire la même page publique qu'un navigateur affiche n'exige rien de tout cela : ni compte à créer, ni clé à demander, ni plafond quotidien à redouter.
 
+## Comment ça marche
+
+![Comment youtube-helper fonctionne : une URL en entrée, des médias et des métadonnées en sortie, sans clé d'API](https://raw.githubusercontent.com/warith-harchaoui/youtube-helper/main/assets/diagrams/comment-ca-marche.png)
+
 ## Installation
 
 **Prérequis** : **Python 3.10-3.13**, **git**, **yt-dlp** et **ffmpeg**, multiplateforme :

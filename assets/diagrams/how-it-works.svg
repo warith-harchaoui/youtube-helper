@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1226 432" width="1226" height="432" role="img" aria-labelledby="yh-title yh-desc" font-family="Roboto, 'Helvetica Neue', Arial, sans-serif">
+  <title id="yh-title">How youtube-helper works: a URL in, media and metadata out, with no platform API key</title>
+  <desc id="yh-desc">A left-to-right plate. In: a URL from YouTube, Vimeo, DailyMotion, Twitch VOD, SoundCloud or any site yt-dlp supports. The work, in three numbered stages: resolve the page through yt-dlp to a stream catalogue; choose a stream, or resolve a direct media URL without downloading at all; then download the video, the audio or the thumbnail, and pull engagement metadata for the channel, the video, the comments and the subtitles. Out: media files and metadata, with no API key anywhere. Underneath, the core object reached through the four surfaces every member exposes.</desc>
+  <style>
+    .panel      { fill: #ffffff; stroke: #d6d6d6; stroke-width: 1.5; }
+    .panel-label{ fill: #6b6b6b; font-size: 13px; font-weight: 600; letter-spacing: .08em; }
+    .io         { fill: #F8F8F8; stroke: #9a9a9a; stroke-width: 1.5; }
+    .stage      { fill: #FFF4E0; stroke: #FF9500; stroke-width: 1.5; }
+    .core       { fill: #007AFF; stroke: #0062CC; stroke-width: 1.5; }
+    .surface    { fill: #EAF3FF; stroke: #007AFF; stroke-width: 1.5; }
+    .n-title    { font-size: 15px; font-weight: 600; fill: #111111; }
+    .n-sub      { font-size: 12px; fill: #5a5a5a; }
+    .on-dark    { fill: #ffffff; font-size: 15px; font-weight: 600; }
+    .on-dark-sub{ fill: #d8e8ff; font-size: 12px; }
+    .flow       { fill: none; stroke: #9a9a9a; stroke-width: 2; }
+    .tie        { fill: none; stroke: #007AFF; stroke-width: 1.5; }
+    .caption    { font-size: 12.5px; fill: #5a5a5a; font-style: italic; }
+    .step       { font-size: 11px; font-weight: 700; fill: #B26A00;
+                  font-family: 'Roboto Mono', ui-monospace, monospace; }
+    .surf-label { font-size: 13px; font-weight: 600; fill: #0062CC; }
+
+    @media (prefers-color-scheme: dark) {
+      .panel      { fill: #1b1b1d; stroke: #3a3a3d; }
+      .panel-label{ fill: #a0a0a6; }
+      .io         { fill: #2a2a2e; stroke: #6f6f76; }
+      .stage      { fill: #3a2d12; stroke: #FF9500; }
+      .surface    { fill: #10243d; stroke: #4da2ff; }
+      .n-title    { fill: #f2f2f4; }
+      .n-sub      { fill: #b4b4ba; }
+      .flow       { stroke: #7a7a82; }
+      .tie        { stroke: #4da2ff; }
+      .caption    { fill: #a0a0a6; }
+      .step       { fill: #FFCC00; }
+      .surf-label { fill: #4da2ff; }
+    }
+  </style>
+  <defs><marker id="ah-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#9a9a9a"/></marker></defs>
+  <text class="panel-label" x="28" y="40">IN</text>
+  <rect class="io" x="28" y="87" width="200" height="78" rx="10"/>
+  <text class="n-title" x="128" y="120" text-anchor="middle">a URL</text>
+  <text class="n-sub" x="128" y="139" text-anchor="middle">YouTube, Vimeo, Twitch, …</text>
+  <path class="flow" d="M234 126 H250" marker-end="url(#ah-arrow)"/>
+  <rect class="panel" x="254" y="54" width="746" height="144" rx="12"/>
+  <text class="panel-label" x="274" y="76">WHAT IT DOES</text>
+  <rect class="stage" x="274" y="94" width="171" height="78" rx="10"/>
+  <text class="n-title" x="360" y="127" text-anchor="middle">resolve</text>
+  <text class="n-sub" x="360" y="146" text-anchor="middle">yt-dlp reads the page</text>
+  <text class="step" x="285" y="110">1</text>
+  <path class="flow" d="M450 133 H466" marker-end="url(#ah-arrow)"/>
+  <rect class="stage" x="472" y="94" width="219" height="78" rx="10"/>
+  <text class="n-title" x="581" y="127" text-anchor="middle">choose a stream</text>
+  <text class="n-sub" x="581" y="146" text-anchor="middle">or just resolve a direct URL</text>
+  <text class="step" x="483" y="110">2</text>
+  <path class="flow" d="M695 133 H711" marker-end="url(#ah-arrow)"/>
+  <rect class="stage" x="717" y="94" width="263" height="78" rx="10"/>
+  <text class="n-title" x="848" y="127" text-anchor="middle">download + read</text>
+  <text class="n-sub" x="848" y="146" text-anchor="middle">video, audio, thumbnail, engagement</text>
+  <text class="step" x="728" y="110">3</text>
+  <path class="flow" d="M1006 126 H1022" marker-end="url(#ah-arrow)"/>
+  <text class="panel-label" x="1026" y="40">OUT</text>
+  <rect class="io" x="1026" y="87" width="172" height="78" rx="10"/>
+  <text class="n-title" x="1112" y="120" text-anchor="middle">media + metadata</text>
+  <text class="n-sub" x="1112" y="139" text-anchor="middle">no platform API key</text>
+  <rect class="core" x="398" y="232" width="431" height="54" rx="10"/>
+  <text class="on-dark" x="613" y="253" text-anchor="middle">one library, called the same way everywhere</text>
+  <text class="on-dark-sub" x="613" y="272" text-anchor="middle">os-helper underneath for logging and file management</text>
+  <path class="tie" d="M613 286 V314 H349 V332"/>
+  <path class="tie" d="M613 314 H877 V332"/>
+  <path class="tie" d="M349 314 V332"/>
+  <rect class="surface" x="274" y="332" width="150" height="46" rx="9"/>
+  <text class="surf-label" x="349" y="360" text-anchor="middle">Python API</text>
+  <path class="tie" d="M525 314 V332"/>
+  <rect class="surface" x="450" y="332" width="150" height="46" rx="9"/>
+  <text class="surf-label" x="525" y="360" text-anchor="middle">CLI (click)</text>
+  <path class="tie" d="M701 314 V332"/>
+  <rect class="surface" x="626" y="332" width="150" height="46" rx="9"/>
+  <text class="surf-label" x="701" y="360" text-anchor="middle">FastAPI + MCP</text>
+  <path class="tie" d="M877 314 V332"/>
+  <rect class="surface" x="802" y="332" width="150" height="46" rx="9"/>
+  <text class="surf-label" x="877" y="360" text-anchor="middle">agent skill</text>
+  <text class="caption" x="613" y="412" text-anchor="middle">No platform API key is involved: the engagement figures are read from the page yt-dlp already fetched, not from a quota'd endpoint.</text>
+</svg>

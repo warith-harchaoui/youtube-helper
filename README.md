@@ -51,6 +51,10 @@ YouTube Helper is battle-tested: every change ships through automated tests and 
 - `is_short(meta)` / `ensure_recent_ytdlp(min_version)`: helpers.
 - Built on yt-dlp's public metadata only: **no Google Data API, no Vimeo API, no OAuth, no quota.** In plain terms, the official platform APIs require you to register an application, obtain credentials through OAuth (the login handshake that proves your app is allowed to act on a user's behalf), and stay under a quota (a hard cap on how many requests you can make per day). Reading the same public page a browser sees needs none of that: no account to register, no key to request, no daily ceiling to run into.
 
+## How it works
+
+![How youtube-helper works: a URL in, media and metadata out, with no platform API key](https://raw.githubusercontent.com/warith-harchaoui/youtube-helper/main/assets/diagrams/how-it-works.png)
+
 ## Installation
 
 **Prerequisites**: **Python 3.10-3.13**, **git**, **yt-dlp**, and **ffmpeg**, cross-platform:
