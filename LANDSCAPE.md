@@ -129,3 +129,15 @@ against a competitor. Where a comparison would need such a number, the prose
 argues from design instead — a stated API shape, a documented quota, a release
 date — because a benchmark that cannot be re-run is worth less than no
 benchmark at all.
+
+## Ideas worth stealing
+
+Researched rather than guessed: what each neighbour does better, and what this library would have to change to match it. Nothing here is a commitment — it is the reading list the next version starts from.
+
+- **`streamlink` — live media is a different question, and should have a different call** — A live broadcast never finishes downloading, so a download call on one blocks forever. The Rust twin here already separates download from resolve for exactly that reason; `streamlink` is the neighbour that treats live as the primary case.
+
+- **`yt-dlp`'s format-selection language, surfaced rather than wrapped away** — A fixed set of quality presets covers the common case and blocks the uncommon one. Passing a format expression through, documented, costs one parameter and removes the ceiling.
+
+- **`gallery-dl` — per-site configuration and postprocessors** — A declarative config per host, with postprocessors attached, is how a downloader stays useful across sites that behave differently without growing a special case per site in the code.
+
+- **`scrapetube` — enumerate a channel or playlist without an API key** — Listing what is in a channel is a separate need from fetching one video, and it currently falls outside this library. It is also the cheap half: metadata without a download.

@@ -138,3 +138,15 @@ taux de réussite à ceux d'un concurrent. Là où la comparaison exigerait un t
 chiffre, le texte argumente par la conception — une forme d'API annoncée, un
 quota documenté, une date de publication — car un banc d'essai qu'on ne peut
 pas rejouer vaut moins que pas de banc d'essai du tout.
+
+## Idées à reprendre
+
+Étudié plutôt que deviné : ce que chaque voisin fait mieux, puis ce que cette bibliothèque devrait changer pour l'égaler. Rien ici n'est un engagement : c'est la liste de lecture dont part la version suivante.
+
+- **`streamlink` — le direct est une autre question, qui mérite un autre appel** — Une diffusion en direct ne finit jamais de se télécharger : un appel de téléchargement dessus bloque indéfiniment. Le jumeau Rust d'ici sépare déjà télécharger de résoudre pour cette raison exacte ; `streamlink` est le voisin qui traite le direct comme le cas principal.
+
+- **Le langage de sélection de format de `yt-dlp`, exposé plutôt qu'enveloppé** — Un jeu fixe de préréglages de qualité couvre le cas courant puis bloque le cas rare. Laisser passer une expression de format, documentée, coûte un paramètre puis supprime le plafond.
+
+- **`gallery-dl` — configuration par site avec post-traitements** — Une config déclarative par hôte, dotée de post-traitements, est la façon dont un téléchargeur reste utile sur des sites au comportement différent sans faire croître un cas particulier par site dans le code.
+
+- **`scrapetube` — énumérer une chaîne ou une playlist sans clé d'API** — Lister le contenu d'une chaîne est un besoin distinct de récupérer une vidéo, puis cela tombe aujourd'hui hors de cette bibliothèque. C'est aussi la moitié bon marché : des métadonnées sans téléchargement.
