@@ -28,7 +28,7 @@ classifiers = [
     "Topic :: Internet :: WWW/HTTP",
 ]
 dependencies = [
-    "os-helper>=2.6.0,<4",
+    "os-helper>=2.6.0,<5",
     "audio-helper>=2.0.0,<3",
     "video-helper>=2.0.0,<3",
     "yt-dlp>=2024.12.23",
