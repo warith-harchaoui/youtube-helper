@@ -210,16 +210,11 @@ de plus en plus intrusifs :
 Si tous les paliers échouent, l'erreur d'origine de la dernière tentative
 est levée.
 
-**Toute lecture est bornée.** Le même goulot fixe le `socket_timeout` de
-yt-dlp à 30 secondes, surchargeable via `YOUTUBE_HELPER_SOCKET_TIMEOUT`.
-Laissé à lui-même, yt-dlp hérite du défaut de Python, à savoir aucun délai du
-tout : une connexion à demi fermée par le serveur distant est alors attendue
-indéfiniment — une récupération de sous-titres a été observée à 0 % de CPU
-pendant neuf minutes, ses sockets en `CLOSE_WAIT` ; seul un `kill` y a mis
-fin. Le dégât va plus loin qu'un appel lent : tous les paliers ci-dessus ne
-s'exécutent qu'une fois la tentative *revenue*. Une lecture non bornée
-neutralise donc l'échelle entière ; la bibliothèque paraît figée au lieu de
-dégradée. C'est la borne qui rend les replis atteignables.
+**Toute lecture est bornée.** Le même goulot fixe le `socket_timeout` de yt-dlp à 30 secondes, surchargeable via `YOUTUBE_HELPER_SOCKET_TIMEOUT`.
+
+Laissé à lui-même, yt-dlp hérite du défaut de Python, à savoir aucun délai du tout : une connexion à demi fermée par le serveur distant est alors attendue indéfiniment. Une récupération de sous-titres a été observée à 0 % de CPU pendant neuf minutes, ses sockets en `CLOSE_WAIT` ; seul un `kill` y a mis fin.
+
+Le dégât va plus loin qu'un appel lent. Tous les paliers de l'échelle ci-dessus ne s'exécutent qu'une fois la tentative *revenue* — une lecture non bornée neutralise donc l'échelle entière, puis la bibliothèque paraît figée au lieu de dégradée. C'est la borne qui rend les replis atteignables.
 
 **Un fragment perdu échoue bruyamment.** Le défaut de yt-dlp est d'abandonner
 un fragment HLS/DASH indisponible une fois ses tentatives épuisées, puis de
@@ -238,18 +233,16 @@ YouTube Helper est un wrapper léger autour de `yt-dlp` et `ffmpeg`. Vous êtes 
 
 ## Exposition multi-surface
 
-`youtube-helper` n'est pas seulement une bibliothèque : les mêmes
-fonctions sont exposées via une interface en ligne de commande (CLI,
-un programme qu'on pilote en tapant des commandes plutôt qu'en écrivant
-du Python), une surface HTTP FastAPI (ces mêmes fonctions accessibles par
-le réseau comme un petit service web), des outils MCP (le Model Context
-Protocol, une norme qui permet à un agent d'intelligence artificielle
-d'appeler directement les fonctions d'un programme, de la même façon
-qu'un humain les appellerait en ligne de commande) et une interface
-graphique dans le navigateur (une page à cliquer). Quatre portes
-d'entrée vers le même code sous-jacent, pour qu'un script, un service
-web, un agent d'IA et un humain devant son navigateur accèdent tous à
-la même logique de téléchargement.
+`youtube-helper` n'est pas seulement une bibliothèque. Les mêmes fonctions sont exposées par quatre portes de plus :
+
+| Porte | Ce que c'est |
+|---|---|
+| **CLI** | un programme qu'on pilote en tapant des commandes plutôt qu'en écrivant du Python |
+| **Surface HTTP FastAPI** | ces mêmes fonctions accessibles par le réseau, comme un petit service web |
+| **Outils MCP** | le Model Context Protocol : une norme qui permet à un agent d'intelligence artificielle d'appeler directement les fonctions d'un programme, de la même façon qu'un humain les appellerait en ligne de commande |
+| **Interface graphique** | une page à cliquer dans le navigateur |
+
+Quatre portes d'entrée vers le même code sous-jacent, pour qu'un script, un service web, un agent d'IA puis un humain devant son navigateur accèdent tous à la même logique de téléchargement.
 
 ```bash
 # Bibliothèque Python (par défaut)

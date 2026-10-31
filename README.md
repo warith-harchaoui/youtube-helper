@@ -200,14 +200,11 @@ is retried down progressively more invasive tiers:
 
 If every tier fails, the original error from the last attempt is raised.
 
-**Every read is bounded.** The same chokepoint sets yt-dlp's `socket_timeout`
-to 30 seconds, overridable with `YOUTUBE_HELPER_SOCKET_TIMEOUT`. Left to
-itself, yt-dlp inherits Python's default of no timeout at all, so a connection
-the remote has half-closed is waited on forever — a caption fetch was observed
-sitting at 0 % CPU for nine minutes with its sockets in `CLOSE_WAIT`, and only
-a kill ended it. The wider damage is that every tier above runs only once an
-attempt *returns*: an unbounded read disables the whole ladder, and the library
-looks hung rather than degraded. The bound is what keeps the retries reachable.
+**Every read is bounded.** The same chokepoint sets yt-dlp's `socket_timeout` to 30 seconds, overridable with `YOUTUBE_HELPER_SOCKET_TIMEOUT`.
+
+Left to itself, yt-dlp inherits Python's default of no timeout at all, so a connection the remote has half-closed is waited on forever. A caption fetch was observed sitting at 0 % CPU for nine minutes with its sockets in `CLOSE_WAIT`; only a kill ended it.
+
+The wider damage is not one slow call. Every tier of the ladder above runs only once an attempt *returns* — so an unbounded read disables the whole ladder, and the library looks hung rather than degraded. The bound is what keeps the retries reachable.
 
 **A lost fragment fails loudly.** yt-dlp's own default is to drop an
 unavailable HLS/DASH fragment once its retries are spent and finalise the
@@ -225,15 +222,16 @@ YouTube Helper is a thin wrapper around `yt-dlp` and `ffmpeg`. You are responsib
 
 ## Multi-surface exposure
 
-`youtube-helper` is not just a library: the same functions are exposed
-as a command-line interface (CLI, a program you drive by typing commands
-rather than writing Python), a FastAPI HTTP surface (the same functions
-reachable over the network as a small web service), MCP tools (the Model
-Context Protocol, a standard that lets an AI agent call a program's
-functions directly, the same way a human would call them from the command
-line), and a browser GUI (a point-and-click page). Four doors onto the same
-underlying code, so a script, a web service, an AI agent, and a human at a
-browser can all reach the exact same download logic:
+`youtube-helper` is not just a library. The same functions are exposed through four more doors:
+
+| Door | What it is |
+|---|---|
+| **CLI** | a program you drive by typing commands rather than writing Python |
+| **FastAPI HTTP surface** | the same functions reachable over the network, as a small web service |
+| **MCP tools** | the Model Context Protocol: a standard that lets an AI agent call a program's functions directly, the same way a human would call them from the command line |
+| **Browser GUI** | a point-and-click page |
+
+Four doors onto the same underlying code, so a script, a web service, an AI agent and a human at a browser all reach the exact same download logic:
 
 ```bash
 # Python library (default)
