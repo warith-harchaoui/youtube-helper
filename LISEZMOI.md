@@ -16,10 +16,20 @@
 
 [![logo](https://raw.githubusercontent.com/warith-harchaoui/youtube-helper/main/assets/logo.png)](https://deraison.ai/ai-helpers)
 
-YouTube Helper est une bibliothèque Python de fonctions utilitaires pour télécharger vidéos, audio et vignettes depuis des plateformes comme YouTube, Vimeo et DailyMotion. Le téléchargement proprement dit passe par `yt-dlp`, un outil libre qui sait déjà parler à des centaines de sites vidéo, chacun avec ses propres particularités ; youtube-helper l'enveloppe dans une interface Python unique, pour qu'on n'ait jamais à apprendre ces particularités soi-même.
-Elle gère aussi le post-traitement : conversion ou fusion de fichiers média avec `ffmpeg`, l'outil en ligne de commande de référence pour lire, convertir et combiner audio et vidéo.
+YouTube Helper est une bibliothèque Python de fonctions utilitaires pour télécharger vidéos, audio puis vignettes depuis des plateformes comme YouTube, Vimeo ou DailyMotion.
 
-YouTube Helper est éprouvé en production. Chaque changement passe par des tests automatisés et une intégration continue avant d'atteindre PyPI ; les versions suivent le [versionnage sémantique](https://semver.org/lang/fr/) (actuellement `v2.7.0`). [`podcast-helper`](https://github.com/warith-harchaoui/podcast-helper), un autre paquet publié de la suite, s'appuie directement dessus en production. YouTube Helper repose lui-même sur [`os-helper`](https://github.com/warith-harchaoui/os-helper) (le socle commun que chaque bibliothèque de la suite utilise pour la journalisation et la gestion des fichiers), sur [`audio-helper`](https://github.com/warith-harchaoui/audio-helper) et sur [`video-helper`](https://github.com/warith-harchaoui/video-helper) pour l'étape de conversion qui suit la récupération du média brut par `yt-dlp`. C'est ce que « éprouvé en production » veut dire ici : pas une promesse, mais un graphe de dépendances sur lequel repose déjà du code publié, dans les deux sens autour de ce paquet.
+Le téléchargement proprement dit passe par `yt-dlp`, un outil libre qui sait déjà parler à des centaines de sites vidéo, chacun avec ses propres particularités. youtube-helper l'enveloppe dans une interface Python unique, pour qu'on n'ait jamais à apprendre ces particularités soi-même.
+
+Elle couvre aussi le post-traitement : conversion puis fusion de fichiers média avec `ffmpeg`, l'outil en ligne de commande de référence pour lire, convertir, combiner audio avec vidéo.
+
+YouTube Helper est éprouvé en production. Chaque changement passe par des tests automatisés puis une intégration continue avant d'atteindre PyPI ; les versions suivent le [versionnage sémantique](https://semver.org/lang/fr/) (actuellement `v2.7.0`).
+
+Il s'inscrit dans un graphe de dépendances sur lequel du code publié repose déjà, dans les deux sens :
+
+- en aval, [`podcast-helper`](https://github.com/warith-harchaoui/podcast-helper) — un autre paquet publié de la suite — s'appuie directement dessus en production ;
+- en amont, il repose sur [`os-helper`](https://github.com/warith-harchaoui/os-helper) (le socle commun que chaque bibliothèque de la suite utilise pour la journalisation puis la gestion des fichiers), avec [`audio-helper`](https://github.com/warith-harchaoui/audio-helper) puis [`video-helper`](https://github.com/warith-harchaoui/video-helper) pour l'étape de conversion qui suit la récupération du média brut par `yt-dlp`.
+
+C'est ce que « éprouvé en production » veut dire ici : pas une promesse, mais un graphe sur lequel d'autre code tient.
 
 ## Documentation
 
@@ -49,7 +59,12 @@ Fonctions de **téléchargement (sur disque)**, dans `youtube_helper.main` :
 - `video_subtitles(url, output_dir, langs=("fr","en"))` : téléchargement automatique de sous-titres.
 - `video_comments(url, max_count, cookies_from_browser="firefox"|"chrome"|...)` : échantillon de commentaires.
 - `is_short(meta)` / `ensure_recent_ytdlp(min_version)` : fonctions utilitaires.
-- Bâti uniquement sur les métadonnées publiques de yt-dlp : **pas d'API Google Data, pas d'API Vimeo, pas d'OAuth, pas de quota.** En clair, les API officielles des plateformes demandent d'enregistrer une application, d'obtenir des identifiants par OAuth (la poignée de main qui prouve à la plateforme que l'application a le droit d'agir au nom d'un utilisateur), puis de rester sous un quota (un plafond strict du nombre de requêtes autorisées par jour). Lire la même page publique qu'un navigateur affiche n'exige rien de tout cela : ni compte à créer, ni clé à demander, ni plafond quotidien à redouter.
+- Bâti uniquement sur les métadonnées publiques de yt-dlp : **pas d'API Google Data, pas d'API Vimeo, pas d'OAuth, pas de quota.** Les API officielles des plateformes demandent trois choses avant toute lecture :
+  - enregistrer une application ;
+  - obtenir des identifiants par OAuth — la poignée de main qui prouve à la plateforme que l'application a le droit d'agir au nom d'un utilisateur ;
+  - rester sous un quota — un plafond strict du nombre de requêtes autorisées par jour.
+
+  Lire la même page publique qu'un navigateur affiche n'exige rien de tout cela : ni compte à créer, ni clé à demander, ni plafond quotidien à redouter.
 
 ## Comment ça marche
 
@@ -160,52 +175,17 @@ de plus en plus intrusifs :
 2. **User-Agent navigateur** : nouvelle tentative avec un User-Agent Chrome
    de bureau complet et à jour, ainsi que les en-têtes correspondants.
    Surchargeable via la variable d'environnement `YOUTUBE_HELPER_USER_AGENT`.
-3. **Un autre client YouTube** : `web_embedded`, puis `tv`, `android_vr`, puis
-   `mweb` — une tentative chacun. YouTube sert plusieurs applications et ne
-   leur applique pas les mêmes contrôles : une vidéo refusée à un client passe
-   souvent pour un autre. Ce palier précède les deux suivants parce qu'il ne
-   coûte rien, ne lit les données privées de personne et ne passe par aucun
-   tiers ; `web_embedded` n'expose en plus aucun flux HLS, ce qui compte car
-   YouTube bride le HLS fragmenté bien plus durement qu'un format https
-   direct. Surchargez la chaîne via `YOUTUBE_HELPER_PLAYER_CLIENTS`
-   (séparée par des virgules, vide désactive le palier) ou épinglez un client
-   avec `default_ytdlp_options(player_clients=[...])` : dans ce cas l'échelle
-   respecte votre choix.
-4. **Cookies du navigateur** (opt-in, ignoré par défaut) : nouvelle
-   tentative avec les cookies de session récupérés directement dans le
-   profil d'un navigateur local (mécanisme `--cookies-from-browser` de
-   yt-dlp). En pratique, c'est ce palier qui fait vraiment sauter le
-   contrôle « Confirmez que vous n'êtes pas un robot » de YouTube — un
-   User-Agent navigateur seul n'y suffit pas, ni Tor (les nœuds de sortie
-   Tor sont eux-mêmes souvent signalés). Lire le trousseau de cookies
-   d'une autre application est suffisamment intrusif pour que cela ne se
-   produise jamais silencieusement : définissez
-   `YOUTUBE_HELPER_COOKIES_FROM_BROWSER` avec un nom de navigateur reconnu
-   par yt-dlp (`chrome`, `firefox`, `edge`, `brave`, `opera`, `vivaldi`,
-   `safari`, `whale`, `chromium`) pour l'activer. Le trousseau de cookies
-   de Safari nécessite en plus l'accès complet au disque (Full Disk
-   Access) accordé au processus/terminal appelant sur macOS, sans quoi
-   l'extraction lève « Operation not permitted » ; Chrome/Firefox n'ont
-   besoin d'aucune autorisation particulière.
-5. **Tor** : nouvelle tentative via un proxy SOCKS Tor local. Tor fait
-   passer la requête par une chaîne de relais avant qu'elle n'atteigne le
-   site visé, si bien que le site voit une adresse IP différente, sans
-   rapport avec la vôtre ; un blocage fondé sur votre IP ne s'applique
-   alors plus. Un proxy SOCKS est simplement un point de relais local
-   auquel un programme peut confier son trafic plutôt que de se connecter
-   directement, c'est ainsi qu'une application transmet ses requêtes à
-   Tor. Configuré par défaut en `socks5h://127.0.0.1:9050` (la résolution
-   DNS, c'est-à-dire la traduction d'un nom de site en adresse IP, passe
-   elle aussi par Tor, pour que le nom du site lui-même ne fuite jamais
-   hors du tunnel). Nécessite un démon Tor (le processus en arrière-plan
-   qui fait tourner la chaîne de relais) lancé localement : voir les
-   commandes d'installation par OS dans la section
-   [Installation](#installation). Surchargeable via
-   `YOUTUBE_HELPER_TOR_PROXY`. Conservé en dernier recours pour les
-   environnements sans navigateur connecté auprès duquel emprunter des
-   cookies — les nœuds de sortie Tor étant eux-mêmes souvent signalés, ce
-   n'est pas un correctif fiable en premier lieu pour ce contrôle
-   anti-robot.
+3. **Un autre client YouTube** : `web_embedded`, puis `tv`, `android_vr`, puis `mweb` — une tentative chacun. YouTube sert plusieurs applications sans leur appliquer les mêmes contrôles : une vidéo refusée à un client passe souvent pour un autre.
+   - **Pourquoi ce palier précède les deux suivants.** Il ne coûte rien, ne lit les données privées de personne, ne passe par aucun tiers. `web_embedded` n'expose en plus aucun flux HLS, ce qui compte car YouTube bride le HLS fragmenté bien plus durement qu'un format https direct.
+   - **Surcharges.** `YOUTUBE_HELPER_PLAYER_CLIENTS` fixe la chaîne (séparée par des virgules ; vide désactive le palier). Épinglez un client avec `default_ytdlp_options(player_clients=[...])` puis l'échelle respecte votre choix.
+4. **Cookies du navigateur** (opt-in, ignoré par défaut) : nouvelle tentative avec les cookies de session récupérés directement dans le profil d'un navigateur local, via le mécanisme `--cookies-from-browser` de yt-dlp.
+   - **Ce que cela débloque.** En pratique, c'est ce palier qui fait vraiment sauter le contrôle « Confirmez que vous n'êtes pas un robot » de YouTube. Un User-Agent navigateur seul n'y suffit pas, Tor non plus — les nœuds de sortie Tor sont eux-mêmes souvent signalés.
+   - **Comment l'activer.** Lire le trousseau de cookies d'une autre application est suffisamment intrusif pour que cela ne se produise jamais silencieusement : définissez `YOUTUBE_HELPER_COOKIES_FROM_BROWSER` avec un nom de navigateur reconnu par yt-dlp (`chrome`, `firefox`, `edge`, `brave`, `opera`, `vivaldi`, `safari`, `whale`, `chromium`).
+   - **Une réserve sous macOS.** Le trousseau de Safari nécessite en plus l'accès complet au disque (Full Disk Access) accordé au processus appelant, sans quoi l'extraction lève « Operation not permitted ». Chrome puis Firefox n'ont besoin d'aucune autorisation particulière.
+5. **Tor** : nouvelle tentative via un proxy SOCKS Tor local.
+   - **Pourquoi cela aide.** Tor fait passer la requête par une chaîne de relais avant qu'elle n'atteigne le site visé, si bien que le site voit une adresse IP différente, sans rapport avec la vôtre : un blocage fondé sur votre IP ne s'applique alors plus. Un proxy SOCKS est simplement un point de relais local auquel un programme peut confier son trafic plutôt que de se connecter directement ; c'est ainsi qu'une application transmet ses requêtes à Tor.
+   - **Configuration.** Par défaut `socks5h://127.0.0.1:9050`, la résolution DNS — la traduction d'un nom de site en adresse IP — passant elle aussi par Tor, pour que le nom du site lui-même ne fuite jamais hors du tunnel. Surchargeable via `YOUTUBE_HELPER_TOR_PROXY`. Nécessite un démon Tor — le processus en arrière-plan qui fait tourner la chaîne de relais — lancé localement : voir les commandes d'installation par OS dans la section [Installation](#installation).
+   - **Pourquoi c'est le dernier palier.** Conservé en dernier recours pour les environnements sans navigateur connecté auprès duquel emprunter des cookies. Les nœuds de sortie Tor étant eux-mêmes souvent signalés, ce n'est pas un correctif fiable en première intention contre le contrôle anti-robot.
 
 Si tous les paliers échouent, l'erreur d'origine de la dernière tentative
 est levée.
@@ -216,20 +196,23 @@ Laissé à lui-même, yt-dlp hérite du défaut de Python, à savoir aucun déla
 
 Le dégât va plus loin qu'un appel lent. Tous les paliers de l'échelle ci-dessus ne s'exécutent qu'une fois la tentative *revenue* — une lecture non bornée neutralise donc l'échelle entière, puis la bibliothèque paraît figée au lieu de dégradée. C'est la borne qui rend les replis atteignables.
 
-**Un fragment perdu échoue bruyamment.** Le défaut de yt-dlp est d'abandonner
-un fragment HLS/DASH indisponible une fois ses tentatives épuisées, puis de
-finaliser le conteneur quand même : ce qui atterrit sur le disque est un
-fichier valide et lisible, qui annonce honnêtement sa durée raccourcie, si
-bien qu'aucune vérification en aval ne s'en plaint. Ce paquet passe plutôt
-`skip_unavailable_fragments=False` et porte `fragment_retries` à 25, les
-échecs constatés sur le terrain relevant du bridage passager plutôt que de la
-donnée manquante. Définissez `YOUTUBE_HELPER_ALLOW_LOSSY_FRAGMENTS=1` pour
-restaurer le comportement d'origine de yt-dlp, `YOUTUBE_HELPER_FRAGMENT_RETRIES`
-pour régler la patience.
+**Un fragment perdu échoue bruyamment.** Le défaut de yt-dlp est d'abandonner un fragment HLS/DASH indisponible une fois ses tentatives épuisées, puis de finaliser le conteneur quand même. Ce qui atterrit sur le disque est alors un fichier valide puis lisible, qui annonce honnêtement sa durée raccourcie — si bien qu'aucune vérification en aval ne s'en plaint.
+
+Ce paquet passe plutôt `skip_unavailable_fragments=False` puis porte `fragment_retries` à 25, les échecs constatés sur le terrain relevant du bridage passager plutôt que de la donnée manquante.
+
+Deux échappatoires : `YOUTUBE_HELPER_ALLOW_LOSSY_FRAGMENTS=1` restaure le comportement d'origine de yt-dlp, `YOUTUBE_HELPER_FRAGMENT_RETRIES` règle la patience.
 
 ## Usage légal et éthique
 
-YouTube Helper est un wrapper léger autour de `yt-dlp` et `ffmpeg`. Vous êtes responsable de la manière dont vous l'utilisez. Ne téléchargez et ne traitez que des contenus que vous possédez, qui sont dans le domaine public, sous licence permissive (par ex. Creative Commons) ou pour lesquels vous avez une autorisation explicite du détenteur des droits. Respectez les Conditions d'Utilisation de chaque plateforme et les lois applicables en matière de droit d'auteur, de vie privée et de protection des données. Les auteurs fournissent cette bibliothèque pour des usages légitimes : archivage personnel, accessibilité, recherche, contenus dont vous détenez les droits, pas pour contourner des contrôles d'accès ou redistribuer du contenu protégé.
+YouTube Helper est un wrapper léger autour de `yt-dlp` puis `ffmpeg`. Vous êtes responsable de la manière dont vous l'utilisez.
+
+Ne téléchargez puis ne traitez que des contenus qui relèvent de l'un de ces cas :
+
+- vous les possédez ;
+- ils relèvent du domaine public ou d'une licence permissive telle que Creative Commons ;
+- vous avez une autorisation explicite du détenteur des droits.
+
+Respectez les Conditions d'Utilisation de chaque plateforme, ainsi que les lois applicables en matière de droit d'auteur, de vie privée puis de protection des données. Les auteurs fournissent cette bibliothèque pour des usages légitimes — archivage personnel, accessibilité, recherche, contenus dont vous détenez les droits — non pour contourner des contrôles d'accès ni redistribuer du contenu protégé.
 
 ## Exposition multi-surface
 
@@ -308,15 +291,11 @@ nommée.
 
 ## Version Rust
 
-Un crate compagnon, [`youtube-helper-rs`](https://github.com/warith-harchaoui/youtube-helper-rs),
-encapsule le même binaire `yt-dlp` depuis Rust plutôt que depuis Python —
-`fetch_metadata` et `download_audio`, rien de plus pour l'instant (pas de
-téléchargement vidéo, de miniatures, de catalogue de flux, de métadonnées
-de chaîne, de sous-titres ni de repli Tor, tous présents ici). L'intérêt :
-un fin wrapper `std::process::Command` avec des résultats typés et une
-énumération d'erreurs `thiserror`, pour qu'un programme Rust qui invoque
-déjà `yt-dlp` obtienne une gestion d'erreurs cohérente et typée, sans le
-moindre runtime Python dans l'image de déploiement.
+Un crate compagnon, [`youtube-helper-rs`](https://github.com/warith-harchaoui/youtube-helper-rs), encapsule le même binaire `yt-dlp` depuis Rust plutôt que depuis Python : `fetch_metadata` puis `download_audio`, rien de plus pour l'instant.
+
+Absents côté Rust, présents ici : le téléchargement vidéo, les miniatures, le catalogue de flux, les métadonnées de chaîne, les sous-titres puis le repli Tor.
+
+L'intérêt : un fin wrapper `std::process::Command` avec des résultats typés puis une énumération d'erreurs `thiserror`, pour qu'un programme Rust qui invoque déjà `yt-dlp` obtienne une gestion d'erreurs cohérente puis typée, sans le moindre runtime Python dans l'image de déploiement.
 
 ## Auteur
  - [Warith HARCHAOUI](https://linkedin.com/in/warith-harchaoui)

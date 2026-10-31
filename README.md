@@ -16,10 +16,20 @@
 
 [![logo](https://raw.githubusercontent.com/warith-harchaoui/youtube-helper/main/assets/logo.png)](https://deraison.ai/ai-helpers)
 
-YouTube Helper is a Python library that provides utility functions for downloading videos, audio, and thumbnails from platforms like YouTube, Vimeo, and DailyMotion. It does the actual fetching through `yt-dlp`, an open-source tool that already knows how to talk to hundreds of video sites, each with its own quirks; youtube-helper wraps it in one consistent Python interface so you never have to learn those quirks yourself.
-It also supports post-processing tasks such as converting or merging media files with `ffmpeg`, the standard command-line tool for reading, converting, and combining audio and video.
+YouTube Helper is a Python library of utility functions for downloading videos, audio and thumbnails from platforms like YouTube, Vimeo and DailyMotion.
 
-YouTube Helper is battle-tested: every change ships through automated tests and continuous integration before it reaches PyPI, versions follow [Semantic Versioning](https://semver.org/) (currently `v2.7.0`), and [`podcast-helper`](https://github.com/warith-harchaoui/podcast-helper), a separate published package in the suite, builds directly on top of it in production. YouTube Helper itself depends on [`os-helper`](https://github.com/warith-harchaoui/os-helper) (the shared foundation package every library in the suite uses for logging and file management), [`audio-helper`](https://github.com/warith-harchaoui/audio-helper), and [`video-helper`](https://github.com/warith-harchaoui/video-helper) for the conversion step after `yt-dlp` fetches the raw media. That is what "battle-tested" means here: not a claim, but a dependency graph other shipped code actually stands on, on both sides of this package.
+The fetching itself goes through `yt-dlp`, an open-source tool that already knows how to talk to hundreds of video sites, each with its own quirks. youtube-helper wraps it in one consistent Python interface, so you never have to learn those quirks yourself.
+
+It also covers the post-processing: converting or merging media files with `ffmpeg`, the standard command-line tool for reading, converting and combining audio and video.
+
+YouTube Helper is battle-tested. Every change ships through automated tests and continuous integration before it reaches PyPI, and versions follow [Semantic Versioning](https://semver.org/) (currently `v2.7.0`).
+
+It stands in a dependency graph other shipped code already relies on, in both directions:
+
+- downstream, [`podcast-helper`](https://github.com/warith-harchaoui/podcast-helper) — a separate published package in the suite — builds directly on top of it in production;
+- upstream, it depends on [`os-helper`](https://github.com/warith-harchaoui/os-helper) (the shared foundation every library in the suite uses for logging and file management), plus [`audio-helper`](https://github.com/warith-harchaoui/audio-helper) and [`video-helper`](https://github.com/warith-harchaoui/video-helper) for the conversion step after `yt-dlp` fetches the raw media.
+
+That is what "battle-tested" means here: not a claim, but a graph other code stands on.
 
 ## Documentation
 
@@ -49,7 +59,12 @@ YouTube Helper is battle-tested: every change ships through automated tests and 
 - `video_subtitles(url, output_dir, langs=("fr","en"))`: auto-subtitle download.
 - `video_comments(url, max_count, cookies_from_browser="firefox"|"chrome"|...)`: a comments sample.
 - `is_short(meta)` / `ensure_recent_ytdlp(min_version)`: helpers.
-- Built on yt-dlp's public metadata only: **no Google Data API, no Vimeo API, no OAuth, no quota.** In plain terms, the official platform APIs require you to register an application, obtain credentials through OAuth (the login handshake that proves your app is allowed to act on a user's behalf), and stay under a quota (a hard cap on how many requests you can make per day). Reading the same public page a browser sees needs none of that: no account to register, no key to request, no daily ceiling to run into.
+- Built on yt-dlp's public metadata only: **no Google Data API, no Vimeo API, no OAuth, no quota.** The official platform APIs ask for three things before you read anything:
+  - register an application;
+  - obtain credentials through OAuth — the login handshake that proves your app is allowed to act on a user's behalf;
+  - stay under a quota — a hard cap on how many requests you can make per day.
+
+  Reading the same public page a browser sees needs none of them: no account to register, no key to request, no daily ceiling to run into.
 
 ## How it works
 
@@ -158,45 +173,17 @@ is retried down progressively more invasive tiers:
 2. **Browser User-Agent**: retried with a fully-populated, up-to-date desktop
    Chrome User-Agent and matching headers. Override with the
    `YOUTUBE_HELPER_USER_AGENT` environment variable.
-3. **Another YouTube client**: `web_embedded`, then `tv`, `android_vr`, then
-   `mweb` — one retry each. YouTube serves several apps and does not apply the
-   same checks to all of them, so a video refused for one client often loads
-   for another. This rung comes before the two below because it costs nothing,
-   reads nobody's private data, and routes through no third party;
-   `web_embedded` additionally publishes no HLS at all, which matters because
-   YouTube throttles fragmented HLS far harder than a direct https format.
-   Override the chain with `YOUTUBE_HELPER_PLAYER_CLIENTS` (comma-separated,
-   empty disables the rung), or pin one client with
-   `default_ytdlp_options(player_clients=[...])`, in which case the ladder
-   leaves your choice alone.
-4. **Cookies from browser** (opt-in, skipped by default): retried with
-   session cookies pulled straight from a local browser profile (yt-dlp's
-   `--cookies-from-browser` mechanism). In practice this is the tier that
-   actually clears YouTube's "Sign in to confirm you're not a bot"
-   challenge — a browser User-Agent alone does not, and neither does Tor
-   (exit nodes are themselves commonly flagged). Reading another app's
-   cookie store is invasive enough that it never happens silently: set
-   `YOUTUBE_HELPER_COOKIES_FROM_BROWSER` to a yt-dlp-recognized browser name
-   (`chrome`, `firefox`, `edge`, `brave`, `opera`, `vivaldi`, `safari`,
-   `whale`, `chromium`) to enable it. Safari's cookie store additionally
-   needs Full Disk Access granted to the calling process/terminal on macOS,
-   or extraction raises "Operation not permitted"; Chrome/Firefox need no
-   such grant.
-5. **Tor**: retried again over a local Tor SOCKS proxy. Tor routes the request
-   through a chain of relays before it reaches the site, so the site sees a
-   different, unrelated IP address instead of yours; a block keyed on your IP
-   no longer applies. A SOCKS proxy is simply a local relay point a program
-   can send its traffic through instead of connecting directly, which is how
-   an application hands its requests off to Tor. Configured as
-   `socks5h://127.0.0.1:9050` by default (DNS lookups are routed through Tor
-   too, so the site name itself is never leaked outside the tunnel). Requires
-   a Tor daemon (the background process that runs the relay chain) running
-   locally; see the per-OS install commands under
-   [Installation](#installation). Override the proxy URL with
-   `YOUTUBE_HELPER_TOR_PROXY`. Kept as the last resort for environments with
-   no logged-in browser to borrow cookies from — Tor exit nodes are
-   themselves commonly flagged, so it is not a reliable primary fix for the
-   bot challenge.
+3. **Another YouTube client**: `web_embedded`, then `tv`, `android_vr`, then `mweb` — one retry each. YouTube serves several apps and does not apply the same checks to all of them, so a video refused for one client often loads for another.
+   - **Why it comes before the two below.** It costs nothing, reads nobody's private data, and routes through no third party. `web_embedded` additionally publishes no HLS at all, which matters because YouTube throttles fragmented HLS far harder than a direct https format.
+   - **Overrides.** `YOUTUBE_HELPER_PLAYER_CLIENTS` sets the chain (comma-separated; empty disables the rung). Pin one client with `default_ytdlp_options(player_clients=[...])` and the ladder leaves your choice alone.
+4. **Cookies from browser** (opt-in, skipped by default): retried with session cookies pulled straight from a local browser profile, through yt-dlp's `--cookies-from-browser` mechanism.
+   - **What it fixes.** In practice this is the tier that actually clears YouTube's "Sign in to confirm you're not a bot" challenge. A browser User-Agent alone does not, and neither does Tor — exit nodes are themselves commonly flagged.
+   - **How to enable it.** Reading another app's cookie store is invasive enough that it never happens silently: set `YOUTUBE_HELPER_COOKIES_FROM_BROWSER` to a yt-dlp-recognized browser name (`chrome`, `firefox`, `edge`, `brave`, `opera`, `vivaldi`, `safari`, `whale`, `chromium`).
+   - **One macOS caveat.** Safari's cookie store also needs Full Disk Access granted to the calling process or terminal, or extraction raises "Operation not permitted". Chrome and Firefox need no such grant.
+5. **Tor**: retried again over a local Tor SOCKS proxy.
+   - **Why it helps.** Tor routes the request through a chain of relays before it reaches the site, so the site sees a different, unrelated IP address instead of yours, and a block keyed on your IP no longer applies. A SOCKS proxy is simply a local relay point a program can send its traffic through instead of connecting directly, which is how an application hands its requests off to Tor.
+   - **Configuration.** `socks5h://127.0.0.1:9050` by default, with DNS lookups routed through Tor too, so the site name itself is never leaked outside the tunnel. Override the proxy URL with `YOUTUBE_HELPER_TOR_PROXY`. Requires a Tor daemon — the background process that runs the relay chain — running locally; see the per-OS install commands under [Installation](#installation).
+   - **Why it is the last rung.** Kept as the last resort for environments with no logged-in browser to borrow cookies from. Tor exit nodes are themselves commonly flagged, so it is not a reliable primary fix for the bot challenge.
 
 If every tier fails, the original error from the last attempt is raised.
 
@@ -206,19 +193,23 @@ Left to itself, yt-dlp inherits Python's default of no timeout at all, so a conn
 
 The wider damage is not one slow call. Every tier of the ladder above runs only once an attempt *returns* — so an unbounded read disables the whole ladder, and the library looks hung rather than degraded. The bound is what keeps the retries reachable.
 
-**A lost fragment fails loudly.** yt-dlp's own default is to drop an
-unavailable HLS/DASH fragment once its retries are spent and finalise the
-container anyway, so what lands on disk is a valid, playable file that honestly
-reports its shorter duration and no downstream check objects. This package
-passes `skip_unavailable_fragments=False` and raises `fragment_retries` to 25
-instead, since the failures seen in the field were transient throttling rather
-than missing data. Set `YOUTUBE_HELPER_ALLOW_LOSSY_FRAGMENTS=1` to restore
-yt-dlp's skip-and-continue behaviour, `YOUTUBE_HELPER_FRAGMENT_RETRIES` to
-change the patience.
+**A lost fragment fails loudly.** yt-dlp's own default is to drop an unavailable HLS/DASH fragment once its retries are spent and finalise the container anyway. What lands on disk is then a valid, playable file that honestly reports its shorter duration — and no downstream check objects.
+
+This package passes `skip_unavailable_fragments=False` and raises `fragment_retries` to 25 instead, since the failures seen in the field were transient throttling rather than missing data.
+
+Two escape hatches: `YOUTUBE_HELPER_ALLOW_LOSSY_FRAGMENTS=1` restores yt-dlp's skip-and-continue behaviour, and `YOUTUBE_HELPER_FRAGMENT_RETRIES` changes the patience.
 
 ## Legal and Ethical Use
 
-YouTube Helper is a thin wrapper around `yt-dlp` and `ffmpeg`. You are responsible for how you use it. Only download or process media that you own, that is in the public domain or under a permissive license (e.g. Creative Commons), or for which you have explicit permission from the rights holder. Respect each platform's Terms of Service and any applicable copyright, privacy, and data-protection laws in your jurisdiction. The authors provide this library for legitimate uses such as personal archiving, accessibility, research, and content you have rights to, not for circumventing access controls or redistributing copyrighted material.
+YouTube Helper is a thin wrapper around `yt-dlp` and `ffmpeg`. You are responsible for how you use it.
+
+Only download or process media that falls into one of these:
+
+- you own it;
+- it is in the public domain, or under a permissive licence such as Creative Commons;
+- you have explicit permission from the rights holder.
+
+Respect each platform's Terms of Service, and any applicable copyright, privacy and data-protection laws in your jurisdiction. The authors provide this library for legitimate uses — personal archiving, accessibility, research, content you have rights to — not for circumventing access controls or redistributing copyrighted material.
 
 ## Multi-surface exposure
 
