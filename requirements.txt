@@ -9,9 +9,9 @@
 # Suite pins are kept in lock-step with their release tags below.
 
 # --- Suite dependencies ---------------------------------------------------
-os-helper>=2.4.0,<5
-audio-helper>=1.5.5
-video-helper>=1.6.3
+os-helper>=2.6.0,<5
+audio-helper>=2.0.0,<3
+video-helper>=2.0.0,<3
 # --- Core runtime ---------------------------------------------------------
 click>=8.1,<9
 yt-dlp>=2024.12.23
