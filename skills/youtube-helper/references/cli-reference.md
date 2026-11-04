@@ -65,11 +65,14 @@ youtube-helper comments         --url URL [--max 100] [--cookies-from-browser BR
 
 `engagement` returns views, likes and comment count for one video;
 `engagement-batch` does the same across a list of URLs in one run — repeat
-`--urls` once per video. Prefer the batch form over a shell loop: it reuses the
-extractor session.
+`--urls` once per video. Prefer the batch form over a shell loop: one process,
+one JSON array, and a URL that fails becomes an `{"url": …, "_error": …}`
+entry instead of aborting the run.
 
-`is_short` (library) tells you whether a URL is a YouTube Short, which is often
-the branch you actually want.
+`is_short(meta)` (library only) tells you whether a video looks like a YouTube
+Short, which is often the branch you actually want. It takes a raw yt-dlp info
+dict such as `video_url_meta_data(url)`, not a URL, and is a heuristic: 60 s
+or less, a `/shorts/` URL, or a `#shorts` tag.
 
 ## Output contract
 

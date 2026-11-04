@@ -640,9 +640,11 @@ def download_audio(url: str, output_path: str = None, target_sample_rate: int = 
 
     Notes
     -----
-    This function uses yt-dlp to download the best quality audio from the given URL. It handles
-    different output formats and ensures the audio is saved with the desired sample rate using a
-    conversion step if necessary.
+    This function uses yt-dlp to download the best quality audio from the given URL. When the
+    extension yt-dlp delivers (``.webm`` / ``.m4a`` on YouTube) differs from ``output_path``'s,
+    the file is converted through ``audio_helper.sound_converter``: ``target_sample_rate`` is
+    applied there and the result is **mono**. When the extensions match, the file is copied
+    untouched and keeps the source's rate and channels.
     """
     if osh.emptystring(output_path):
         metadata = video_url_meta_data(url)

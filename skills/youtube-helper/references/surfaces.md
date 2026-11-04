@@ -7,7 +7,7 @@ import youtube_helper as yh
 ```
 
 Public API (`youtube_helper.__all__`): `default_ytdlp_options`,
-`video_url_meta_data`, `is_valid_video_url`, `download_thumbnail`,
+`height_capped_format`, `video_url_meta_data`, `is_valid_video_url`, `download_thumbnail`,
 `download_audio`, `download_video`, `resolve_direct_url`, `DirectMediaURL`,
 `list_video_streams`, `pick_video_stream`, `VideoStreamInfo`,
 `extract_frames_stream`, `channel_info`, `channel_videos`, `video_engagement`,
@@ -34,7 +34,7 @@ Logging and file management route through `os_helper` — the suite convention.
 
 ```bash
 pip install 'youtube-helper[api]'
-python -m youtube_helper.api        # 127.0.0.1:8000, OpenAPI docs at /docs
+uvicorn youtube_helper.api:app --port 8000   # OpenAPI docs at /docs
 ```
 
 One route per operation: `/metadata`, `/valid`, `/resolve`, `/list-streams`,
@@ -42,7 +42,9 @@ One route per operation: `/metadata`, `/valid`, `/resolve`, `/list-streams`,
 `/engagement-batch`, `/comments`, `/ytdlp-version`, `/video`, `/audio`,
 `/thumbnail`, `/subtitles`, plus `/health`, `/` and `/gui`.
 
-Probing routes return JSON; download routes write locally and report the path.
+Probing routes return JSON. Download routes fetch into a temporary folder on
+the server and send the file back as the response body (`/subtitles` sends a
+ZIP of the `.vtt` files), then delete it; a failed fetch is a 502.
 
 ## 4. MCP — `fastapi-mcp` over the *same* app (`[mcp]`)
 

@@ -91,16 +91,19 @@ qu'il est un média valide, l'appel le journalise et le renvoie au lieu de
 retélécharger.
 
 `download_audio` ne repasse par `audio-helper` que si la sortie de yt-dlp ne
-porte pas déjà l'extension demandée — et `target_sample_rate` s'applique lors
-de cette conversion. Une cible `.wav` ou `.m4a` obtient donc bien la fréquence
-nommée :
+porte pas déjà l'extension demandée ; `target_sample_rate` s'applique lors de
+cette conversion, qui ramène aussi le son en **mono**. yt-dlp rend le conteneur
+audio propre au site (de l'Opus en `.webm` sur YouTube, sinon du `.m4a`) : une
+cible `.mp3` ou `.wav` obtient donc bien la fréquence nommée :
 
 ```python
 yth.download_audio(URL, "bunny-16k.wav", target_sample_rate=16000)
 ```
 
-tandis que demander `.mp3`, ce que yt-dlp rend de toute façon, recopie le
-fichier tel quel, à la fréquence qu'avait la source.
+Mesuré sur Big Buck Bunny : `--output bunny.mp3 --sample-rate 16000` revient
+en MP3 mono à 16 kHz. Seule une cible dont l'extension coïncide avec ce que
+livre yt-dlp (`.webm`, ou `.m4a` quand le site sert de l'AAC) est recopiée
+telle quelle, à la fréquence et au nombre de canaux de la source.
 
 ## 2. Catalogue de flux et sélecteur
 

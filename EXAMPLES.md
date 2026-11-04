@@ -88,16 +88,19 @@ three are idempotent: if that file already exists and is a valid media file,
 the call logs and returns it instead of fetching again.
 
 `download_audio` re-encodes through `audio-helper` only when yt-dlp's output
-does not already carry the extension you asked for — and `target_sample_rate`
-is applied on that conversion step. So a `.wav` or `.m4a` target gets the rate
-you named:
+does not already carry the extension you asked for, and `target_sample_rate`
+is applied on that conversion step, which also downmixes to **mono**. yt-dlp
+hands back the site's own audio container (Opus in `.webm` on YouTube, or
+`.m4a`), so an `.mp3` or `.wav` target gets the rate you named:
 
 ```python
 yth.download_audio(URL, "bunny-16k.wav", target_sample_rate=16000)
 ```
 
-whereas asking for `.mp3`, which is what yt-dlp hands back anyway, copies the
-file through untouched at whatever rate the source had.
+Measured on Big Buck Bunny: `--output bunny.mp3 --sample-rate 16000` came back
+as a 16 kHz mono MP3. Only a target whose extension matches what yt-dlp
+delivered (`.webm`, or `.m4a` when the site serves AAC) is copied through
+untouched, at the source's own rate and channel count.
 
 ## 2. Stream catalog and picker
 
