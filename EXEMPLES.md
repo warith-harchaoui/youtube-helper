@@ -102,7 +102,7 @@ yth.download_audio(URL, "bunny-16k.wav", target_sample_rate=16000)
 
 Mesuré sur Big Buck Bunny : `--output bunny.mp3 --sample-rate 16000` revient
 en MP3 mono à 16 kHz. Seule une cible dont l'extension coïncide avec ce que
-livre yt-dlp (`.webm`, ou `.m4a` quand le site sert de l'AAC) est recopiée
+livre yt-dlp (`.webm` sur YouTube, `.m4a` quand le site sert de l'AAC) est recopiée
 telle quelle, à la fréquence et au nombre de canaux de la source.
 
 ## 2. Catalogue de flux et sélecteur
