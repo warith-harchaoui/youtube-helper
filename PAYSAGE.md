@@ -149,4 +149,4 @@ pas rejouer vaut moins que pas de banc d'essai du tout.
 
 - **`gallery-dl` — configuration par site avec post-traitements** — Une config déclarative par hôte, dotée de post-traitements, est la façon dont un téléchargeur reste utile sur des sites au comportement différent sans faire croître un cas particulier par site dans le code.
 
-- **`scrapetube` — énumérer une chaîne ou une playlist sans clé d'API** — Lister le contenu d'une chaîne est un besoin distinct de récupérer une vidéo, puis cela tombe aujourd'hui hors de cette bibliothèque. C'est aussi la moitié bon marché : des métadonnées sans téléchargement.
+- **`scrapetube` : énumérer une chaîne ou une playlist sans clé d'API.** `channel_videos` liste déjà une chaîne ici, mais paie toujours un second appel yt-dlp par vidéo pour obtenir des likes et des commentaires fiables. Exposer seule la liste à plat (identifiants et titres, un appel par onglet de chaîne) en serait la moitié bon marché ; les playlists, elles, ne sont pas encore couvertes.

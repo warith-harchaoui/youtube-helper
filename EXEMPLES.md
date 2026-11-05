@@ -85,10 +85,10 @@ yth.is_valid_video_url(URL)  # True / False
 ```
 
 Sans `output_path`, l'écriture se fait dans `<titre-ascii>.mp4` (ou `.mp3`, ou
-l'extension de la vignette) à côté de votre répertoire de travail, en chemin
-absolu. Les trois fonctions sont idempotentes : si ce fichier existe déjà et
-qu'il est un média valide, l'appel le journalise et le renvoie au lieu de
-retélécharger.
+`.png` pour la vignette) dans votre répertoire de travail, en chemin absolu.
+Les trois fonctions sont idempotentes : si ce fichier existe déjà (et, pour la
+vidéo comme pour l'audio, s'il est un média valide), l'appel le journalise et
+le renvoie au lieu de retélécharger.
 
 `download_audio` ne repasse par `audio-helper` que si la sortie de yt-dlp ne
 porte pas déjà l'extension demandée ; `target_sample_rate` s'applique lors de
@@ -342,7 +342,7 @@ yth.is_short(yth.video_url_meta_data(URL))  # True / False
 Une seule ligne de commande, bâtie avec `click`, installée sous le nom
 `youtube-helper` par `pip install youtube-helper`. Quinze sous-commandes,
 chaque argument en option nommée. La surface FastAPI reprend les mêmes noms
-un à un :
+un à un, sauf `comments --max`, qui s'appelle `max_count` dans le corps JSON :
 
 ```bash
 youtube-helper metadata       --url https://www.youtube.com/watch?v=YE7VzlLtp-4
@@ -460,9 +460,10 @@ Chaque sous-commande accepte `-h` pour ses propres options.
   plupart des erreurs de « déchiffrement cassé ».
 - **Authentification.** Les vidéos réservées aux membres, à accès limité par
   âge ou privées demandent des cookies. Passez
-  `cookies_from_browser="firefox"` (ou `"chrome"`, `"safari"`) aux fonctions de
-  catalogue, de sélection et de branding ; yt-dlp lit alors la session active
-  du navigateur. Sur macOS, Safari exige en plus l'accès complet au disque
+  `cookies_from_browser="firefox"` (ou `"chrome"`, `"safari"`) à
+  `list_video_streams`, `pick_video_stream`, `extract_frames_stream` ou
+  `video_comments` ; yt-dlp lit alors la session active du navigateur. Les
+  autres appels ne l'empruntent que par `YOUTUBE_HELPER_COOKIES_FROM_BROWSER`. Sur macOS, Safari exige en plus l'accès complet au disque
   accordé à votre terminal, sans quoi l'extraction lève « Operation not
   permitted ».
 - **Les commentaires reviennent vides.** Les fils de commentaires YouTube

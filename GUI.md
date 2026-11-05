@@ -76,7 +76,7 @@ that reads cookies from the selected browser profile.
   triggers a download of the selected format, `c` opens the channel
   comparator with the current video's channel pre-selected.
 - **Colorblind-safe by construction.** All state uses shape + color +
-  text, never color alone (see companion `front-colors` audit skill).
+  text, never color alone (see the companion `sprezzature-colors` audit skill).
 
 ## What we deliberately don't do
 
@@ -89,9 +89,10 @@ that reads cookies from the selected browser profile.
 
 ## Stack
 
-- Front end: TypeScript + Svelte 5 + WaveSurfer.js (audio preview) +
-  Vega-Lite (comparator charts). No React, matching the `front-ui`
-  companion skill's stack.
+- Front end: vanilla ES modules + Tailwind CSS, the stack of the shipped
+  `/gui` page and of the companion `sprezzature-ui` skill, plus
+  WaveSurfer.js (audio preview) and Vega-Lite (comparator charts). No
+  React, no build step.
 - Back end: the FastAPI app already exists (`youtube_helper.api`) and
   covers 100 % of the operations. GUI is a client only.
 - Cache format: SQLite (metadata index) + a `library/` folder for the

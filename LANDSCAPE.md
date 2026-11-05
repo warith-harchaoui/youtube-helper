@@ -140,4 +140,4 @@ Researched rather than guessed: what each neighbour does better, and what this l
 
 - **`gallery-dl` — per-site configuration and postprocessors** — A declarative config per host, with postprocessors attached, is how a downloader stays useful across sites that behave differently without growing a special case per site in the code.
 
-- **`scrapetube` — enumerate a channel or playlist without an API key** — Listing what is in a channel is a separate need from fetching one video, and it currently falls outside this library. It is also the cheap half: metadata without a download.
+- **`scrapetube`: enumerate a channel or playlist without an API key.** `channel_videos` already lists a channel here, but it always pays a second yt-dlp fetch per video to get reliable likes and comments. Exposing the flat listing on its own (IDs and titles, one call per channel tab) would be the cheap half, and playlists are not covered at all yet.

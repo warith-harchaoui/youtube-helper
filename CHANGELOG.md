@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Documentation
+
+- **The Markdown now matches the code it describes.** The Rust companion is
+  described with its four real functions (`resolve_media_url` and
+  `download_audio_with_options` were missing) and its yt-dlp provisioning; the
+  one CLI flag whose HTTP field differs (`comments --max` / `max_count`) is
+  named; `cookies_from_browser=` is listed on the four functions that take it,
+  not on "the branding functions"; an auto-named thumbnail is a `.png`; the
+  skill and the landscape no longer describe a GUI, a channel listing or a
+  second CLI that do not exist as written; the skill uses the suite's `yth`
+  alias; GUI.md points at the sprezzature skills; CONTRIBUTING names the
+  Python 3.10 floor job.
+
 ## [2.7.1] - 2026-11-01
 
 ### Fixed

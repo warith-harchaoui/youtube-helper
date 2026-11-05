@@ -82,10 +82,10 @@ print(meta["title"], meta["duration"], meta["channel"])  # str, int seconds, str
 yth.is_valid_video_url(URL)  # True / False
 ```
 
-Omitting `output_path` writes `<ascii-title>.mp4` (or `.mp3`, or the
-thumbnail's extension) next to your working directory, as an absolute path. All
-three are idempotent: if that file already exists and is a valid media file,
-the call logs and returns it instead of fetching again.
+Omitting `output_path` writes `<ascii-title>.mp4` (or `.mp3`, or `.png` for
+the thumbnail) in your working directory, as an absolute path. All three are
+idempotent: if that file already exists (and, for video and audio, is a valid
+media file), the call logs and returns it instead of fetching again.
 
 `download_audio` re-encodes through `audio-helper` only when yt-dlp's output
 does not already carry the extension you asked for, and `target_sample_rate`
@@ -329,7 +329,8 @@ yth.is_short(yth.video_url_meta_data(URL))  # True / False
 
 One command line, built with `click`, installed as `youtube-helper` by
 `pip install youtube-helper`. Fifteen subcommands, every argument a named flag,
-and the FastAPI surface mirrors the names one-to-one:
+and the FastAPI surface mirrors the names one-to-one (except `comments --max`,
+which is `max_count` in the JSON body):
 
 ```bash
 youtube-helper metadata       --url https://www.youtube.com/watch?v=YE7VzlLtp-4
@@ -441,9 +442,10 @@ is missing, and the two are otherwise interchangeable. Every subcommand takes
   yt-dlp is too old, and `pip install -U yt-dlp` fixes most "broken decryption"
   errors.
 - **Authentication.** Members-only, age-gated, or private videos need cookies.
-  Pass `cookies_from_browser="firefox"` (or `"chrome"`, `"safari"`) to the
-  catalog, picker, or branding functions; yt-dlp reads the active browser
-  session. On macOS, Safari additionally needs Full Disk Access granted to
+  Pass `cookies_from_browser="firefox"` (or `"chrome"`, `"safari"`) to
+  `list_video_streams`, `pick_video_stream`, `extract_frames_stream` or
+  `video_comments`; yt-dlp reads the active browser session. Every other call
+  borrows it only through `YOUTUBE_HELPER_COOKIES_FROM_BROWSER`. On macOS, Safari additionally needs Full Disk Access granted to
   your terminal, or extraction raises "Operation not permitted".
 - **Comments come back empty.** YouTube comment threads almost always need
   `cookies_from_browser` now. Without it you will usually get an empty list or

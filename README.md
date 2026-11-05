@@ -22,7 +22,7 @@ The fetching itself goes through `yt-dlp`, an open-source tool that already know
 
 It also covers the post-processing: converting or merging media files with `ffmpeg`, the standard command-line tool for reading, converting and combining audio and video.
 
-YouTube Helper is battle-tested. Every change ships through automated tests and continuous integration before it reaches PyPI, and versions follow [Semantic Versioning](https://semver.org/) (currently `v2.7.0`).
+YouTube Helper is battle-tested. Every change ships through automated tests and continuous integration before it reaches PyPI, and versions follow [Semantic Versioning](https://semver.org/) (currently `v2.7.1`).
 
 It stands in a dependency graph other shipped code already relies on, in both directions:
 
@@ -251,8 +251,8 @@ youtube-helper-mcp
 
 There is exactly one command line, built with `click`: `youtube-helper` carries
 fifteen subcommands, and the HTTP surface mirrors them one-to-one, so a flag
-name learned in the terminal is the field name in the JSON body. The full list
-is in the
+name learned in the terminal is the field name in the JSON body. One exception:
+`comments --max` arrives over HTTP as `max_count`. The full list is in the
 [📋 examples](https://github.com/warith-harchaoui/youtube-helper/blob/main/EXAMPLES.md).
 
 **Download bench GUI** (`GET /gui`): a single self-contained page (Tailwind via
@@ -288,13 +288,19 @@ the test suite fails if a capability stops being named.
 ## Rust rewrite
 
 A companion crate, [`youtube-helper-rs`](https://github.com/warith-harchaoui/youtube-helper-rs),
-wraps the same `yt-dlp` binary from Rust instead of Python —
-`fetch_metadata` and `download_audio`, nothing more yet (no video download,
-thumbnails, stream catalog, channel metadata, subtitles, or Tor fallback,
-all present here). The interest: it's a thin `std::process::Command`
-wrapper with typed results and a `thiserror` error enum, so a Rust program
-that already shells out to `yt-dlp` gets consistent, typed error handling
-with no Python runtime in the deployment image at all.
+wraps the same `yt-dlp` binary from Rust instead of Python. It offers four
+functions: `fetch_metadata`, `download_audio`, `download_audio_with_options`
+(WAV, MP3, M4A, Opus, FLAC or the source format) and `resolve_media_url`, which
+returns a direct media URL without downloading, live broadcasts included. When
+no `yt-dlp` is on `PATH`, it fetches the official standalone build into the
+user cache (`YOUTUBE_HELPER_NO_AUTO_INSTALL=1` turns that off).
+
+Absent on the Rust side, present here: video download, thumbnails, the stream
+catalog, channel and engagement metadata, subtitles, comments and the retry
+ladder (other clients, cookies, Tor). The interest: a thin
+`std::process::Command` wrapper with typed results and a `thiserror` error
+enum, so a Rust program that already shells out to `yt-dlp` gets consistent,
+typed error handling with no Python runtime in the deployment image at all.
 
 ## Author
  - [Warith HARCHAOUI](https://linkedin.com/in/warith-harchaoui)

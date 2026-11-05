@@ -22,7 +22,7 @@ Le téléchargement proprement dit passe par `yt-dlp`, un outil libre qui sait d
 
 Elle couvre aussi le post-traitement : conversion puis fusion de fichiers média avec `ffmpeg`, l'outil en ligne de commande de référence pour lire, convertir, combiner audio avec vidéo.
 
-YouTube Helper est éprouvé en production. Chaque changement passe par des tests automatisés puis une intégration continue avant d'atteindre PyPI ; les versions suivent le [versionnage sémantique](https://semver.org/lang/fr/) (actuellement `v2.7.0`).
+YouTube Helper est éprouvé en production. Chaque changement passe par des tests automatisés puis une intégration continue avant d'atteindre PyPI ; les versions suivent le [versionnage sémantique](https://semver.org/lang/fr/) (actuellement `v2.7.1`).
 
 Il s'inscrit dans un graphe de dépendances sur lequel du code publié repose déjà, dans les deux sens :
 
@@ -256,7 +256,8 @@ youtube-helper-mcp
 Il n'y a qu'une seule ligne de commande, bâtie avec `click` :
 `youtube-helper` porte quinze sous-commandes et la surface HTTP les reflète
 une à une, si bien qu'un nom d'option appris au terminal est le nom du champ
-dans le corps JSON. La liste complète est dans les
+dans le corps JSON. Une seule exception : `comments --max` devient `max_count`
+côté HTTP. La liste complète est dans les
 [📋 exemples](https://github.com/warith-harchaoui/youtube-helper/blob/main/EXEMPLES.md).
 
 **Banc de téléchargement (GUI)** (`GET /gui`) : une page unique autonome
@@ -292,9 +293,9 @@ nommée.
 
 ## Version Rust
 
-Un crate compagnon, [`youtube-helper-rs`](https://github.com/warith-harchaoui/youtube-helper-rs), encapsule le même binaire `yt-dlp` depuis Rust plutôt que depuis Python : `fetch_metadata` puis `download_audio`, rien de plus pour l'instant.
+Un crate compagnon, [`youtube-helper-rs`](https://github.com/warith-harchaoui/youtube-helper-rs), encapsule le même binaire `yt-dlp` depuis Rust plutôt que depuis Python. Il offre quatre fonctions : `fetch_metadata`, `download_audio`, `download_audio_with_options` (WAV, MP3, M4A, Opus, FLAC ou le format de la source) ainsi que `resolve_media_url`, qui renvoie une URL média directe sans rien télécharger, directs compris. Quand aucun `yt-dlp` n'est sur le `PATH`, il récupère la version autonome officielle dans le cache utilisateur (`YOUTUBE_HELPER_NO_AUTO_INSTALL=1` l'en empêche).
 
-Absents côté Rust, présents ici : le téléchargement vidéo, les miniatures, le catalogue de flux, les métadonnées de chaîne, les sous-titres puis le repli Tor.
+Absents côté Rust, présents ici : le téléchargement vidéo, les miniatures, le catalogue de flux, les métadonnées de chaîne et d'engagement, les sous-titres, les commentaires ainsi que l'échelle de reprises (autres clients, cookies, Tor).
 
 L'intérêt : un fin wrapper `std::process::Command` avec des résultats typés puis une énumération d'erreurs `thiserror`, pour qu'un programme Rust qui invoque déjà `yt-dlp` obtienne une gestion d'erreurs cohérente puis typée, sans le moindre runtime Python dans l'image de déploiement.
 

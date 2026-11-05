@@ -3,7 +3,7 @@
 ## 1. Library
 
 ```python
-import youtube_helper as yh
+import youtube_helper as yth
 ```
 
 Public API (`youtube_helper.__all__`): `default_ytdlp_options`,
@@ -18,8 +18,9 @@ Two worth knowing about:
 
 - `resolve_direct_url(url)` → a `DirectMediaURL` another tool can stream from,
   with nothing written to disk.
-- `extract_frames_stream(url)` → frames straight off the network, matching
-  video-helper's `extract_frames` shape (BGR uint8) without a full download.
+- `extract_frames_stream(url)` → frames straight off the network, in
+  video-helper's `extract_frames` shape (BGR uint8 by default, RGB with
+  `destination="torch"`) without a full download.
 
 `default_ytdlp_options()` is the suite's baseline option dict — start from it
 rather than hand-building one, so logging and output templates stay consistent.
@@ -65,8 +66,10 @@ claude mcp add youtube-helper --transport http http://127.0.0.1:8000/mcp
 
 ## 5. Browser GUI (`[api]`)
 
-`GET /gui` — paste a URL, see the metadata and the available streams, pick one
-and download. The surface to hand a human who wants to look before pulling.
+`GET /gui` (`/` redirects there; `?lang=fr` for French): paste a URL, choose
+audio (with a sample rate) or video, download. The page POSTs to the same
+`/audio` and `/video` routes and plays the result inline with a download
+link.
 
 ## Where this sits in the suite
 

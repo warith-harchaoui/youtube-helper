@@ -12,7 +12,7 @@ description: >-
   is the title / duration / uploader of this URL", "is this a valid video
   URL", "how many views does this have", "list this channel's videos", "best
   quality stream", "is this a Short", or names `youtube-helper`,
-  `youtube-helper-mcp`, `import youtube_helper as yh`, `yt-dlp`. Do NOT use to
+  `youtube-helper-mcp`, `import youtube_helper as yth`, `yt-dlp`. Do NOT use to
   transcribe (vocal-helper), edit the downloaded file (video-helper /
   audio-helper), or read a podcast RSS feed (podcast-helper).
 license: BSD-3-Clause
@@ -79,11 +79,11 @@ youtube-helper subtitles --url "https://youtu.be/YE7VzlLtp-4" --output-dir ./sub
 ```
 
 ```python
-import youtube_helper as yh
+import youtube_helper as yth
 
-meta = yh.video_url_meta_data(url)  # title, duration, uploader, …
-path = yh.download_audio(url, output_path="./dl/talk.mp3")
-for frame in yh.extract_frames_stream(url):  # frames without a full download
+meta = yth.video_url_meta_data(url)  # title, duration, uploader, …
+path = yth.download_audio(url, output_path="./dl/talk.mp3")
+for frame in yth.extract_frames_stream(url):  # frames without a full download
     ...
 ```
 

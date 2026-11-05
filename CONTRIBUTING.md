@@ -99,8 +99,11 @@ dependency.
 GitHub Actions runs `pytest` on Python 3.12 (Linux), a deliberately
 light single-version gate; the full multi-version sweep runs locally
 before push. A blocking `ruff check` and `ruff format --check` job
-runs alongside it. Integration tests are marked `integration` and
-skipped by default (`addopts = -m 'not integration'`).
+runs alongside it, on a pinned ruff so a new release cannot turn the
+gate red on files nobody touched. A third job installs the package on
+Python 3.10 and imports it, which is what keeps the `requires-python`
+floor honest. Integration tests are marked `integration` and skipped by
+default (`addopts = -m 'not integration'`).
 
 ## Running tests locally
 
