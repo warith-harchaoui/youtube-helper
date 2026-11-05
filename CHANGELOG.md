@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **`youtube-helper-mcp --help` started the server instead of answering.** The entry
+  point read its bind from `YOUTUBE_HELPER_HOST` / `YOUTUBE_HELPER_PORT` and ignored its
+  arguments, so `--help` (or any flag) launched uvicorn and never returned. It
+  is now a click command: `--help` prints the options and exits, `--host` /
+  `--port` set the bind, and with no flag the same environment variables and
+  the same `127.0.0.1:8000` default apply as before. A test runs every console
+  script with `--help` under a timeout.
+- **`TRIGGERS.md` and the skill's `references/triggers.md` had drifted
+  apart.** They are one catalogue again, identical at both paths, and
+  `scripts/check_triggers.py` (run by the test suite) fails when they differ.
+  The skill copy gains the "When a download is refused, or crawls"
+  section; its knob table now names the per-call `cookies_from_browser=` /
+  `--cookies-from-browser` it said did not exist, `YOUTUBE_HELPER_USER_AGENT`,
+  and that `player_clients=` pins a client rather than setting the retry
+  chain. `extract_frames_stream` and `is_short` get rows; the GUI is said to
+  cover audio and video downloads only.
+
 ### Documentation
 
 - **The Markdown now matches the code it describes.** The Rust companion is

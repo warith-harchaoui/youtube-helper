@@ -54,6 +54,10 @@ pip install 'youtube-helper[mcp]'
 youtube-helper-mcp                  # same app, MCP mounted at /mcp
 ```
 
+`youtube-helper-mcp` binds `--host` / `--port`, read from `YOUTUBE_HELPER_HOST`
+(default `127.0.0.1`) and `YOUTUBE_HELPER_PORT` (default `8000`) when the flags
+are absent. `youtube-helper-mcp --help` prints the options and exits.
+
 `youtube_helper.mcp` takes the FastAPI app from `youtube_helper.api` and
 mounts `FastApiMCP` on it. Every MCP tool *is* an HTTP route, so the two
 surfaces cannot drift and one process serves both doors.

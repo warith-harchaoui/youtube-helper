@@ -1,11 +1,12 @@
-# youtube-helper skill — exhaustive trigger catalogue
+# youtube-helper — trigger catalogue
 
-Auditable superset of the phrasings that should fire this skill. The
-`description:` in `SKILL.md` is what a host model actually sees and is capped at
-1024 characters; this file carries the full list. Keep the two in sync — and
-keep this file in sync with the repo-root `TRIGGERS.md`, the user-facing
-catalogue it mirrors.
-
+The exhaustive catalogue of what `youtube-helper` can do and the
+natural-language phrasings, commands, functions and site cues that should
+invoke it. It exists twice, identical: `TRIGGERS.md` at the repo root for
+people, `skills/youtube-helper/references/triggers.md` for agents;
+`scripts/check_triggers.py` fails when the two drift apart. The `description:`
+in the skill's `SKILL.md` is what a host model actually sees and is capped at
+1024 characters; this file carries the full list.
 
 `youtube-helper` **fetches** online media and metadata from a page URL (yt-dlp +
 ffmpeg) and writes files locally. It is local-first: it downloads only what you
@@ -15,9 +16,9 @@ files, transcribe, synthesize, or upload.
 ## Operations → how to invoke
 
 | Intent | CLI | Library | API |
-|--------|-----|---------|-----------|
+|--------|-----|---------|-----|
 | Download video (best video+audio) | `youtube-helper video` | `download_video` | `POST /video` |
-| Download audio only (mp3) | `youtube-helper audio` | `download_audio` | `POST /audio` |
+| Download audio only (mp3 unless the output path says otherwise) | `youtube-helper audio` | `download_audio` | `POST /audio` |
 | Download thumbnail | `youtube-helper thumbnail` | `download_thumbnail` | `POST /thumbnail` |
 | Metadata dict for a URL | `youtube-helper metadata` | `video_url_meta_data` | `POST /metadata` |
 | Validate a video URL | `youtube-helper valid` | `is_valid_video_url` | `POST /valid` |
@@ -28,12 +29,17 @@ files, transcribe, synthesize, or upload.
 | Channel video list | `youtube-helper channel-videos` | `channel_videos` | `POST /channel-videos` |
 | Per-video engagement | `youtube-helper engagement` | `video_engagement` | `POST /engagement` |
 | Batched engagement | `youtube-helper engagement-batch` | `engagement_batch` | `POST /engagement-batch` |
-| Auto-subtitles | `youtube-helper subtitles` | `video_subtitles` | `POST /subtitles` |
+| Subtitles (auto or manual) | `youtube-helper subtitles` | `video_subtitles` | `POST /subtitles` |
 | Top comments | `youtube-helper comments` | `video_comments` | `POST /comments` |
 | yt-dlp freshness check | `youtube-helper ytdlp-version` | `ensure_recent_ytdlp` | `POST /ytdlp-version` |
+| Stream decoded frames from a URL | — | `extract_frames_stream` | — |
+| Does this entry look like a Short | — | `is_short` | — |
 
-Every download is also reachable through the download bench GUI at `GET /gui`
-(audio and video).
+Audio and video downloads are also reachable through the download bench GUI at
+`GET /gui`. The HTTP API and the GUI need the `[api]` extra;
+`youtube-helper-mcp` (the `[mcp]` extra) serves the same app with the MCP
+endpoint at `/mcp`, bound to `--host` / `--port` or `YOUTUBE_HELPER_HOST` /
+`YOUTUBE_HELPER_PORT` (default `127.0.0.1:8000`).
 
 ## Natural-language phrasings that should fire
 
@@ -47,13 +53,52 @@ Every download is also reachable through the download bench GUI at `GET /gui`
 - **Streams**: "resolve this to a direct mp4 / audio URL", "list the available
   formats / resolutions", "pick the 1080p h264 stream", "stream frames from
   this URL".
-- **Surfaces**: "run the youtube-helper API server", "open the download
-  GUI", "install youtube-helper".
+- **Surfaces**: "run the youtube-helper API server", "expose youtube-helper
+  over MCP", "open the download GUI", "install youtube-helper".
 
 ## Sites it supports
 
 YouTube, Vimeo, DailyMotion, Twitch VOD, SoundCloud, and any other site
 `yt-dlp` supports. Do not assume YouTube-only.
+
+## When a download is refused, or crawls
+
+Two failures look alike from outside and are not the same thing. Read the message.
+
+**"Sign in to confirm you're not a bot".** YouTube scores the request, not you. The fix that
+costs nothing and reads nobody's data is to ask as a different client: YouTube does not apply
+the same checks to its web, mobile, TV and embedded players. `youtube-helper` does this
+automatically, trying `web_embedded`, `tv`, `android_vr` then `mweb` before it ever considers
+borrowing cookies or routing through Tor. Override the list with
+`YOUTUBE_HELPER_PLAYER_CLIENTS` (comma-separated; empty disables the rung).
+
+**"The uploader has not made this video available in your country".** That is a geo-block, not
+a bot check, and no client, cookie or User-Agent will clear it. The Tor rung, always the last
+one tried (a local SOCKS proxy at `socks5h://127.0.0.1:9050` unless `YOUTUBE_HELPER_TOR_PROXY`
+names another), is the one that can, when an exit node happens to sit in the right country.
+
+**The download crawls at a few hundred KiB/s.** That is almost always fragmented HLS, which
+YouTube throttles hard. Measured on one 1h42 episode: 75-300 KiB/s across 1507 fragments,
+against ~2 MiB/s for the same video's direct https format, which was also eight times smaller.
+Pass `--max-height 720` (or `max_height=720`, or set `YOUTUBE_HELPER_MAX_HEIGHT`): the capped
+selector prefers direct https formats and only falls back to HLS if nothing else exists. The
+same flag is what you want when the destination has a size limit, e.g. a FAT32 volume, which
+refuses any file over 4 GiB.
+
+| Knob | Env | CLI | Library |
+|---|---|---|---|
+| Cap height, prefer non-HLS | `YOUTUBE_HELPER_MAX_HEIGHT` | `video --max-height 720` | `download_video(..., max_height=720)` |
+| Which clients the ladder retries as | `YOUTUBE_HELPER_PLAYER_CLIENTS` | n. a. | n. a. |
+| Pin one client, skipping the ladder | n. a. | n. a. | `default_ytdlp_options(..., player_clients=[...])` |
+| Browser User-Agent rung | `YOUTUBE_HELPER_USER_AGENT` | n. a. | n. a. |
+| Borrow browser cookies (retry ladder, opt-in) | `YOUTUBE_HELPER_COOKIES_FROM_BROWSER` | n. a. | n. a. |
+| Browser cookies for stream catalogues and comments | n. a. | `--cookies-from-browser` on `list-streams`, `pick-stream`, `comments` | `cookies_from_browser=` on `list_video_streams`, `pick_video_stream`, `extract_frames_stream`, `video_comments` |
+| Cookie file (Netscape) | `YOUTUBE_HELPER_COOKIES` | n. a. | n. a. |
+| Tor proxy address | `YOUTUBE_HELPER_TOR_PROXY` | n. a. | n. a. |
+
+Nothing here depends on one person's machine: every knob is an environment variable or an
+argument, all default to the previous behaviour, and the automatic client fallback needs no
+configuration at all.
 
 ## When NOT to use youtube-helper (SKIP)
 
