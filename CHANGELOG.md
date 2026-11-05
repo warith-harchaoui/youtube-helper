@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.7.2] - 2026-11-05
+
 ### Fixed
 
 - **`youtube-helper-mcp --help` started the server instead of answering.** The entry

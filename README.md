@@ -22,7 +22,7 @@ The fetching itself goes through `yt-dlp`, an open-source tool that already know
 
 It also covers the post-processing: converting or merging media files with `ffmpeg`, the standard command-line tool for reading, converting and combining audio and video.
 
-YouTube Helper is battle-tested. Every change ships through automated tests and continuous integration before it reaches PyPI, and versions follow [Semantic Versioning](https://semver.org/) (currently `v2.7.1`).
+YouTube Helper is battle-tested. Every change ships through automated tests and continuous integration before it reaches PyPI, and versions follow [Semantic Versioning](https://semver.org/) (currently `v2.7.2`).
 
 It stands in a dependency graph other shipped code already relies on, in both directions:
 

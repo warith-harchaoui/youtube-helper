@@ -22,7 +22,7 @@ Le téléchargement proprement dit passe par `yt-dlp`, un outil libre qui sait d
 
 Elle couvre aussi le post-traitement : conversion puis fusion de fichiers média avec `ffmpeg`, l'outil en ligne de commande de référence pour lire, convertir, combiner audio avec vidéo.
 
-YouTube Helper est éprouvé en production. Chaque changement passe par des tests automatisés puis une intégration continue avant d'atteindre PyPI ; les versions suivent le [versionnage sémantique](https://semver.org/lang/fr/) (actuellement `v2.7.1`).
+YouTube Helper est éprouvé en production. Chaque changement passe par des tests automatisés puis une intégration continue avant d'atteindre PyPI ; les versions suivent le [versionnage sémantique](https://semver.org/lang/fr/) (actuellement `v2.7.2`).
 
 Il s'inscrit dans un graphe de dépendances sur lequel du code publié repose déjà, dans les deux sens :
 
