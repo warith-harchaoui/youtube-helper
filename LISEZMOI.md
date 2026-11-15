@@ -2,7 +2,7 @@
 
 [🇫🇷](https://github.com/warith-harchaoui/youtube-helper/blob/main/LISEZMOI.md) · [🇬🇧](https://github.com/warith-harchaoui/youtube-helper/blob/main/README.md)
 
-[![CI](https://github.com/warith-harchaoui/youtube-helper/actions/workflows/ci.yml/badge.svg)](https://github.com/warith-harchaoui/youtube-helper/actions/workflows/ci.yml) [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://github.com/warith-harchaoui/youtube-helper/blob/main/LICENSE) [![Python](https://img.shields.io/badge/python-3.10%E2%80%933.13-blue.svg)](#) [![Local-first](https://img.shields.io/badge/privacy-local--first-2f6f5e.svg)](#la-promesse)
+[![CI](https://github.com/warith-harchaoui/youtube-helper/actions/workflows/ci.yml/badge.svg)](https://github.com/warith-harchaoui/youtube-helper/actions/workflows/ci.yml) [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://github.com/warith-harchaoui/youtube-helper/blob/main/LICENSE) [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](#) [![Local-first](https://img.shields.io/badge/privacy-local--first-2f6f5e.svg)](#la-promesse)
 
 `YouTube Helper` fait partie d'une collection de bibliothèques appelée `AI Helpers`, développée pour bâtir des applications d'intelligence artificielle.
 
@@ -22,7 +22,7 @@ Le téléchargement proprement dit passe par `yt-dlp`, un outil libre qui sait d
 
 Elle couvre aussi le post-traitement : conversion puis fusion de fichiers média avec `ffmpeg`, l'outil en ligne de commande de référence pour lire, convertir, combiner audio avec vidéo.
 
-YouTube Helper est éprouvé en production. Chaque changement passe par des tests automatisés puis une intégration continue avant d'atteindre PyPI ; les versions suivent le [versionnage sémantique](https://semver.org/lang/fr/) (actuellement `v2.7.2`).
+YouTube Helper est éprouvé en production. Chaque changement passe par des tests automatisés puis une intégration continue avant d'atteindre PyPI ; les versions suivent le [versionnage sémantique](https://semver.org/lang/fr/) (actuellement `v2.7.3`).
 
 Il s'inscrit dans un graphe de dépendances sur lequel du code publié repose déjà, dans les deux sens :
 
@@ -72,7 +72,7 @@ Fonctions de **téléchargement (sur disque)**, dans `youtube_helper.main` :
 
 ## Installation
 
-**Prérequis** : **Python 3.10-3.13**, **git**, **yt-dlp** et **ffmpeg**, multiplateforme :
+**Prérequis** : **Python 3.10 ou plus récent**, **git**, **yt-dlp** et **ffmpeg**, multiplateforme :
 
 - 🍎 **macOS** ([Homebrew](https://brew.sh)) : `brew install python git yt-dlp ffmpeg`
 - 🐧 **Ubuntu/Debian** : `sudo apt update && sudo apt install -y python3 python3-pip git yt-dlp ffmpeg`

@@ -2,7 +2,7 @@
 
 [🇫🇷](https://github.com/warith-harchaoui/youtube-helper/blob/main/LISEZMOI.md) · [🇬🇧](https://github.com/warith-harchaoui/youtube-helper/blob/main/README.md)
 
-[![CI](https://github.com/warith-harchaoui/youtube-helper/actions/workflows/ci.yml/badge.svg)](https://github.com/warith-harchaoui/youtube-helper/actions/workflows/ci.yml) [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://github.com/warith-harchaoui/youtube-helper/blob/main/LICENSE) [![Python](https://img.shields.io/badge/python-3.10%E2%80%933.13-blue.svg)](#) [![Local-first](https://img.shields.io/badge/privacy-local--first-2f6f5e.svg)](#the-promise)
+[![CI](https://github.com/warith-harchaoui/youtube-helper/actions/workflows/ci.yml/badge.svg)](https://github.com/warith-harchaoui/youtube-helper/actions/workflows/ci.yml) [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://github.com/warith-harchaoui/youtube-helper/blob/main/LICENSE) [![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](#) [![Local-first](https://img.shields.io/badge/privacy-local--first-2f6f5e.svg)](#the-promise)
 
 `YouTube Helper` belongs to a collection of libraries called `AI Helpers` developed for building Artificial Intelligence.
 
@@ -22,7 +22,7 @@ The fetching itself goes through `yt-dlp`, an open-source tool that already know
 
 It also covers the post-processing: converting or merging media files with `ffmpeg`, the standard command-line tool for reading, converting and combining audio and video.
 
-YouTube Helper is battle-tested. Every change ships through automated tests and continuous integration before it reaches PyPI, and versions follow [Semantic Versioning](https://semver.org/) (currently `v2.7.2`).
+YouTube Helper is battle-tested. Every change ships through automated tests and continuous integration before it reaches PyPI, and versions follow [Semantic Versioning](https://semver.org/) (currently `v2.7.3`).
 
 It stands in a dependency graph other shipped code already relies on, in both directions:
 
@@ -72,7 +72,7 @@ That is what "battle-tested" means here: not a claim, but a graph other code sta
 
 ## Installation
 
-**Prerequisites**: **Python 3.10-3.13**, **git**, **yt-dlp**, and **ffmpeg**, cross-platform:
+**Prerequisites**: **Python 3.10 or later**, **git**, **yt-dlp**, and **ffmpeg**, cross-platform:
 
 - 🍎 **macOS** ([Homebrew](https://brew.sh)): `brew install python git yt-dlp ffmpeg`
 - 🐧 **Ubuntu/Debian**: `sudo apt update && sudo apt install -y python3 python3-pip git yt-dlp ffmpeg`
